@@ -37,3 +37,9 @@
 - Verified local commit `52aad9b` push was rejected: GitHub App cannot create/update `.github/workflows/ci.yml` without workflows permission. No remote workflow ran; no deployment was attempted by Actions.
 - To publish the allowed app source without pretending CI is installed, split the still-unpublished local commit: keep both workflow files in the workspace, unstage them, and commit/push app/config/tests/docs only on the same fixed branch. No user files are discarded, no remote history is rewritten, no other branch is used.
 - GAP-014 tracks workflow publication; GAP-007 tracks Pages activation. Owner must update GitHub authorization and enable Pages. S01 remote acceptance remains blocked, even though all local tests pass. No successful public URL reported.
+
+### Confirmed remote source publication
+
+- App-source commit `3ac9509` pushed successfully to `origin/arena/f3e87408-the-fish-tank`; fetch plus SHA equality check passed.
+- `gh run list --branch arena/f3e87408-the-fish-tank`: empty list, as expected because the workflow upload was rejected. Both workflow files remain untracked in the workspace for the next authorized upload; they are not discarded or claimed to be installed remotely.
+- Original input hash checks and final local full verification still pass. Remaining external requirements have explicit GAP-007/GAP-014 owners; no Pages URL is claimed live.
