@@ -1,6 +1,6 @@
 # Implementation Plan — Human × AI Evolution Tank
 
-Prepared 2026-11-08. **Status: planning complete; application implementation not started.**
+Prepared 2026-11-08. **Status: S01 app scaffold verified locally; CI/Pages workflow publication BLOCKED by integration permissions. S02–S39 not started.**
 
 ## 1. Authority, scope and hosting
 
@@ -17,12 +17,14 @@ Actual session capacity varies. Before starting, compare scope with available to
 **Dependencies:** S01 has none. Each subsequent step depends on the preceding step and all earlier phase gates. Within a phase, complete listed steps in sequence. No later phase starts until all acceptance criteria from TECH_SPEC §22 for the preceding phase are recorded as passed. Code architecture contracts may be defined early, but features stay hidden until functional. Later dependent fields/screens must have real empty states, not fake content.
 
 **Start every session:**
+
 1. Read working rules, chunking rules, audit, implementation log, changelog, roadmap, this step and the cited original sections.
 2. Run `git status`, `git branch -a`, `git log -5 --oneline`; use only the Arena session branch. Resolve unexpected changes without overwriting user work.
 3. Create an atomic checklist in `_working_docs/thinking/` with deletion condition. Confirm requirements, relevant libraries and external inputs before editing.
 4. Recheck current primary documentation/license before adopting external code. Record date, upstream commit, exact paths, license and adapted behavior in THIRD_PARTY_NOTICES.md. No blind copying from spec claims.
 
 **End every session (mandatory for every step):**
+
 1. Exercise real UI-to-domain-to-storage behavior; verify configuration and English strings use shared registries. Define each business rule once.
 2. For each new/changed test or automatic check, introduce a controlled defect, observe the expected failure, restore and rerun. Record command, failure and restored outcome. Do not check off based only on compilation.
 3. Run `npm run verify` once the app toolchain exists, focused tests, build, architecture checks and secret scan. Before S01, `python3 scripts/verify_docs.py` is the docs-only verification entrypoint. Live AI tests need explicit user authorization/key and are never substituted with fixtures while claiming live success.
@@ -33,47 +35,47 @@ Actual session capacity varies. Before starting, compare scope with available to
 
 ## 3. Ordered session index
 
-| Session | Phase | Deliverable | Depends on | Status |
-|---|---|---|---|---|
-| S01 | 1 | Toolchain and verification foundation | None | NOT STARTED |
-| S02 | 1 | Schemas, configuration and shared UI library | S01 | NOT STARTED |
-| S03 | 1 | Fixed-step tank scene and quality controls | S02 | NOT STARTED |
-| S04 | 1 | Shared currents and interactive water | S03 | NOT STARTED |
-| S05 | 2 | Drawing transactions and ink pricing | S04 | NOT STARTED |
-| S06 | 2 | Paper.js drawing interface | S05 | NOT STARTED |
-| S07 | 2 | Cutout pipeline and Stage 0 birth | S06 | NOT STARTED |
-| S08 | 3 | Steering, spatial grid and fish decisions | S07 | NOT STARTED |
-| S09 | 3 | Mesh swimming and social motion | S08 | NOT STARTED |
-| S10 | 3 | Petting, dragging and cursor personality | S09 | NOT STARTED |
-| S11 | 4 | Dexie saves, migrations and lifecycle | S10 | NOT STARTED |
-| S12 | 4 | Validated portable backup and import | S11 | NOT STARTED |
-| S13 | 4 | Safe away-time simulation | S12 | NOT STARTED |
-| S14 | 5 | Shop, inventory and food physics | S13 | NOT STARTED |
-| S15 | 5 | Scent transport and feeding | S14 | NOT STARTED |
-| S16 | 5 | Needs, water, consequences and rescue | S15 | NOT STARTED |
-| S17 | 6 | Selection, preview and full-card shell | S16 | NOT STARTED |
-| S18 | 6 | Histories, lineage and memorial views | S17 | NOT STARTED |
-| S19 | 7 | Provider capability and privacy research | S18 | NOT STARTED |
-| S20 | 7 | Gemini adapter and key settings | S19 | NOT STARTED |
-| S21 | 7 | Additional direct-browser adapters | S20 | NOT STARTED |
-| S22 | 7 | Persistent queue, limits and safe results | S21 | NOT STARTED |
-| S23 | 7 | Birth analysis and genuine no-key play | S22 | NOT STARTED |
-| S24 | 8 | Infinite stages and idempotent rewards | S23 | NOT STARTED |
-| S25 | 8 | Procedural growth forms and morph history | S24 | NOT STARTED |
-| S26 | 8 | Image generation and continuity pipeline | S25 | NOT STARTED |
-| S27 | 9 | Inheritance, compatibility and ancestry | S26 | NOT STARTED |
-| S28 | 9 | Courtship, eggs and procedural offspring | S27 | NOT STARTED |
-| S29 | 9 | AI offspring jobs and family integration | S28 | NOT STARTED |
-| S30 | 10 | L-system plants and placement | S29 | NOT STARTED |
-| S31 | 10 | Plant ecology and text evolution | S30 | NOT STARTED |
-| S32 | 11 | Consent, upload contracts and disabled default | S31 | NOT STARTED |
-| S33 | 11 | Durable sync queue and deletion flow | S32 | NOT STARTED |
-| S34 | 12 | Headless balance harness and economy tuning | S33 | NOT STARTED |
-| S35 | 12 | Performance, memory and soak budgets | S34 | NOT STARTED |
-| S36 | 12 | Audio and final visual finish | S35 | NOT STARTED |
-| S37 | 12 | Onboarding, accessibility and mobile acceptance | S36 | NOT STARTED |
-| S38 | 12 | GitHub Pages delivery configuration | S37 | NOT STARTED |
-| S39 | 12 | Release audit and live acceptance | S38 | NOT STARTED |
+| Session | Phase | Deliverable                                     | Depends on | Status                |
+| ------- | ----- | ----------------------------------------------- | ---------- | --------------------- |
+| S01     | 1     | Toolchain and verification foundation           | None       | BLOCKED (publication) |
+| S02     | 1     | Schemas, configuration and shared UI library    | S01        | NOT STARTED           |
+| S03     | 1     | Fixed-step tank scene and quality controls      | S02        | NOT STARTED           |
+| S04     | 1     | Shared currents and interactive water           | S03        | NOT STARTED           |
+| S05     | 2     | Drawing transactions and ink pricing            | S04        | NOT STARTED           |
+| S06     | 2     | Paper.js drawing interface                      | S05        | NOT STARTED           |
+| S07     | 2     | Cutout pipeline and Stage 0 birth               | S06        | NOT STARTED           |
+| S08     | 3     | Steering, spatial grid and fish decisions       | S07        | NOT STARTED           |
+| S09     | 3     | Mesh swimming and social motion                 | S08        | NOT STARTED           |
+| S10     | 3     | Petting, dragging and cursor personality        | S09        | NOT STARTED           |
+| S11     | 4     | Dexie saves, migrations and lifecycle           | S10        | NOT STARTED           |
+| S12     | 4     | Validated portable backup and import            | S11        | NOT STARTED           |
+| S13     | 4     | Safe away-time simulation                       | S12        | NOT STARTED           |
+| S14     | 5     | Shop, inventory and food physics                | S13        | NOT STARTED           |
+| S15     | 5     | Scent transport and feeding                     | S14        | NOT STARTED           |
+| S16     | 5     | Needs, water, consequences and rescue           | S15        | NOT STARTED           |
+| S17     | 6     | Selection, preview and full-card shell          | S16        | NOT STARTED           |
+| S18     | 6     | Histories, lineage and memorial views           | S17        | NOT STARTED           |
+| S19     | 7     | Provider capability and privacy research        | S18        | NOT STARTED           |
+| S20     | 7     | Gemini adapter and key settings                 | S19        | NOT STARTED           |
+| S21     | 7     | Additional direct-browser adapters              | S20        | NOT STARTED           |
+| S22     | 7     | Persistent queue, limits and safe results       | S21        | NOT STARTED           |
+| S23     | 7     | Birth analysis and genuine no-key play          | S22        | NOT STARTED           |
+| S24     | 8     | Infinite stages and idempotent rewards          | S23        | NOT STARTED           |
+| S25     | 8     | Procedural growth forms and morph history       | S24        | NOT STARTED           |
+| S26     | 8     | Image generation and continuity pipeline        | S25        | NOT STARTED           |
+| S27     | 9     | Inheritance, compatibility and ancestry         | S26        | NOT STARTED           |
+| S28     | 9     | Courtship, eggs and procedural offspring        | S27        | NOT STARTED           |
+| S29     | 9     | AI offspring jobs and family integration        | S28        | NOT STARTED           |
+| S30     | 10    | L-system plants and placement                   | S29        | NOT STARTED           |
+| S31     | 10    | Plant ecology and text evolution                | S30        | NOT STARTED           |
+| S32     | 11    | Consent, upload contracts and disabled default  | S31        | NOT STARTED           |
+| S33     | 11    | Durable sync queue and deletion flow            | S32        | NOT STARTED           |
+| S34     | 12    | Headless balance harness and economy tuning     | S33        | NOT STARTED           |
+| S35     | 12    | Performance, memory and soak budgets            | S34        | NOT STARTED           |
+| S36     | 12    | Audio and final visual finish                   | S35        | NOT STARTED           |
+| S37     | 12    | Onboarding, accessibility and mobile acceptance | S36        | NOT STARTED           |
+| S38     | 12    | GitHub Pages delivery configuration             | S37        | NOT STARTED           |
+| S39     | 12    | Release audit and live acceptance               | S38        | NOT STARTED           |
 
 ## 4. Detailed session work orders
 
@@ -81,9 +83,9 @@ All paths below are intended implementation targets, **not claims that files alr
 
 ### S01 — Toolchain and verification foundation
 
-- **Phase:** 1. **Dependency:** approved plan and clean repository. **Status:** NOT STARTED.
+- **Phase:** 1. **Dependency:** approved plan and clean repository. **Status:** IMPLEMENTED LOCALLY; CI publication BLOCKED (GAP-014; docs/S01_VERIFICATION.md).
 - **Read first:** TECH_SPEC §4, §21; relevant GAME_IDEA philosophy/feature sections and current audit.
-- **Bounded work:** Pin supported Node/npm and exact TypeScript/Vite/PixiJS v8/Paper.js/Dexie/Zod/test/lint versions after registry and compatibility review; create strict TS app shell and lockfile; establish npm run verify and CI without deployment.
+- **Bounded work:** Pin supported Node/npm and exact TypeScript/Vite/PixiJS v8/Paper.js/Dexie/Zod/test/lint versions after registry and compatibility review; create strict TS app shell and lockfile; establish npm run verify and CI. Owner-requested exception DEC-013 brings Pages workflow setup forward here; public activation is tracked separately in GAP-007.
 - **Deliverables / likely paths:** `src/core/, package.json, lockfile, tsconfig, eslint/prettier, .github/workflows/ci.yml`. Update existing shared primitives and contracts rather than copying them.
 - **Verification / negative cases:** Clean install, typecheck, lint, unit smoke and production build; deliberately introduce a type/lint/test failure and show each gate rejects it.
 - **Exit gate:** all bounded work is integrated and reachable where appropriate; the above checks pass with recorded controlled-failure evidence; no silently dropped requirement; save/schema changes include migration coverage. Complete the common session handoff before proceeding.
@@ -471,80 +473,80 @@ All paths below are intended implementation targets, **not claims that files alr
 
 ## 5. Phase acceptance checkpoints
 
-| Spec phase | Sessions | Gate (in addition to individual exits) |
-|---|---|---|
-| 1 Foundation | S01–S04 | Empty tank targets 60 fps on recorded target; responsive water and quality settings; borrowed effects credited. |
-| 2 Drawing/economy | S05–S07 | Exact normalized price, true undo/refund, no overspend, preserved vectors and transparent Stage 0 birth. |
-| 3 Fish engine | S08–S10 | Parameter changes visibly affect motion; body bends/banks/turns; school/cursor interactions functional. |
-| 4 Storage | S11–S13 | Reload/export/import preserve complete state; transactional recovery; every away-time death path suppressed. |
-| 5 Food/senses | S14–S16 | Food found through scent/close vision; hunger/rot/ecology consequential; warned decline and rescue. |
-| 6 Cards/history | S17–S18 | Single/double input and keyboard alternatives; all history/property/family sections, empty states honest. |
-| 7 AI core | S19–S23 | Actual supported adapters plus clear live evidence status; persisted queue; playable genuine no-key fallback. |
-| 8 Growth | S24–S26 | Infinite bounded stages, one reward per stage, recognizable identity, continuous transitions and failure fallback. |
-| 9 Mating | S27–S29 | Both-parent inheritance, courtship/eggs, consistent lineage, pending capacity reservations and bounded population. |
-| 10 Plants | S30–S31 | Bounded L-system plants, water sway, working ecology and tank-conditioned gradual evolution. |
-| 11 Sync | S32–S33 | Explicit consent gates every upload; zero credentials uploaded; deletion tested; empty endpoint disables feature. |
-| 12 Polish/release | S34–S39 | Balance, soak, visual/audio/accessibility/device budgets and actual Pages acceptance all evidenced. |
+| Spec phase        | Sessions | Gate (in addition to individual exits)                                                                             |
+| ----------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
+| 1 Foundation      | S01–S04  | Empty tank targets 60 fps on recorded target; responsive water and quality settings; borrowed effects credited.    |
+| 2 Drawing/economy | S05–S07  | Exact normalized price, true undo/refund, no overspend, preserved vectors and transparent Stage 0 birth.           |
+| 3 Fish engine     | S08–S10  | Parameter changes visibly affect motion; body bends/banks/turns; school/cursor interactions functional.            |
+| 4 Storage         | S11–S13  | Reload/export/import preserve complete state; transactional recovery; every away-time death path suppressed.       |
+| 5 Food/senses     | S14–S16  | Food found through scent/close vision; hunger/rot/ecology consequential; warned decline and rescue.                |
+| 6 Cards/history   | S17–S18  | Single/double input and keyboard alternatives; all history/property/family sections, empty states honest.          |
+| 7 AI core         | S19–S23  | Actual supported adapters plus clear live evidence status; persisted queue; playable genuine no-key fallback.      |
+| 8 Growth          | S24–S26  | Infinite bounded stages, one reward per stage, recognizable identity, continuous transitions and failure fallback. |
+| 9 Mating          | S27–S29  | Both-parent inheritance, courtship/eggs, consistent lineage, pending capacity reservations and bounded population. |
+| 10 Plants         | S30–S31  | Bounded L-system plants, water sway, working ecology and tank-conditioned gradual evolution.                       |
+| 11 Sync           | S32–S33  | Explicit consent gates every upload; zero credentials uploaded; deletion tested; empty endpoint disables feature.  |
+| 12 Polish/release | S34–S39  | Balance, soak, visual/audio/accessibility/device budgets and actual Pages acceptance all evidenced.                |
 
-No phase is currently accepted. These are future gates, not a statement that the current repository is playable.
+S01 implementation is locally verified, but its CI publication gate is blocked; no whole phase is currently accepted. These are gates for later work, not a statement that the current repository is playable.
 
 ## 6. Requirements traceability
 
 ### GAME_IDEA §17 acceptance checklist (original order)
 
-| # | Requirement | Owning sessions |
-|---|---|---|
-| 1 | Full-screen tank | S03–S04, S36 |
-| 2 | Money and length-based drawing cost, no overspend | S05–S06, S34 |
-| 3 | Drawing enters tank with birth | S07 |
-| 4 | Tank-aware AI personality/behavior | S19–S23 |
-| 5 | Creative non-realistic identity | S23, S25–S26, S29 |
-| 6 | Standard parameter-driven behavior | S02, S08–S10, S16 |
-| 7 | Deforming swimming animation | S09 |
-| 8 | Food, physics, scent, realistic seeking | S14–S15 |
-| 9 | Needs, growth, warned harm/death | S16, S24–S26 |
-| 10 | Gradual AI growth and morphing | S25–S26 |
-| 11 | Stage rewards and balance | S24, S34 |
-| 12 | Indefinite growth safeguards | S24 |
-| 13 | Mating, both-parent offspring and lineage | S27–S29 |
-| 14 | Population/ecology balance | S16, S28, S31, S34 |
-| 15 | Purchased swaying evolving plants | S30–S31 |
-| 16 | Cursor water/pet/drag interactions | S04, S10, S14, S30 |
-| 17 | AI never blocks player | S22–S23, S26, S29 |
-| 18 | Preview/full cards and complete histories | S17–S18, S29–S31 |
-| 19 | Unique persistent tanks | S02, S11–S13, S23 |
-| 20 | Premium visuals/audio and performance | S03–S04, S09, S35–S37 |
-| 21 | Central config and harness | S02, S34 |
-| 22 | Validation, retry, fallback, budgets | S02, S22–S23, S26, S29, S31 |
+| #   | Requirement                                       | Owning sessions             |
+| --- | ------------------------------------------------- | --------------------------- |
+| 1   | Full-screen tank                                  | S03–S04, S36                |
+| 2   | Money and length-based drawing cost, no overspend | S05–S06, S34                |
+| 3   | Drawing enters tank with birth                    | S07                         |
+| 4   | Tank-aware AI personality/behavior                | S19–S23                     |
+| 5   | Creative non-realistic identity                   | S23, S25–S26, S29           |
+| 6   | Standard parameter-driven behavior                | S02, S08–S10, S16           |
+| 7   | Deforming swimming animation                      | S09                         |
+| 8   | Food, physics, scent, realistic seeking           | S14–S15                     |
+| 9   | Needs, growth, warned harm/death                  | S16, S24–S26                |
+| 10  | Gradual AI growth and morphing                    | S25–S26                     |
+| 11  | Stage rewards and balance                         | S24, S34                    |
+| 12  | Indefinite growth safeguards                      | S24                         |
+| 13  | Mating, both-parent offspring and lineage         | S27–S29                     |
+| 14  | Population/ecology balance                        | S16, S28, S31, S34          |
+| 15  | Purchased swaying evolving plants                 | S30–S31                     |
+| 16  | Cursor water/pet/drag interactions                | S04, S10, S14, S30          |
+| 17  | AI never blocks player                            | S22–S23, S26, S29           |
+| 18  | Preview/full cards and complete histories         | S17–S18, S29–S31            |
+| 19  | Unique persistent tanks                           | S02, S11–S13, S23           |
+| 20  | Premium visuals/audio and performance             | S03–S04, S09, S35–S37       |
+| 21  | Central config and harness                        | S02, S34                    |
+| 22  | Validation, retry, fallback, budgets              | S02, S22–S23, S26, S29, S31 |
 
 ### TECH_SPEC section ownership
 
-| Section | Coverage |
-|---|---|
-| 1 Locked decisions/defaults | S01–S02, S11–S13, S19–S23, S30, S32, S36–S39 |
-| 2 Glossary | Shared naming across S02 onward; no separate feature |
-| 3 Architecture | S01–S04, S08, S22 |
-| 4 Setup | S01, S38 |
-| 5 Models | S02, S11–S12, S18, S27, S30 |
-| 6 Trait Card | S02, S08, S23, S27, S31 |
-| 7 Tank Context | S22 and every AI job in S23, S26, S29, S31 |
-| 8 Drawing | S05–S07 |
-| 9 Stages/death | S16, S24–S26 |
-| 10 Behavior | S08–S10, S15–S16, S28 |
-| 11 Mating | S27–S29 |
-| 12 AI/image pipeline | S07, S19–S23, S26, S29, S31 |
-| 13 Free fallback | S23, S25, S28, S31 |
-| 14 Ecology | S04, S14–S16, S28, S30–S31 |
-| 15 Economy | S05, S14, S16, S24, S34 |
-| 16 Rendering | S03–S04, S07, S09, S25, S30, S35–S36 |
-| 17 Persistence/sync | S11–S13, S20, S32–S33 |
-| 18 UI | S02–S03, S06, S10, S14, S17–S18, S20, S30, S37 |
-| 19 Performance | S03–S04, S09–S10, S35 |
-| 20 Borrowed code | Just-in-time audit at S01, S04, S08–S09, S19, S30, S36 |
-| 21 Tests/harness | Every session, plus S34–S35, S37–S39 |
-| 22 Build order | Phase table above, no phase skipping |
-| 23 Invariants | Every exit gate; full reconciliation S39 |
-| 24 Owner items | Defaults in DECISIONS; legal/server gate S32–S33; audio S36 |
+| Section                     | Coverage                                                    |
+| --------------------------- | ----------------------------------------------------------- |
+| 1 Locked decisions/defaults | S01–S02, S11–S13, S19–S23, S30, S32, S36–S39                |
+| 2 Glossary                  | Shared naming across S02 onward; no separate feature        |
+| 3 Architecture              | S01–S04, S08, S22                                           |
+| 4 Setup                     | S01, S38                                                    |
+| 5 Models                    | S02, S11–S12, S18, S27, S30                                 |
+| 6 Trait Card                | S02, S08, S23, S27, S31                                     |
+| 7 Tank Context              | S22 and every AI job in S23, S26, S29, S31                  |
+| 8 Drawing                   | S05–S07                                                     |
+| 9 Stages/death              | S16, S24–S26                                                |
+| 10 Behavior                 | S08–S10, S15–S16, S28                                       |
+| 11 Mating                   | S27–S29                                                     |
+| 12 AI/image pipeline        | S07, S19–S23, S26, S29, S31                                 |
+| 13 Free fallback            | S23, S25, S28, S31                                          |
+| 14 Ecology                  | S04, S14–S16, S28, S30–S31                                  |
+| 15 Economy                  | S05, S14, S16, S24, S34                                     |
+| 16 Rendering                | S03–S04, S07, S09, S25, S30, S35–S36                        |
+| 17 Persistence/sync         | S11–S13, S20, S32–S33                                       |
+| 18 UI                       | S02–S03, S06, S10, S14, S17–S18, S20, S30, S37              |
+| 19 Performance              | S03–S04, S09–S10, S35                                       |
+| 20 Borrowed code            | Just-in-time audit at S01, S04, S08–S09, S19, S30, S36      |
+| 21 Tests/harness            | Every session, plus S34–S35, S37–S39                        |
+| 22 Build order              | Phase table above, no phase skipping                        |
+| 23 Invariants               | Every exit gate; full reconciliation S39                    |
+| 24 Owner items              | Defaults in DECISIONS; legal/server gate S32–S33; audio S36 |
 
 ## 7. Test strategy and evidence storage
 
@@ -564,4 +566,8 @@ Optional AI plant images, tank events, social sharing/timelapse, milestone extra
 
 ## 9. Immediate next action
 
-Review/approve this plan, then execute **S01 only**. The full product requires the subsequent sessions; this documentation session does not authorize pretending all steps are complete. The current branch is `arena/d27a08e6-the-fish-tank`; never switch/create another branch in this Arena session.
+First resolve **GAP-014 workflow permission** and **GAP-007 Pages activation**, finish S01 publication, then execute **S02 only**. The full product requires the subsequent sessions; this documentation session does not authorize pretending all steps are complete. The current branch is `arena/f3e87408-the-fish-tank`; never switch/create another branch in this Arena session.
+
+## 10. Owner-approved early delivery exception (2026-11-08)
+
+The owner asked to create the GitHub Pages `.github.io` page first so future changes can be observed live, then begin Phase 1. S01 therefore includes deployment configuration originally reserved for S38. `pages.yml` is prepared locally to publish only this Arena branch after the shared full verification job passes; uploading it is blocked by missing workflows permission (GAP-014). Pages activation needs owner settings when the integration lacks API scope (GAP-007); no successful live deployment is implied. This is a hosting-order exception, not permission to skip S02–S04 or later acceptance. S38 still owns final release hosting/subpath/security revalidation. See docs/DEPLOYMENT.md and DEC-013.

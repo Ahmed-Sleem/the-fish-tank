@@ -1,0 +1,11 @@
+node_modules/
+dist/
+playwright-report/
+test-results/
+coverage/
+# Preserve owner-provided reference documents byte-for-byte.
+GAME_IDEA.md
+TECH_SPEC.md
+_working_docs/AGENT_RULES.md
+_working_docs/CHUNKING_MECHANISM.md
+_working_docs/thinking/

@@ -2,21 +2,25 @@
 
 ## Current state
 
-Planning documentation published on the Arena session branch. No application, package dependencies or deployed game yet. All S01–S39 implementation sessions are NOT STARTED.
+**S01 implemented locally; CI publication blocked (GAP-014):** strict Vite/TypeScript app scaffold, actual empty PixiJS renderer, responsive honest development overlay, exact dependency lockfile and centralized verification with locally prepared CI. No drawing, fish simulation, saves, shop, AI or uploads yet. S02–S39 are NOT STARTED; Phase 1 is not yet fully accepted.
+
+Owner explicitly requested Pages first, so deployment plumbing was brought forward from S38. Publishing branch: `arena/f3e87408-the-fish-tank`. The initial Pages enablement API returned 403; owner activation/settings may still block the public page. See [deployment guide](../docs/DEPLOYMENT.md), GAP-007 and the latest implementation log for actual workflow results. Never claim an expected URL is live without evidence.
 
 ## Next action
 
-1. Review IMPLEMENTATION_PLAN.md and open audit items.
-2. Execute **S01 — Toolchain and verification foundation**, and only that bounded step.
-3. Read rules/chunking/idea/spec/decisions/audit/log/changelog, inspect actual Git state and write session checklist first.
-4. Pick and audit exact supported package versions; build strict TS/Vite shell and real centralized checks. Do not enable production Pages deployment yet.
-5. Verify, document test failures/restoration, update records and push only the Arena session branch.
+1. Update/reconnect Arena GitHub authorization to allow workflow writes (GAP-014). The two `.github/workflows` files are saved locally, not uploaded; publish them after authorization. Do not recreate/discard the app work.
+2. Complete owner Pages setup if still blocked and rerun Deploy Pages; this must precede claiming public live delivery.
+3. After S01 publication is completed, execute **S02 — Schemas, configuration and shared UI library**, only that bounded step.
+4. Read rules/chunking/idea/spec/decisions/audit/log/changelog and inspect Git first.
+5. Reuse existing `src/ui/shared/dom.ts`, theme/string registries, app startup/cancellation and verification commands. Extend them rather than fork.
+6. Define complete entity/save/Trait Card schemas, seed/events/config and accessible reusable primitives. Later sessions S03/S04 add fixed-step water rendering and currents/ripples.
+7. Run `npm run verify`, including a real browser, and demonstrate new checks fail before green. Review [S01 report](../docs/S01_VERIFICATION.md) and third-party declarations limitation GAP-012.
 
-## Before subsequent gates
+## Continuing gates
 
-- Obtain owner pricing decision for GAP-002 before S05.
-- Check licenses before reusing code; verify provider browser support before adapter work.
-- Keep no-key fallback playable; no visible unfinished controls or production mocks.
-- Pages and optional collection are separate: publishing docs does not deploy a game or enable uploads.
+- Owner pricing decision for GAP-002 before S05.
+- Audit sources/licenses before adopting shaders/plants; provider access before adapter work.
+- No-key fallback must ultimately be genuinely playable; the current shell is clearly not that final fallback.
+- Preserve all four original attachment hashes. Keep deployment trigger aligned to the active Arena branch on future sessions, with explicit owner authorization if publishing source changes.
 
-The authoritative ordered session index and detailed work orders live only in IMPLEMENTATION_PLAN.md; do not maintain a competing duplicate task list here.
+The detailed ordered task list lives only in IMPLEMENTATION_PLAN.md.

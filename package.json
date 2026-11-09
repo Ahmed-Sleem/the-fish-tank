@@ -1,0 +1,46 @@
+{
+  "name": "the-fish-tank",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.22.3",
+    "npm": ">=10.9.8 <11"
+  },
+  "packageManager": "npm@10.9.8",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "preview": "vite preview --host 0.0.0.0",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "verify:docs": "python3 scripts/verify_docs.py",
+    "verify:architecture": "node scripts/verify-architecture.mjs",
+    "verify": "npm run verify:docs && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run verify:architecture && npm audit --audit-level=high && npm run build && npm run test:e2e"
+  },
+  "dependencies": {
+    "dexie": "4.4.7",
+    "paper": "0.17.0",
+    "pixi.js": "8.22.0",
+    "simplex-noise": "4.0.3",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.65.0",
+    "@types/node": "22.20.5",
+    "eslint": "10.14.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.2",
+    "vite": "8.3.7",
+    "vitest": "5.1.0"
+  },
+  "overrides": {
+    "minimatch": "11.0.5"
+  }
+}

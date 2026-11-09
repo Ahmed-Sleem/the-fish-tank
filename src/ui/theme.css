@@ -1,0 +1,88 @@
+/* Single source for shell colors, type, spacing and decorative water values. */
+:root {
+  color-scheme: dark;
+  --font-body: 'Segoe UI', Arial, sans-serif;
+  --font-display: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --color-ink: #e3ede4;
+  --color-muted: #a5b9b8;
+  --color-faint: #92adac;
+  --color-mint: #b8dbbe;
+  --color-dark: #071e25;
+  --color-focus: #d6f8c4;
+  --color-line: #a7c9bc30;
+  --water-background:
+    radial-gradient(ellipse at 76% 20%, #1d63645c, transparent 47%),
+    linear-gradient(155deg, #123c44, #071e25 61%, #061c25);
+  --water-light:
+    radial-gradient(ellipse at 77% 43%, #6eb7a821, transparent 43%),
+    conic-gradient(
+      from 171deg at 82% -8%,
+      transparent 0deg,
+      #95c8aa09 4deg,
+      transparent 11deg,
+      #9de3c710 18deg,
+      transparent 26deg,
+      #a8d4b009 32deg,
+      transparent 41deg
+    );
+  --water-grain: repeating-linear-gradient(0deg, transparent, transparent 3px, #cde5cc03 4px);
+  --water-mask: radial-gradient(ellipse at 65% 20%, #000, transparent 75%);
+  --shell-width: 90rem;
+  --page-pad: clamp(1.5rem, 4vw, 4.5rem);
+  --page-gap: clamp(2rem, 4vw, 4rem);
+  --header-height: 6.5rem;
+  --intro-padding: clamp(3.5rem, 10vh, 7.5rem);
+  --intro-bottom: clamp(4rem, 12vh, 9rem);
+  --title-size: clamp(3.1rem, 7.6vw, 7.5rem);
+  --title-line-height: 1.05;
+  --title-tracking: -0.045em;
+  --title-top-gap: 1.8rem;
+  --wordmark-size: 2.6rem;
+  --wordmark-tracking: -0.07em;
+  --body-size: 1rem;
+  --body-leading: 1.8;
+  --description-size: clamp(1rem, 1.5vw, 1.15rem);
+  --description-width: 30rem;
+  --label-size: 0.625rem;
+  --label-tracking: 0.16em;
+  --label-leading: 1.7;
+  --phase-size: 0.7rem;
+  --label-gap: 0.45rem;
+  --space-tiny: 0.5rem;
+  --space-small: 1rem;
+  --space-medium: 1.5rem;
+  --space-large: 2rem;
+  --chapter-grid: minmax(7.5rem, 0.65fr) minmax(17rem, 2.7fr) minmax(12rem, 1fr);
+  --chapter-padding: 2.25rem;
+  --chapter-title-size: 1.8rem;
+  --chapter-copy-width: 35rem;
+  --chapter-copy-size: 0.875rem;
+  --footer-padding: 2.1rem;
+  --footer-copy-size: 0.75rem;
+  --link-size: 0.8rem;
+  --line-width: 1px;
+  --focus-width: 2px;
+  --focus-offset: 6px;
+  --z-water: -1;
+  --z-content: 0;
+  --z-skip: 2;
+  --skip-offset: -200%;
+  --footer-min-width: 15rem;
+}
+
+/* Breakpoints live with the design tokens, not repeated across components. */
+@media (width <= 700px) {
+  :root {
+    --header-height: 7rem;
+    --chapter-grid: 1fr;
+    --intro-padding: 3.8rem;
+    --intro-bottom: 4rem;
+    --chapter-padding: 1.7rem;
+    --page-gap: 1.5rem;
+  }
+
+  .brand-detail {
+    display: none;
+  }
+}
