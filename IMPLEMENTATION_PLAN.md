@@ -566,8 +566,12 @@ Optional AI plant images, tank events, social sharing/timelapse, milestone extra
 
 ## 9. Immediate next action
 
-First resolve **GAP-014 workflow permission** and **GAP-007 Pages activation**, finish S01 publication, then execute **S02 only**. The full product requires the subsequent sessions; this documentation session does not authorize pretending all steps are complete. The current branch is `arena/f3e87408-the-fish-tank`; never switch/create another branch in this Arena session.
+First resolve **GAP-014 workflow permission** and **GAP-007 Pages activation**, finish S01 publication, then execute **S02 only**. The full product requires the subsequent sessions; this documentation session does not authorize pretending all steps are complete. The current branch is `arena/9da1a61d-the-fish-tank`; never switch/create another branch in this Arena session.
 
 ## 10. Owner-approved early delivery exception (2026-11-08)
 
 The owner asked to create the GitHub Pages `.github.io` page first so future changes can be observed live, then begin Phase 1. S01 therefore includes deployment configuration originally reserved for S38. `pages.yml` is prepared locally to publish only this Arena branch after the shared full verification job passes; uploading it is blocked by missing workflows permission (GAP-014). Pages activation needs owner settings when the integration lacks API scope (GAP-007); no successful live deployment is implied. This is a hosting-order exception, not permission to skip S02–S04 or later acceptance. S38 still owns final release hosting/subpath/security revalidation. See docs/DEPLOYMENT.md and DEC-013.
+
+## 11. Durable Pages handoff correction (2026-11-08)
+
+The untracked session-branch workflows and temporary ZIP from the earlier handoff did not survive into the new checkout. Their durable replacement is `docs/github-pages-setup/README.md`, `ci.yml` and `pages.yml`. These are inert owner-installable copies, not active workflows. DEC-016 supersedes the session-branch publishing draft: the owner installs both into `.github/workflows/` on **main**, then enables Pages. Stable main publishing follows successful merges/builds; Arena preview remains the immediate view for unmerged edits. GAP-007/GAP-014 remain until actual activation/CI/deployment evidence exists. This correction does not complete any further gameplay session.

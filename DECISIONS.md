@@ -49,3 +49,9 @@ Pixi's external bitmap-font declaration fails exact-optional checking; `skipLibC
 ## DEC-015 — Honest early shell (2026-11-08)
 
 Publish a responsive, static, underwater-styled development shell and actual empty Pixi renderer status, commit identifier and working source/plan links. No canned fish or fake wallet/AI buttons. Its temporary overlay is not the final gameplay layout. Design tokens and strings are shared from the start; the complete UI library and entity schemas remain S02. No art or simulation code has been copied from upstream projects yet.
+
+## DEC-016 — Durable manual-install Pages handoff (2026-11-08)
+
+The owner could not find the prior temporary ZIP or destination folder and asked for downloadable plain files in the repo, with unnecessary archives cleaned up. Store canonical inert handoff files in `docs/github-pages-setup/`, with explicit destination `.github/workflows/ci.yml` and `.github/workflows/pages.yml` on main. Do not activate or write workflow paths through the integration. No archive is needed; none exists in the fresh checkout.
+
+Use stable main in these owner-installable templates rather than a stale Arena-session branch. Both app PRs have been merged into the checkout's main ancestry. This prepares a conventional merge-to-publish path for owner review/installation; it does not activate deployment or authorize this agent to switch/push/merge main. Retain build-before-deploy, pinned actions and least-privilege permissions. Earlier session-branch publishing notes describe the superseded draft, not a deployed service.

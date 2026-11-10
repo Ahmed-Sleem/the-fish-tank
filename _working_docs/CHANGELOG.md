@@ -18,3 +18,12 @@
 - Known limits: Pages activation rejected by integration scope (owner settings required); third-party Pixi declaration checking tracked separately. No gameplay or Phase 1 completion claimed.
 - Publication: first push rejected for missing workflows permission; app source published separately, local workflow files retained pending authorization (GAP-014). No Actions run claimed. No default-branch merge performed.
 - Next: S02 only, after checking live publishing status.
+
+## 2026-11-08 session 3 — Plain workflow downloads and clear upload paths
+
+- Added docs/github-pages-setup with two plain workflow files and step-by-step download/web-editor/upload instructions; no ZIP required.
+- Documented exact destination paths `.github/workflows/ci.yml` and `.github/workflows/pages.yml` on main; stable main publishing supersedes the old temporary branch trigger.
+- Corrected stale handoff/deployment instructions and linked the setup folder prominently from README. Earlier temporary archive absent; no replacement archive generated.
+- Validation: YAML parse/contract assertions, 15 controlled negative documentation checks, full npm verify (11 unit + 6 browser cases), source hashes and heuristic secret scan passed.
+- Publication: current Arena branch only, inert docs templates only; Pages enablement/active workflow installation remains owner action, not a completed deployment.
+- Next: owner install templates and enable Pages; then observe real CI/deployment before closing S01 publication gates.
