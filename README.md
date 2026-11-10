@@ -1,57 +1,43 @@
-# The Fish Tank
+# Tank — a world from a little ink
 
-A full-screen living aquarium where a player's drawing becomes the seed for AI-driven personality, gradual growth and inherited offspring—without turning handmade creatures into generic realistic fish.
+Tank is a browser aquarium being built around a simple idea: **you draw the beginning, then discover what it becomes.** In the planned game, your handmade creatures will develop personalities, grow, and pass features on to their offspring without losing their hand-drawn identity.
 
-**Current build: S01 foundation.** A real Vite/TypeScript/PixiJS app scaffold and responsive development page. Drawing, living fish, AI, saves and other game systems are **not implemented yet**. Phase 1 continues in S02–S04.
+## Open Tank
 
-## GitHub Pages: download and install the two files
+**[Open the browser build](https://ahmed-sleem.github.io/the-fish-tank/)** — no installation or account required.
 
-**[Open `docs/github-pages-setup/`](docs/github-pages-setup/README.md)** for the plain `ci.yml` and `pages.yml` files and step-by-step instructions. **No ZIP needed.**
+**Release status:** the first public deployment is awaiting publication of a verified repair. If the link returns a missing-page error, the site has not been published successfully yet. The current version is an early foundation preview, **not a playable aquarium**.
 
-Download them, then install them on GitHub's **main** branch at these exact paths:
+## What you can do now
 
-```text
-.github/workflows/ci.yml
-.github/workflows/pages.yml
-```
+- Open the underwater-styled development page on desktop or mobile.
+- Check the build identifier and graphics status under **Current build**.
+- Follow **Explore the source** or **Read the build plan** to see how the project is progressing.
+- Use a keyboard: press **Tab** for the “Skip to build status” link and the other page links.
 
-The guide has direct **Create file** links that create the missing folders for you. Do not upload the files into the repository root. The copies under `docs/` are inert; they must be installed by the owner because the integration cannot currently write active workflows.
+There is nothing to buy, feed or draw in this version yet. You do not need an AI key.
 
-Then choose **GitHub Actions** in [Pages settings](https://github.com/Ahmed-Sleem/the-fish-tank/settings/pages) and run **Deploy Pages** on main. Expected URL after success: https://ahmed-sleem.github.io/the-fish-tank/. This is not a claim of a live deployment.
+## Not available yet
 
-## See development changes
+Drawing creatures, swimming fish, feeding, growth, offspring, plants, creature history cards and saved tanks are planned but **not implemented**. They will be added in verified steps; instructions will appear here when you can actually use them.
 
-Use Arena's preview while an app server is running (`npm run dev`, `/the-fish-tank/`) for immediate local edits. The new manual-install templates publish **main** after merges and successful verification, not a temporary Arena branch. See [deployment details](docs/DEPLOYMENT.md).
+## Browser help
 
-## Run and verify
+Use a current browser with JavaScript and WebGL enabled. The page supports mouse, touch and keyboard navigation. The current preview has no animation to reduce.
 
-Node **22.22.3**, npm **10.9.8**, Python 3:
+- **“PixiJS renderer ready”** means the empty graphics canvas started successfully. It does not mean fish gameplay is available.
+- **“Graphics unavailable…”**: enable hardware acceleration/WebGL or try another up-to-date browser. The page text and links remain usable without the graphics canvas.
+- **“Graphics context interrupted…”**: reload the page to restart the renderer.
+- **Older build after an update?** Refresh once publication finishes; compare the build identifier shown on the page. Updates appear after a successful release, not on every development edit.
 
-```sh
-npm ci
-npx playwright install --with-deps chromium
-npm run dev
-```
+## Your data and cost
 
-Open the address Vite prints, including `/the-fish-tank/`. Before publishing:
+This version has **no AI calls, no data uploads, no saved game and no login**. It does not request API keys or charge for play. Future optional AI features will use your own provider key and may incur that provider's costs; they are not active now.
 
-```sh
-npm run verify
-```
+## Follow development
 
-Runs documentation/source hashes, formatting, typed lint, strict source typechecking, unit tests, architecture checks, dependency audit, production build and real-browser smoke at the Pages subpath. The [S01 verification report](docs/S01_VERIFICATION.md) distinguishes measured results, mutation checks and sandbox restrictions. `npm run build` and `npm run preview` serve a production build locally.
+- [Game idea](GAME_IDEA.md) — the full creative vision.
+- [Implementation plan](IMPLEMENTATION_PLAN.md) — the ordered build stages.
+- [Changelog](_working_docs/CHANGELOG.md) — what changed and what is still missing.
 
-## Project references
-
-- [Original game idea](GAME_IDEA.md) — includes the owner's verbatim concept, highest-priority creative reference.
-- [Technical specification](TECH_SPEC.md) — locked stack, models, AI, economy and 12 phases.
-- [Detailed implementation plan](IMPLEMENTATION_PLAN.md) — 39 ordered single-session steps with dependencies, tests and exit gates.
-- [Decisions/conflicts](DECISIONS.md), [third-party notices](THIRD_PARTY_NOTICES.md).
-- [Agent rules](_working_docs/AGENT_RULES.md) and [chunking mechanism](_working_docs/CHUNKING_MECHANISM.md).
-- [Next session](_working_docs/NEXT_SESSIONS_ROADMAP.md), [audit](_working_docs/AUDIT_AND_TODO.md), [implementation log](_working_docs/IMPLEMENTATION_LOG.md), [changelog](_working_docs/CHANGELOG.md).
-
-All four supplied reference documents remain unchanged; amendments are separate.
-
-## Client-side boundary
-
-The static app is GitHub Pages compatible. Rendering, simulation, local IndexedDB and procedural fallback will run in the browser. Optional AI uses the player's key directly with browser-supported providers. No owner AI billing or required game backend. Saves will be device/browser-local with export/import; optional collection stays off without consent and an external endpoint. The current shell makes no external service requests or uploads and does not ask for a key.
+Want to run the project yourself or contribute? See [developer setup](docs/DEVELOPMENT.md), [contributing](CONTRIBUTING.md) and [deployment notes](docs/DEPLOYMENT.md). Those details are separate from the player guide above.

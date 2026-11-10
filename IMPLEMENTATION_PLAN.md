@@ -1,6 +1,6 @@
 # Implementation Plan — Human × AI Evolution Tank
 
-Prepared 2026-11-08. **Status: S01 app scaffold verified locally; CI/Pages workflow publication BLOCKED by integration permissions. S02–S39 not started.**
+Prepared 2026-11-08. **Status: S01 app scaffold verified locally; workflows installed by owner; verification repair pending main release. S02–S39 not started.**
 
 ## 1. Authority, scope and hosting
 
@@ -566,7 +566,7 @@ Optional AI plant images, tank events, social sharing/timelapse, milestone extra
 
 ## 9. Immediate next action
 
-First resolve **GAP-014 workflow permission** and **GAP-007 Pages activation**, finish S01 publication, then execute **S02 only**. The full product requires the subsequent sessions; this documentation session does not authorize pretending all steps are complete. The current branch is `arena/9da1a61d-the-fish-tank`; never switch/create another branch in this Arena session.
+First merge/validate the **GAP-016 verification repair** and observe the **GAP-007 first successful Pages deployment**, then execute **S02 only**. Workflow installation is already complete (GAP-014). The full product requires the subsequent sessions; this documentation session does not authorize pretending all steps are complete. The current branch is `arena/e967afb3-the-fish-tank`; never switch/create another branch in this Arena session.
 
 ## 10. Owner-approved early delivery exception (2026-11-08)
 
@@ -575,3 +575,7 @@ The owner asked to create the GitHub Pages `.github.io` page first so future cha
 ## 11. Durable Pages handoff correction (2026-11-08)
 
 The untracked session-branch workflows and temporary ZIP from the earlier handoff did not survive into the new checkout. Their durable replacement is `docs/github-pages-setup/README.md`, `ci.yml` and `pages.yml`. These are inert owner-installable copies, not active workflows. DEC-016 supersedes the session-branch publishing draft: the owner installs both into `.github/workflows/` on **main**, then enables Pages. Stable main publishing follows successful merges/builds; Arena preview remains the immediate view for unmerged edits. GAP-007/GAP-014 remain until actual activation/CI/deployment evidence exists. This correction does not complete any further gameplay session.
+
+## 12. Installed workflow lifecycle repair and player docs (2026-11-08)
+
+Owner installed both workflows and enabled Pages Actions. The missing-template verification failure is fixed by validating `.github/workflows/` directly; no duplicate sources are restored. CI/deployment outcomes still need fresh evidence for the repaired commit. Standing contributor policy now requires a player-oriented README update for every user-visible change; see CONTRIBUTING.md. This session repairs the release gate before starting S02, rather than skipping the dependency.

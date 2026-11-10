@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the planning deliverables; this does not validate an unbuilt game."""
+"""Validate project documentation and installed workflow contracts, not live deployment."""
 from pathlib import Path
 import hashlib
 import re
@@ -17,8 +17,19 @@ REQUIRED = [*SOURCES, 'README.md', 'IMPLEMENTATION_PLAN.md', 'DECISIONS.md',
             'THIRD_PARTY_NOTICES.md', '_working_docs/AUDIT_AND_TODO.md',
             '_working_docs/IMPLEMENTATION_LOG.md', '_working_docs/CHANGELOG.md',
             '_working_docs/NEXT_SESSIONS_ROADMAP.md',
-            'docs/github-pages-setup/README.md', 'docs/github-pages-setup/ci.yml',
-            'docs/github-pages-setup/pages.yml']
+            'docs/github-pages-setup/README.md', 'docs/DEPLOYMENT.md',
+            'docs/DEVELOPMENT.md', 'docs/S01_VERIFICATION.md', 'CONTRIBUTING.md',
+            '.github/workflows/ci.yml', '.github/workflows/pages.yml']
+
+WORKFLOW_RULES = {
+    'ci.yml': ['branches: [main]', 'workflow_call:', 'publish:',
+               'run: npm run verify', 'if: inputs.publish', 'path: dist'],
+    'pages.yml': ['branches: [main]', 'workflow_dispatch:',
+                  'uses: ./.github/workflows/ci.yml', 'publish: true',
+                  "if: github.ref == 'refs/heads/main'", 'needs: build',
+                  'pages: write', 'id-token: write'],
+}
+
 
 
 def verify():
@@ -60,21 +71,13 @@ def verify():
                 continue
             if not (path.parent / target.split('#')[0]).exists():
                 errors.append(f'broken local link: {name} -> {target}')
-    # These are intentionally inert owner-installable templates, not active workflows.
-    template_rules = {
-        'ci.yml': ['branches: [main]', 'workflow_call:', 'publish:',
-                   'run: npm run verify', 'if: inputs.publish', 'path: dist'],
-        'pages.yml': ['branches: [main]', 'workflow_dispatch:',
-                      'uses: ./.github/workflows/ci.yml', 'publish: true',
-                      "if: github.ref == 'refs/heads/main'", 'needs: build',
-                      'pages: write', 'id-token: write'],
-    }
-    for filename, clauses in template_rules.items():
-        template = ROOT / 'docs/github-pages-setup' / filename
+    # Validate the installed canonical files; moved documentation copies are not required.
+    for filename, clauses in WORKFLOW_RULES.items():
+        template = ROOT / '.github/workflows' / filename
         content = template.read_text() if template.exists() else ''
         for clause in clauses:
             if clause not in content:
-                errors.append(f'Pages handoff {filename} missing contract: {clause}')
+                errors.append(f'Installed workflow {filename} missing contract: {clause}')
     # Scan tracked and untracked deliverables, excluding ignored files and Git internals.
     files = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z'], cwd=ROOT).decode().split('\0')
     patterns = [r'gh[pousr]_[A-Za-z0-9]{30,}', r'github_pat_[A-Za-z0-9_]{30,}',
@@ -100,5 +103,5 @@ if __name__ == '__main__':
     if failures:
         print('\n'.join(f'FAIL: {error}' for error in failures))
         sys.exit(1)
-    print('PASS: source hashes, required docs, 39 session contracts, 12 phase gates, 22 idea / 24 spec mappings, local links, Pages handoff contracts, credential-pattern scan')
+    print('PASS: source hashes, required docs, 39 session contracts, 12 phase gates, 22 idea / 24 spec mappings, local links, installed workflow contracts, credential-pattern scan')
     print('LIMIT: structural docs checks and heuristic secret scan only; no app, provider or deployment validation.')
