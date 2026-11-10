@@ -9,7 +9,7 @@ it('holds a fast startup for the full minimum', async () => {
   const done = waitForStartup(Promise.resolve(), appConfig.loading.minimumMs).then(() => {
     finished = true;
   });
-  await vi.advanceTimersByTimeAsync(2999);
+  await vi.advanceTimersByTimeAsync(4999);
   expect(finished).toBe(false);
   await vi.advanceTimersByTimeAsync(1);
   await done;

@@ -39,3 +39,7 @@ See [the reuse ledger](../REUSE_LEDGER.md) for shipped Oimo Water and mitt adapt
 ### S03 MainLoop study
 
 Pinned IceCreamYou/MainLoop.js `3ddadf0ab902da96af7077be40206ac27ba1b1d3`, MIT. Downloaded `src/mainloop.js` and `LICENSE.txt`, studied update accumulator, catch-up panic and render interpolation, adapted in `src/core/loop.ts`. Snapshots `mainloop.js.txt` and `mainloop-LICENSE.txt` are hash-registered; full distribution license in `public/licenses/mainloop.txt`. See [reuse ledger](../REUSE_LEDGER.md) and `docs/S03_VERIFICATION.md`.
+
+### S04 implementation outcome
+
+Selected source/license snapshots in `threejs-water/` and `screenjoy/` are now used in the runtime wave/impulse/caustic adaptations at `src/render/effects/shaders.ts`; integration/quality/lifecycle changes in `water.ts`. Both complete licenses ship under `public/licenses/`. See `docs/REUSE_LEDGER.md` and `docs/S04_VERIFICATION.md` for exact edits, rejected alternatives and performance limits. No fish/reef/skybox assets adopted; Fish Tank Plus remains reference-only.

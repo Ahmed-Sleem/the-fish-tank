@@ -1,6 +1,6 @@
 # Implementation Plan — the fish tank
 
-Prepared 2026-11-08. **Status: S01 hosted CI/deployment succeeded; S02 implemented and verified locally; S03 implemented locally; S04–S39 not started.**
+Prepared 2026-11-08. **Status: S01 hosted CI/deployment succeeded; S02 implemented and verified locally; S03 implemented locally; S04 water implementation complete with hardware performance gate open; S05–S39 not started.**
 
 ## 1. Authority, scope and hosting
 
@@ -35,47 +35,47 @@ Actual session capacity varies. Before starting, compare scope with available to
 
 ## 3. Ordered session index
 
-| Session | Phase | Deliverable                                     | Depends on | Status                |
-| ------- | ----- | ----------------------------------------------- | ---------- | --------------------- |
-| S01     | 1     | Toolchain and verification foundation           | None       | BLOCKED (publication) |
-| S02     | 1     | Schemas, configuration and shared UI library    | S01        | NOT STARTED           |
-| S03     | 1     | Fixed-step tank scene and quality controls      | S02        | IMPLEMENTED LOCALLY   |
-| S04     | 1     | Shared currents and interactive water           | S03        | NOT STARTED           |
-| S05     | 2     | Drawing transactions and ink pricing            | S04        | NOT STARTED           |
-| S06     | 2     | Paper.js drawing interface                      | S05        | NOT STARTED           |
-| S07     | 2     | Cutout pipeline and Stage 0 birth               | S06        | NOT STARTED           |
-| S08     | 3     | Steering, spatial grid and fish decisions       | S07        | NOT STARTED           |
-| S09     | 3     | Mesh swimming and social motion                 | S08        | NOT STARTED           |
-| S10     | 3     | Petting, dragging and cursor personality        | S09        | NOT STARTED           |
-| S11     | 4     | Dexie saves, migrations and lifecycle           | S10        | NOT STARTED           |
-| S12     | 4     | Validated portable backup and import            | S11        | NOT STARTED           |
-| S13     | 4     | Safe away-time simulation                       | S12        | NOT STARTED           |
-| S14     | 5     | Shop, inventory and food physics                | S13        | NOT STARTED           |
-| S15     | 5     | Scent transport and feeding                     | S14        | NOT STARTED           |
-| S16     | 5     | Needs, water, consequences and rescue           | S15        | NOT STARTED           |
-| S17     | 6     | Selection, preview and full-card shell          | S16        | NOT STARTED           |
-| S18     | 6     | Histories, lineage and memorial views           | S17        | NOT STARTED           |
-| S19     | 7     | Provider capability and privacy research        | S18        | NOT STARTED           |
-| S20     | 7     | Gemini adapter and key settings                 | S19        | NOT STARTED           |
-| S21     | 7     | Additional direct-browser adapters              | S20        | NOT STARTED           |
-| S22     | 7     | Persistent queue, limits and safe results       | S21        | NOT STARTED           |
-| S23     | 7     | Birth analysis and genuine no-key play          | S22        | NOT STARTED           |
-| S24     | 8     | Infinite stages and idempotent rewards          | S23        | NOT STARTED           |
-| S25     | 8     | Procedural growth forms and morph history       | S24        | NOT STARTED           |
-| S26     | 8     | Image generation and continuity pipeline        | S25        | NOT STARTED           |
-| S27     | 9     | Inheritance, compatibility and ancestry         | S26        | NOT STARTED           |
-| S28     | 9     | Courtship, eggs and procedural offspring        | S27        | NOT STARTED           |
-| S29     | 9     | AI offspring jobs and family integration        | S28        | NOT STARTED           |
-| S30     | 10    | L-system plants and placement                   | S29        | NOT STARTED           |
-| S31     | 10    | Plant ecology and text evolution                | S30        | NOT STARTED           |
-| S32     | 11    | Consent, upload contracts and disabled default  | S31        | NOT STARTED           |
-| S33     | 11    | Durable sync queue and deletion flow            | S32        | NOT STARTED           |
-| S34     | 12    | Headless balance harness and economy tuning     | S33        | NOT STARTED           |
-| S35     | 12    | Performance, memory and soak budgets            | S34        | NOT STARTED           |
-| S36     | 12    | Audio and final visual finish                   | S35        | NOT STARTED           |
-| S37     | 12    | Onboarding, accessibility and mobile acceptance | S36        | NOT STARTED           |
-| S38     | 12    | GitHub Pages delivery configuration             | S37        | NOT STARTED           |
-| S39     | 12    | Release audit and live acceptance               | S38        | NOT STARTED           |
+| Session | Phase | Deliverable                                     | Depends on | Status                     |
+| ------- | ----- | ----------------------------------------------- | ---------- | -------------------------- |
+| S01     | 1     | Toolchain and verification foundation           | None       | BLOCKED (publication)      |
+| S02     | 1     | Schemas, configuration and shared UI library    | S01        | NOT STARTED                |
+| S03     | 1     | Fixed-step tank scene and quality controls      | S02        | IMPLEMENTED LOCALLY        |
+| S04     | 1     | Shared currents and interactive water           | S03        | IMPLEMENTED; GPU GATE OPEN |
+| S05     | 2     | Drawing transactions and ink pricing            | S04        | NOT STARTED                |
+| S06     | 2     | Paper.js drawing interface                      | S05        | NOT STARTED                |
+| S07     | 2     | Cutout pipeline and Stage 0 birth               | S06        | NOT STARTED                |
+| S08     | 3     | Steering, spatial grid and fish decisions       | S07        | NOT STARTED                |
+| S09     | 3     | Mesh swimming and social motion                 | S08        | NOT STARTED                |
+| S10     | 3     | Petting, dragging and cursor personality        | S09        | NOT STARTED                |
+| S11     | 4     | Dexie saves, migrations and lifecycle           | S10        | NOT STARTED                |
+| S12     | 4     | Validated portable backup and import            | S11        | NOT STARTED                |
+| S13     | 4     | Safe away-time simulation                       | S12        | NOT STARTED                |
+| S14     | 5     | Shop, inventory and food physics                | S13        | NOT STARTED                |
+| S15     | 5     | Scent transport and feeding                     | S14        | NOT STARTED                |
+| S16     | 5     | Needs, water, consequences and rescue           | S15        | NOT STARTED                |
+| S17     | 6     | Selection, preview and full-card shell          | S16        | NOT STARTED                |
+| S18     | 6     | Histories, lineage and memorial views           | S17        | NOT STARTED                |
+| S19     | 7     | Provider capability and privacy research        | S18        | NOT STARTED                |
+| S20     | 7     | Gemini adapter and key settings                 | S19        | NOT STARTED                |
+| S21     | 7     | Additional direct-browser adapters              | S20        | NOT STARTED                |
+| S22     | 7     | Persistent queue, limits and safe results       | S21        | NOT STARTED                |
+| S23     | 7     | Birth analysis and genuine no-key play          | S22        | NOT STARTED                |
+| S24     | 8     | Infinite stages and idempotent rewards          | S23        | NOT STARTED                |
+| S25     | 8     | Procedural growth forms and morph history       | S24        | NOT STARTED                |
+| S26     | 8     | Image generation and continuity pipeline        | S25        | NOT STARTED                |
+| S27     | 9     | Inheritance, compatibility and ancestry         | S26        | NOT STARTED                |
+| S28     | 9     | Courtship, eggs and procedural offspring        | S27        | NOT STARTED                |
+| S29     | 9     | AI offspring jobs and family integration        | S28        | NOT STARTED                |
+| S30     | 10    | L-system plants and placement                   | S29        | NOT STARTED                |
+| S31     | 10    | Plant ecology and text evolution                | S30        | NOT STARTED                |
+| S32     | 11    | Consent, upload contracts and disabled default  | S31        | NOT STARTED                |
+| S33     | 11    | Durable sync queue and deletion flow            | S32        | NOT STARTED                |
+| S34     | 12    | Headless balance harness and economy tuning     | S33        | NOT STARTED                |
+| S35     | 12    | Performance, memory and soak budgets            | S34        | NOT STARTED                |
+| S36     | 12    | Audio and final visual finish                   | S35        | NOT STARTED                |
+| S37     | 12    | Onboarding, accessibility and mobile acceptance | S36        | NOT STARTED                |
+| S38     | 12    | GitHub Pages delivery configuration             | S37        | NOT STARTED                |
+| S39     | 12    | Release audit and live acceptance               | S38        | NOT STARTED                |
 
 ## 4. Detailed session work orders
 
@@ -103,7 +103,7 @@ All paths below are intended implementation targets, **not claims that files alr
 
 ### S03 — Fixed-step tank scene and quality controls
 
-- **Phase:** 1. **Dependency:** S02 complete. **Status:** VERIFIED LOCALLY; review/hosted checks pending.
+- **Phase:** 1. **Dependency:** S02 complete. **Status:** MERGED through PR #8; hosted checks passed.
 - **Read first:** TECH_SPEC §3, §16, §19; relevant GAME_IDEA philosophy/feature sections and current audit.
 - **Bounded work:** Build Pixi layer hierarchy, resize/DPR lifecycle and 30 Hz accumulator with render interpolation; add gradient, surface, particle pool, settings and Low/Medium/High presets; cap catch-up work after background tabs.
 - **Deliverables / likely paths:** `src/core/loop, src/render/, src/ui/settings`. Update existing shared primitives and contracts rather than copying them.
@@ -113,7 +113,7 @@ All paths below are intended implementation targets, **not claims that files alr
 
 ### S04 — Shared currents and interactive water
 
-- **Phase:** 1. **Dependency:** S03 complete. **Status:** NOT STARTED.
+- **Phase:** 1. **Dependency:** S03 complete. **Status:** IMPLEMENTED; local verification recorded in `docs/S04_VERIFICATION.md`; real-hardware GAP-005 remains open.
 - **Read first:** TECH_SPEC §14.1, §16.2, §20; relevant GAME_IDEA philosophy/feature sections and current audit.
 - **Bounded work:** Audit relevant aquarium/ripple/caustic sources and licenses before reuse; adapt shared curl-noise flow sampling and pointer impulses; implement bounded ping-pong ripple displacement plus credited caustics/rays or documented compatible alternatives.
 - **Deliverables / likely paths:** `src/sim/water, src/render/effects, THIRD_PARTY_NOTICES.md`. Update existing shared primitives and contracts rather than copying them.
@@ -601,3 +601,5 @@ Heavy code reuse is mandatory in each session: search → collect pinned source/
 The loading minimum is **3000ms**, superseding all earlier 1500ms notes. Keep real page/renderer readiness gates, reduced motion, sequential loading letters and failure fallback. Water must be lightweight and visibly grainy: current Oimo adaptation uses 1100-cell, DPR≤1, 24Hz budgets with static fragment grain and reused buffers. After loading, enter the fullscreen-layout aquarium GUI directly—no landing page/hero/development journal. Retain the dark-blue theme, flat-circle icon and the fish tank name. Reuse shared controls for a floating HUD; expose only implemented actions, never fake gameplay or wallet data. S03/S04 should extend this direct aquarium interface, not restore a landing page. This bounded startup/UI correction does not complete their remaining scene/physics acceptance gates.
 
 S03 evidence: `docs/S03_VERIFICATION.md`. Settings and pooled loader update implemented; final hosted checks/review pending. Next numbered session S04.
+
+S04 handoff: owner-supplied MIT water/Screenjoy source adapted into Pixi height-field/current/caustic effects. Loader five seconds with initial push. No later-session gameplay added. S05 remains blocked on GAP-002 pricing clarification; real GPU budget certification is open, not silently waived.

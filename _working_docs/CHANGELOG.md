@@ -58,3 +58,7 @@ Raised minimum loading duration to 3 seconds while retaining readiness gates. Re
 ## S03 — pooled loader and fixed-step scene
 
 Implemented seeded pooled particles, ordered layers/surface, bounded 30Hz loop and quality/reduced-motion controls. Loader begins pooled at the bottom with no warmup. See `docs/S03_VERIFICATION.md` for tests, controlled regressions, source reuse and software-browser measurements. Real-device GAP-005 remains open; no creatures/storage/economy or S04 currents implemented. Full local verify passed: 84 unit/16 browser/11 architecture/4 documentation tests, build/lint/typecheck/hash checks and audit zero. Publishing S03 for review; hosted verification and merge/deployment pending.
+
+## S04 water implementation and loader adjustment
+
+Implemented native Pixi half-float ping-pong ripples and refraction, seeded shared curl current, owner-source credited caustics/depth/rays, coalesced cursor/touch impulses and cleanup/quality/motion handling. Loader minimum now five seconds, bottom pool receives a bounded initial push. No Three dependency or placeholder fish. See `docs/S04_VERIFICATION.md` for exact scope, regression proof and honest software-renderer timings. Hardware <1.5ms GPU/60fps targets remain open GAP-005 (software RAF does NOT meet them); S05 pricing still blocked GAP-002. Full local verify passed: 86 unit, 22 browser, 11 architecture, 4 documentation tests; format/lint/typecheck/build/hash checks and audit zero. Publishing on arena/4cbba201-the-fish-tank for review; no auto-merge authorization assumed.

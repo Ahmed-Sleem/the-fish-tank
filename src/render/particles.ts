@@ -18,15 +18,18 @@ export function createParticles() {
   let time = 0;
   return {
     pool,
-    update(seconds: number) {
+    update(seconds: number, sample?: (x: number, y: number) => { x: number; y: number }) {
       time += seconds;
       for (const p of pool) {
         p.previousX = p.x;
         p.previousY = p.y;
+        const flow = sample?.(p.x, p.y);
+        p.x += (flow?.x ?? 0) * seconds;
+        p.y += (flow?.y ?? 0) * seconds;
         p.y -= seconds * sceneConfig.risePerSecond * p.speed;
         p.x += Math.sin(time + p.phase) * seconds * sceneConfig.swayPerSecond;
-        if (p.y < 0) {
-          p.y += 1;
+        if (p.y < 0 || p.y > 1) {
+          p.y = (p.y + 1) % 1;
           p.previousY = p.y;
         }
         if (p.x < 0 || p.x > 1) {
