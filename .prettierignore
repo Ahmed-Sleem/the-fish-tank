@@ -9,3 +9,5 @@ TECH_SPEC.md
 _working_docs/AGENT_RULES.md
 _working_docs/CHUNKING_MECHANISM.md
 _working_docs/thinking/
+
+docs/design-references/*.txt

@@ -30,6 +30,7 @@ test('the project subpath renders, reloads and never calls external services', a
   await page.reload();
   await expect(page.getByRole('status')).toHaveText(strings.rendererReady);
   await expect(page.locator('canvas')).toHaveCount(1);
+  await expect(page.locator('.loading-screen')).toHaveCount(0);
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: strings.skip })).toBeFocused();
   await page.keyboard.press('Enter');
@@ -53,6 +54,7 @@ test('graphics failure leaves accessible status and working navigation', async (
     'href',
     /IMPLEMENTATION_PLAN\.md$/,
   );
+  await expect(page.locator('.loading-screen')).toHaveCount(0);
   expect(failures).toEqual([]);
 });
 

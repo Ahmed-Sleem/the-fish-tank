@@ -579,3 +579,9 @@ The untracked session-branch workflows and temporary ZIP from the earlier handof
 ## 12. Installed workflow lifecycle repair and player docs (2026-11-08)
 
 Owner installed both workflows and enabled Pages Actions. The missing-template verification failure is fixed by validating `.github/workflows/` directly; no duplicate sources are restored. CI/deployment outcomes still need fresh evidence for the repaired commit. Standing contributor policy now requires a player-oriented README update for every user-visible change; see CONTRIBUTING.md. This session repairs the release gate before starting S02, rather than skipping the dependency.
+
+## Startup addition and design-reuse execution order
+
+The owner requested a circular aqua favicon and cursor-reactive splash with a 1500ms minimum and actual-page/startup readiness gate. This is a bounded S01 enhancement, not completion of S02. Renderer import is deferred so the lightweight splash can appear during its download. Startup errors release the overlay to readable fallback status.
+
+Use the [five-site research/reuse ledger](docs/design-references/README.md) at every step. Next is **S02**, unchanged in scope: shared schemas/config/UI primitives, including common accessible motion/cancellation rules. **S03** follows only after S02 acceptance: depth gradient, pooled particles/bubbles, quality controls and lifecycle, informed by Seer without importing Three. **S04** follows S03: inspect collected Paper water GLSL, port compatible caustic/ray/ripple concepts to Pixi with notices, benchmark low/high tiers and retain a static fallback. Later inspector/polish sessions study Codrops viewport-safe reveals and GSAP interruption patterns; prefer native transitions. No effect may obscure creature identity, move hit targets, trap focus or ignore reduced motion. Each step remains one bounded verified session. S02–S39 remain not started; do not claim all phases complete in this startup update.

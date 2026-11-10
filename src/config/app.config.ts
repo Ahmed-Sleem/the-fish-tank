@@ -1,7 +1,8 @@
 /** Public application identity and renderer limits; not simulation balance. */
 export const appConfig = {
   repository: 'https://github.com/Ahmed-Sleem/the-fish-tank',
-  branch: 'arena/f3e87408-the-fish-tank',
+  branch: 'main',
+  loading: { minimumMs: 1500, rippleIntervalMs: 90, maxRipples: 12 },
   renderer: {
     maxResolution: 2,
     backgroundAlpha: 0,

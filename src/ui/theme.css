@@ -86,3 +86,24 @@
     display: none;
   }
 }
+
+/* Splash tokens; the favicon is a self-contained static representation of this palette. */
+:root {
+  --z-loading: 10;
+  --loading-caption-offset: 8rem;
+  --loading-drop-size: 2.5rem;
+  --loading-ripple-size: 4rem;
+  --loading-cycle: 1.5s;
+  --loading-ripple-duration: 1.2s;
+  --loading-drop-fill: linear-gradient(135deg, var(--color-ink), #439c9c);
+  --loading-glow: 0 0 2rem #b8dbbe30;
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading-drop {
+    animation: none;
+  }
+  .loading-ripple,
+  .loading-hint {
+    display: none;
+  }
+}

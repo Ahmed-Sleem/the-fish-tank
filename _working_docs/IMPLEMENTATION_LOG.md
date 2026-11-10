@@ -73,3 +73,9 @@
 - Source repair commit `43dc965` pushed to arena/e967afb3-the-fish-tank; PR #4: https://github.com/Ahmed-Sleem/the-fish-tank/pull/4.
 - GitHub Verify run **42735606550**, job **129563957712**, concluded **success** (1m51s): https://github.com/Ahmed-Sleem/the-fish-tank/actions/runs/42735606550. `gh pr checks 4 --watch` exited 0 with verify pass. This is real hosted verification using the installed workflow, not a local mock. GAP-016 code/checker repair is closed.
 - GAP-007 remains: the fixed PR is not merged, so main's previously failed commit still cannot deploy. Owner should review/merge PR #4, then observe Deploy Pages and live smoke. No main merge, workflow edit or public deployment was performed by this session.
+
+## Circular favicon and interactive startup splash
+
+Added original lightweight CSS water drop and bounded pointer ripples; waits for both 1500ms and page/renderer initialization. Reduced motion is static; startup failures expose existing fallback. Pixi downloads dynamically. Collected pinned Apache-2.0 Paper water reference with LICENSE/NOTICE and documented five-site research and sequential reuse gates. Updated player README. S02–S39 remain future bounded sessions; no new gameplay or public deployment claimed.
+
+Verification: full `npm run verify` passed (4 Python docs regressions, 13 unit tests, 8 desktop/mobile Chromium cases, audit 0). Removing minimum-delay and readiness gates separately made the respective unit tests fail (exit 1), then restored green. Browser checks cover delayed renderer download, pointer/reduced-motion behavior, Pages favicon path, graphics failure and keyboard release. Removed obsolete docs/github-pages-setup/README.md and updated verifier required paths; active workflow YAML untouched. No physical-device performance or public deployment claim.

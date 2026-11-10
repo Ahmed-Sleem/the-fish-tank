@@ -30,3 +30,7 @@ Official GitHub Actions Pages starter/Vite guidance was studied, not pasted whol
 ## Future code/asset adoption
 
 Before each adoption, record source URL, immutable commit/release, exact functions/assets, license text, required attribution, adaptations and compatibility/security checks. The upstream projects listed in TECH_SPEC.md are research leads, not verified license claims. Reference-only studies must be labelled as such. Never ship temporary creature art as final creatures.
+
+## Research snapshots (not app runtime)
+
+`docs/design-references/paper-water.ts.txt` is unmodified source from paper-design/shaders commit `3f29ea8391addaea459b22caf5e1e8ccabfbd4ee`, Apache-2.0. Its license and NOTICE are adjacent. See the [reuse ledger](docs/design-references/README.md) for provenance, limitations and future adaptation gates. The splash loader itself is original project code; no external effect library was added.
