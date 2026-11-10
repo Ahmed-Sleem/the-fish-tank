@@ -1,6 +1,6 @@
 # Implementation Plan — the fish tank
 
-Prepared 2026-11-08. **Status: S01 hosted CI/deployment succeeded; S02 implemented and verified locally; S03–S39 not started.**
+Prepared 2026-11-08. **Status: S01 hosted CI/deployment succeeded; S02 implemented and verified locally; S03 implemented locally; S04–S39 not started.**
 
 ## 1. Authority, scope and hosting
 
@@ -39,7 +39,7 @@ Actual session capacity varies. Before starting, compare scope with available to
 | ------- | ----- | ----------------------------------------------- | ---------- | --------------------- |
 | S01     | 1     | Toolchain and verification foundation           | None       | BLOCKED (publication) |
 | S02     | 1     | Schemas, configuration and shared UI library    | S01        | NOT STARTED           |
-| S03     | 1     | Fixed-step tank scene and quality controls      | S02        | NOT STARTED           |
+| S03     | 1     | Fixed-step tank scene and quality controls      | S02        | IMPLEMENTED LOCALLY   |
 | S04     | 1     | Shared currents and interactive water           | S03        | NOT STARTED           |
 | S05     | 2     | Drawing transactions and ink pricing            | S04        | NOT STARTED           |
 | S06     | 2     | Paper.js drawing interface                      | S05        | NOT STARTED           |
@@ -103,7 +103,7 @@ All paths below are intended implementation targets, **not claims that files alr
 
 ### S03 — Fixed-step tank scene and quality controls
 
-- **Phase:** 1. **Dependency:** S02 complete. **Status:** NOT STARTED.
+- **Phase:** 1. **Dependency:** S02 complete. **Status:** VERIFIED LOCALLY; review/hosted checks pending.
 - **Read first:** TECH_SPEC §3, §16, §19; relevant GAME_IDEA philosophy/feature sections and current audit.
 - **Bounded work:** Build Pixi layer hierarchy, resize/DPR lifecycle and 30 Hz accumulator with render interpolation; add gradient, surface, particle pool, settings and Low/Medium/High presets; cap catch-up work after background tabs.
 - **Deliverables / likely paths:** `src/core/loop, src/render/, src/ui/settings`. Update existing shared primitives and contracts rather than copying them.
@@ -599,3 +599,5 @@ Heavy code reuse is mandatory in each session: search → collect pinned source/
 ## Latest startup/GUI owner amendment
 
 The loading minimum is **3000ms**, superseding all earlier 1500ms notes. Keep real page/renderer readiness gates, reduced motion, sequential loading letters and failure fallback. Water must be lightweight and visibly grainy: current Oimo adaptation uses 1100-cell, DPR≤1, 24Hz budgets with static fragment grain and reused buffers. After loading, enter the fullscreen-layout aquarium GUI directly—no landing page/hero/development journal. Retain the dark-blue theme, flat-circle icon and the fish tank name. Reuse shared controls for a floating HUD; expose only implemented actions, never fake gameplay or wallet data. S03/S04 should extend this direct aquarium interface, not restore a landing page. This bounded startup/UI correction does not complete their remaining scene/physics acceptance gates.
+
+S03 evidence: `docs/S03_VERIFICATION.md`. Settings and pooled loader update implemented; final hosted checks/review pending. Next numbered session S04.

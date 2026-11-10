@@ -1,4 +1,5 @@
 /** Direct aquarium interface. Future gameplay controls stay hidden until implemented. */
+import { createSettings } from './settings';
 import { button, dialog, stat, toolbar } from './shared/controls';
 import { domainConfig } from '../config/domain.config';
 import { appConfig } from '../config/app.config';
@@ -70,7 +71,10 @@ export function createShell(root: HTMLElement, revision: string, signal: AbortSi
     { signal },
   );
   // Some mobile browsers have no fullscreen API. Keep unavailable controls out of the HUD.
-  const controls = document.fullscreenEnabled ? [fullscreen, about] : [about];
+  const settings = createSettings(signal);
+  const controls = document.fullscreenEnabled
+    ? [settings.button, fullscreen, about]
+    : [settings.button, about];
   const header = element('header', 'game-hud');
   header.append(
     element('h1', 'wordmark', strings.brand),
@@ -80,9 +84,10 @@ export function createShell(root: HTMLElement, revision: string, signal: AbortSi
   runtime.id = 'build-status';
   runtime.setAttribute('aria-label', strings.liveLabel);
   runtime.append(status);
-  root.replaceChildren(skip, main, header, runtime, details.node);
+  root.replaceChildren(skip, main, header, runtime, details.node, settings.node);
   return {
     canvasHost,
+    settings,
     status,
     setStatus: (value: string) => {
       status.textContent = value;

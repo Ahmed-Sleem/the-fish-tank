@@ -44,3 +44,7 @@ Before each adoption, record source URL, immutable commit/release, exact functio
 Copyright (c) 2023 saharan, MIT. Source: https://github.com/saharan/works at `f34a4951a95ba178bfc9964d08dc898795ea4736`, `water/src/Main.hx` and `WaterShader.hx`. Pinned source/license snapshots are in `docs/design-references/oimo/`. Runtime port: `src/render/water/oimo-fluid.ts` and `oimo-view.ts`. Modified to TypeScript/GLSL ES 3 with compact APIC stencil loops, bounded particle count, seeded jitter, hover/touch input, dark-blue theme uniforms, reduced-motion, resize and disposal. No WASM/accelerometer/Pot/Muun/hgsl dependencies, upstream menu or telemetry shipped. This is an adapted solver and shader, not the untouched full demo.
 
 Complete distribution license texts are included under `public/licenses/{oimo,mitt}.txt` and copied by Vite into the released site. The [reuse ledger](docs/REUSE_LEDGER.md) records all direct dependencies, adaptations, modifications and paths.
+
+## MainLoop.js — S03 loop pattern adaptation
+
+Copyright (c) 2016 Isaac Sukin. MIT. `src/core/loop.ts` adapts accumulator/catch-up/interpolation patterns from IceCreamYou/MainLoop.js commit `3ddadf0ab902da96af7077be40206ac27ba1b1d3`. Full upstream license: `public/licenses/mainloop.txt`; pinned source/license: `docs/design-references/mainloop{.js,-LICENSE}.txt`. Changed to a bounded 30Hz TypeScript simulation helper; no upstream scheduler/global API or runtime package shipped.

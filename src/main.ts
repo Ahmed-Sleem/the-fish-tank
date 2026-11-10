@@ -13,7 +13,11 @@ const root = document.querySelector<HTMLElement>('#app');
 if (!root) throw new Error('Missing application root');
 const controller = new AbortController();
 const loading = createLoadingScreen(root);
-const { canvasHost, setStatus } = createShell(root, __BUILD_REVISION__, controller.signal);
+const { canvasHost, setStatus, settings } = createShell(
+  root,
+  __BUILD_REVISION__,
+  controller.signal,
+);
 
 const events = createEvents<AppEvents>();
 events.on('rendererStatus', ({ state }) => {
@@ -35,7 +39,7 @@ controller.signal.addEventListener(
 async function mountRenderer() {
   try {
     const { startRenderer } = await import('./render/bootstrap');
-    if (await startRenderer(canvasHost, controller.signal)) {
+    if (await startRenderer(canvasHost, controller.signal, settings)) {
       events.emit('rendererStatus', { state: 'ready' });
       canvasHost.querySelector('canvas')?.addEventListener(
         'webglcontextlost',

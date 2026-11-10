@@ -1,5 +1,13 @@
 /** English copy is centralized so the overlay can be translated later. */
 export const strings = {
+  settings: 'Settings',
+  quality: 'Visual quality',
+  qualityLow: 'Low',
+  qualityMedium: 'Medium',
+  qualityHigh: 'High',
+  reducedMotion: 'Reduce motion',
+  settingsHelp:
+    'Quality changes particle density and pixel resolution, not simulation speed. Your system reduced-motion preference is always respected. Settings apply for this visit.',
   credits: 'Open-source credits',
   buildDetails: 'About this build',
   close: 'Close',
