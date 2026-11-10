@@ -32,3 +32,7 @@ No landing page: startup now opens the aquarium GUI directly. Loading minimum is
 ## Next: S04
 
 Water currents, ripples and credited compatible caustics; preserve S03 quality/motion/lifecycle limits. Await S03 review/merge before starting another numbered session.
+
+## S04 reuse-first preparation
+
+S03 PR #8 merged (`ae23c60907a55c74b6ffb12298ec9ee5a7c129f8`), hosted verify passed. Downloaded and studied owner-provided MIT water demo and Screenjoy sources; pinned snapshots/licenses/hash records retained. Fish Tank Plus public UI studied; licensed source/access remains open. See `docs/S04_PREPARATION.md`. Next implementation: direct tank reveal and aquarium cursor/touch flow/ripples with existing Pixi/30Hz/quality/motion infrastructure, adapting downloaded code rather than replacing the app. S04 runtime not yet implemented. README unchanged: research-only preparation introduces no player-visible feature.

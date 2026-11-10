@@ -48,3 +48,7 @@ Complete distribution license texts are included under `public/licenses/{oimo,mi
 ## MainLoop.js — S03 loop pattern adaptation
 
 Copyright (c) 2016 Isaac Sukin. MIT. `src/core/loop.ts` adapts accumulator/catch-up/interpolation patterns from IceCreamYou/MainLoop.js commit `3ddadf0ab902da96af7077be40206ac27ba1b1d3`. Full upstream license: `public/licenses/mainloop.txt`; pinned source/license: `docs/design-references/mainloop{.js,-LICENSE}.txt`. Changed to a bounded 30Hz TypeScript simulation helper; no upstream scheduler/global API or runtime package shipped.
+
+## S04 research-only snapshots
+
+`docs/design-references/threejs-water/`: MIT, original Copyright (c) 2011 Evan Wallace; modified Copyright (c) 2026 Yong Su. `docs/design-references/screenjoy/`: MIT, Copyright 2026 Steven Partridge, npm @screenjoy/fishtank 0.1.0. Complete original licenses are included alongside snapshots. These are preparation references, not app runtime code or adopted fish/reef assets. Adaptation/distribution attribution must be added when integrated. Fish Tank Plus is a visual/product reference only; no source license established.

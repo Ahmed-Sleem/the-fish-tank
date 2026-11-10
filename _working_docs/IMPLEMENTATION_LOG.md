@@ -114,3 +114,7 @@ Final local verification passed: 79 unit tests, 11 architecture fixtures, 4 Pyth
 ## S03 — pooled loader and fixed-step scene
 
 Implemented seeded pooled particles, ordered layers/surface, bounded 30Hz loop and quality/reduced-motion controls. Loader begins pooled at the bottom with no warmup. See `docs/S03_VERIFICATION.md` for tests, controlled regressions, source reuse and software-browser measurements. Real-device GAP-005 remains open; no creatures/storage/economy or S04 currents implemented. Full local verify passed: 84 unit/16 browser/11 architecture/4 documentation tests, build/lint/typecheck/hash checks and audit zero. Publishing S03 for review; hosted verification and merge/deployment pending.
+
+## S04 reuse-first preparation
+
+S03 PR #8 merged (`ae23c60907a55c74b6ffb12298ec9ee5a7c129f8`), hosted verify passed. Downloaded and studied owner-provided MIT water demo and Screenjoy sources; pinned snapshots/licenses/hash records retained. Fish Tank Plus public UI studied; licensed source/access remains open. See `docs/S04_PREPARATION.md`. Next implementation: direct tank reveal and aquarium cursor/touch flow/ripples with existing Pixi/30Hz/quality/motion infrastructure, adapting downloaded code rather than replacing the app. S04 runtime not yet implemented. README unchanged: research-only preparation introduces no player-visible feature.

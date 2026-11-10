@@ -39,3 +39,7 @@ See [the reuse ledger](../REUSE_LEDGER.md) for shipped Oimo Water and mitt adapt
 ### S03 MainLoop study
 
 Pinned IceCreamYou/MainLoop.js `3ddadf0ab902da96af7077be40206ac27ba1b1d3`, MIT. Downloaded `src/mainloop.js` and `LICENSE.txt`, studied update accumulator, catch-up panic and render interpolation, adapted in `src/core/loop.ts`. Snapshots `mainloop.js.txt` and `mainloop-LICENSE.txt` are hash-registered; full distribution license in `public/licenses/mainloop.txt`. See [reuse ledger](../REUSE_LEDGER.md) and `docs/S03_VERIFICATION.md`.
+
+### S04 aquarium source preparation
+
+Owner resources downloaded/studied: jeantimex/threejs-water at `f35a700a16fe386beac997806ed4471018c93ef7` (MIT, Evan Wallace/Yong Su), and npm `@screenjoy/fishtank` 0.1.0 (MIT, Steven Partridge). Selected original sources/licenses in adjacent directories; manifest registers every snapshot. Research-only, not yet shipped adaptations. `docs/S04_PREPARATION.md` maps wave/impulse/caustic code to the Pixi implementation plan and records Fish Tank Plus access/license limitations.
