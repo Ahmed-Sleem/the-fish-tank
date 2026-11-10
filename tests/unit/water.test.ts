@@ -31,3 +31,12 @@ it('hover moves actual water rather than drawing decorative DOM circles', () => 
   expect(vertices.every(Number.isFinite)).toBe(true);
   expect(vertices[2]).toBeGreaterThan(0);
 });
+
+it('keeps loader CPU and pixel budgets substantially below the original adaptation', async () => {
+  const { waterConfig } = await import('../../src/config/water.config');
+  expect(waterConfig.cells).toBeLessThanOrEqual(1100);
+  expect(waterConfig.maxResolution).toBeLessThanOrEqual(1);
+  expect(waterConfig.frameMs).toBeGreaterThanOrEqual(1000 / 24);
+  expect(waterConfig.grain).toBeGreaterThan(0);
+  expect(waterConfig.grain).toBeLessThanOrEqual(1);
+});

@@ -11,18 +11,14 @@ export const strings = {
     'This is a foundation preview. Drawing, fish and saved tanks are not available yet. No AI calls or uploads are made.',
   loading: 'loading',
   brand: 'the fish tank',
-  brandDetail: 'HUMAN × AI · A LIVING EXPERIMENT',
-  stage: 'DEVELOPMENT JOURNAL',
-  phase: '01 / FOUNDATION',
-  eyebrow: 'A HUMAN BEGINNING. AN UNWRITTEN EVOLUTION.',
-  heading: ['Every world begins', 'with a little ', 'ink.'],
-  description:
-    'One day, your first line will become a life of its own. For now, we’re making a home for it.',
-  chapterNumber: 'CHAPTER 01',
-  chapterTitle: 'The water comes first.',
-  chapterDescription:
-    'The browser app and its delivery pipeline are taking shape. Drawing, living fish, and AI evolution will arrive in the next chapters—not in this build yet.',
-  liveLabel: 'CURRENT BUILD',
+  aquarium: 'Aquarium',
+  emptyTank: 'An empty aquarium. Your first creatures will arrive in a future build.',
+  interfaceTools: 'Aquarium controls',
+  fullscreen: 'Fullscreen',
+  exitFullscreen: 'Exit fullscreen',
+  fullscreenUnavailable:
+    'Fullscreen is unavailable in this browser. The aquarium still fills the window.',
+  liveLabel: 'AQUARIUM STATUS',
   rendererStarting: 'Starting the renderer…',
   rendererReady: 'PixiJS renderer ready',
   rendererFailed:
@@ -30,9 +26,8 @@ export const strings = {
   rendererLost: 'Graphics context interrupted. Reload this page to restart the renderer.',
   source: 'Explore the source',
   plan: 'Read the build plan',
-  footer: 'HAND-DRAWN ORIGINS. INFINITE POSSIBILITIES.',
   privacy: 'No AI calls. No uploads. Just the beginning.',
   revisionPrefix: 'BUILD',
   localRevision: 'local',
-  skip: 'Skip to build status',
+  skip: 'Skip to aquarium',
 } as const;

@@ -1,14 +1,15 @@
 import { afterEach, expect, it, vi } from 'vitest';
+import { appConfig } from '../../src/config/app.config';
 import { waitForStartup } from '../../src/ui/shared/loading';
 
 afterEach(() => vi.useRealTimers());
 it('holds a fast startup for the full minimum', async () => {
   vi.useFakeTimers();
   let finished = false;
-  const done = waitForStartup(Promise.resolve(), 1500).then(() => {
+  const done = waitForStartup(Promise.resolve(), appConfig.loading.minimumMs).then(() => {
     finished = true;
   });
-  await vi.advanceTimersByTimeAsync(1499);
+  await vi.advanceTimersByTimeAsync(2999);
   expect(finished).toBe(false);
   await vi.advanceTimersByTimeAsync(1);
   await done;
@@ -21,7 +22,7 @@ it('does not hide a slow startup when the minimum expires', async () => {
   const startup = new Promise<void>((resolve) => {
     ready = resolve;
   });
-  const done = waitForStartup(startup, 1500).then(() => {
+  const done = waitForStartup(startup, 3000).then(() => {
     finished = true;
   });
   await vi.advanceTimersByTimeAsync(6000);

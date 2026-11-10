@@ -40,7 +40,7 @@ test('Oimo water, sequential loading letters, flat icon and correct identity', a
     .poll(async () =>
       page.locator('.loading-water').evaluate((canvas) => (canvas as HTMLCanvasElement).width),
     )
-    .toBe(await page.evaluate(() => Math.floor(420 * Math.min(devicePixelRatio, 1.5))));
+    .toBe(await page.evaluate(() => Math.floor(420 * Math.min(devicePixelRatio, 1))));
   await page.waitForTimeout(1600);
   await expect(splash).toBeVisible();
   release();

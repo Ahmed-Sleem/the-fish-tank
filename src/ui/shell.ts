@@ -1,4 +1,4 @@
-/** Honest early-build overlay, with working repository links instead of unfinished tools. */
+/** Direct aquarium interface. Future gameplay controls stay hidden until implemented. */
 import { button, dialog, stat, toolbar } from './shared/controls';
 import { domainConfig } from '../config/domain.config';
 import { appConfig } from '../config/app.config';
@@ -7,75 +7,37 @@ import { buildLabel } from '../core/build';
 import { element, link } from './shared/dom';
 
 export function createShell(root: HTMLElement, revision: string, signal: AbortSignal) {
-  const skip = link(strings.skip, '#build-status', 'skip-link');
+  const skip = link(strings.skip, '#aquarium', 'skip-link');
+  const main = element('main', 'aquarium');
+  main.id = 'aquarium';
+  main.tabIndex = -1;
+  main.setAttribute('aria-label', strings.aquarium);
   const water = element('div', 'water');
   water.setAttribute('aria-hidden', 'true');
   const canvasHost = element('div', 'canvas-host');
   water.append(canvasHost, element('div', 'water-light'), element('div', 'water-grain'));
+  const empty = element('p', 'aquarium-empty', strings.emptyTank);
+  main.append(water, empty);
 
-  const header = element('header', 'masthead');
-  const identity = element('div', 'identity');
-  identity.append(
-    element('span', 'wordmark', strings.brand),
-    element('span', 'brand-detail', strings.brandDetail),
-  );
-  const stage = element('div', 'stage');
-  stage.append(
-    element('span', 'small-label', strings.stage),
-    element('span', 'phase-label', strings.phase),
-  );
-  header.append(identity, stage);
-
-  const main = element('main', 'intro');
-  main.append(element('p', 'eyebrow', strings.eyebrow));
-  const heading = element('h1', 'hero-title');
-  const firstLine = element('span', 'title-line', strings.heading[0]);
-  const secondLine = element('span', 'title-line', strings.heading[1]);
-  secondLine.append(element('em', 'ink-word', strings.heading[2]));
-  heading.append(firstLine, secondLine);
-  main.append(heading, element('p', 'description', strings.description));
-
-  const chapter = element('section', 'chapter');
-  chapter.id = 'build-status';
-  chapter.tabIndex = -1;
-  chapter.setAttribute('aria-labelledby', 'chapter-title');
-  const number = element('p', 'small-label', strings.chapterNumber);
-  const chapterTitle = element('h2', 'chapter-title', strings.chapterTitle);
-  chapterTitle.id = 'chapter-title';
-  const chapterBody = element('div', 'chapter-body');
-  chapterBody.append(chapterTitle, element('p', 'chapter-description', strings.chapterDescription));
-  const runtime = element('div', 'runtime');
   const status = element('p', 'renderer-status', strings.rendererStarting);
   status.setAttribute('role', 'status');
   status.setAttribute('aria-live', 'polite');
-  const build = element('span', 'build-id', `${strings.revisionPrefix} ${buildLabel(revision)}`);
-  runtime.append(element('p', 'small-label', strings.liveLabel), status, build);
-  chapter.append(number, chapterBody, runtime);
-
-  const footer = element('footer', 'footer');
-  const footerCopy = element('div', 'footer-copy');
-  footerCopy.append(
-    element('p', 'small-label', strings.footer),
-    element('p', 'privacy-note', strings.privacy),
-  );
-  const links = element('nav', 'links');
-  links.setAttribute('aria-label', strings.stage);
-  links.append(
-    link(strings.source, appConfig.repository),
-    link(strings.plan, `${appConfig.repository}/blob/${appConfig.branch}/IMPLEMENTATION_PLAN.md`),
-  );
   const graphics = stat(strings.runtimeLabel, strings.rendererStarting);
   const details = dialog(
     strings.buildDetails,
     strings.close,
     [
       element('p', '', strings.capabilities),
+      stat(strings.schemaLabel, `${strings.dataFormat} ${String(domainConfig.schemaVersion)}`).node,
+      graphics.node,
+      element('p', 'build-id', `${strings.revisionPrefix} ${buildLabel(revision)}`),
+      element('p', '', strings.privacy),
       link(
         strings.credits,
         `${appConfig.repository}/blob/${appConfig.branch}/docs/REUSE_LEDGER.md`,
       ),
-      stat(strings.schemaLabel, `${strings.dataFormat} ${String(domainConfig.schemaVersion)}`).node,
-      graphics.node,
+      link(strings.source, appConfig.repository),
+      link(strings.plan, `${appConfig.repository}/blob/${appConfig.branch}/IMPLEMENTATION_PLAN.md`),
     ],
     signal,
   );
@@ -86,9 +48,39 @@ export function createShell(root: HTMLElement, revision: string, signal: AbortSi
     },
     signal,
   );
-  footer.append(footerCopy, links, toolbar(strings.buildTools, [about]));
-  root.replaceChildren(skip, water, header, main, chapter, footer, details.node);
-
+  const fullscreen = button(
+    strings.fullscreen,
+    () => {
+      const change = document.fullscreenElement
+        ? document.exitFullscreen()
+        : root.requestFullscreen();
+      void change.catch(() => {
+        status.textContent = strings.fullscreenUnavailable;
+      });
+    },
+    signal,
+  );
+  document.addEventListener(
+    'fullscreenchange',
+    () => {
+      fullscreen.textContent = document.fullscreenElement
+        ? strings.exitFullscreen
+        : strings.fullscreen;
+    },
+    { signal },
+  );
+  // Some mobile browsers have no fullscreen API. Keep unavailable controls out of the HUD.
+  const controls = document.fullscreenEnabled ? [fullscreen, about] : [about];
+  const header = element('header', 'game-hud');
+  header.append(
+    element('h1', 'wordmark', strings.brand),
+    toolbar(strings.interfaceTools, controls),
+  );
+  const runtime = element('section', 'tank-status');
+  runtime.id = 'build-status';
+  runtime.setAttribute('aria-label', strings.liveLabel);
+  runtime.append(status);
+  root.replaceChildren(skip, main, header, runtime, details.node);
   return {
     canvasHost,
     status,

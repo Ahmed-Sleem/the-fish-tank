@@ -1,5 +1,13 @@
 # the fish tank — owner-directed identity and water correction
 
+## Latest startup/GUI revision
+
+Minimum loading duration is now **3000ms**, still gated by actual page/renderer readiness. Oimo budget is 1100 cells (formerly 4000), DPR≤1 (formerly 1.5), target 24Hz (formerly 30). Static integer-hash fragment grain adds no animated noise texture or extra render pass; GPU vertex storage is allocated on resize and reused. Duplicate unchanged resize notifications do not recreate fluid/buffers. After loading the full-window aquarium opens directly: floating identity/Fullscreen/About controls, bottom graphics status and a quiet empty-tank note. No hero, journal, footer, fake wallet or nonfunctional gameplay tools.
+
+Observed profile: 2146 particles at 41×26 cells, 25 two-substep samples in headless Chromium on a 2-vCPU sandbox, median 4.3ms / p95 10.6ms including warmup. Earlier 8094-particle profile below is historical, not a paired same-device speed guarantee. Layout/grain screenshots inspected; physical-device profiling remains a later gate.
+
+The original correction evidence below describes the prior version; the latest README/config/plan supersedes its 1500ms and quality-budget values.
+
 ## Acceptance and implementation
 
 - Flat favicon: exactly one solid-blue circle, no gradients/filter/highlight; title/wordmark/README use **the fish tank**. Current palette is dark navy/blue across page, loader, dialog and controls.

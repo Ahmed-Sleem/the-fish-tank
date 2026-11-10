@@ -100,3 +100,13 @@ S02 source published as cb5c0d2 on arena/b46a5b8f-the-fish-tank. PR #6: https://
 - Measured 8094-particle, two-substep solver in headless Chromium on this 2-vCPU sandbox: median 16.1ms / p95 44.8ms over 25 samples (includes warmup), not mobile-device performance proof. Inspected actual rendered loader screenshot; this is particle fluid, not CSS rings.
 
 Final style evidence: docs/STYLE_VERIFICATION.md. Local full verification passes 78 unit + 11 architecture + 4 Python + 12 browser cases; audit 0. Controlled hover, simulation, mount, lettering and favicon regressions all failed as intended, with lettering/icon exercised separately; exact sources restored. Immutable snapshot hashes and distributed-license equality verified. No physical-device guarantee or later gameplay completion claimed.
+
+## Lightweight water / direct GUI owner request
+
+Active branch arena/900d501a-the-fish-tank starts from merged PR6. Reused existing MIT Oimo solver/shader, shared DOM/button/dialog/stat helpers, status event bridge and dark-blue theme; no new libraries or source adoption. Raised minimum to 3000ms, lowered 4000→1100 cells / 1.5→1 DPR / 30→24Hz, added static integer-hash grain, reused vertex-buffer storage and avoided redundant resize resets. Replaced landing layout with full-window aquarium HUD and genuine Fullscreen/About actions; no fake creatures/tools/wallet. Removed obsolete landing strings/styles/tokens. Updated README, standing instructions, plan and reuse ledger.
+
+Measured 2146-particle two-substep solver on this 2-vCPU headless Chromium sandbox, 25 samples including warmup: median 4.3ms, p95 10.6ms. Prior 8094-particle measurements are historical, not a paired benchmark or physical-device guarantee. Rendered GUI and grain screenshots inspected locally; screenshots stay ignored/unshipped.
+
+Controlled source regressions: restoring 1500ms failed minimum-delay tests; restoring 4000-cell budget failed budget regression; inserting a landing hero failed direct-GUI browser test; replacing requestFullscreen with no-op failed the real fullscreen browser test. All exited 1 for their guarded behavior and exact sources were restored before final verification. No new source/license adoption; existing pinned MIT notices remain unchanged.
+
+Final local verification passed: 79 unit tests, 11 architecture fixtures, 4 Python docs regressions and 14 desktop/mobile Chromium cases; audit 0, strict types/lint/format/docs/build all green. This verifies the startup/UI correction, not S03 gameplay completion. Hosted PR verification/merge outcome is tracked on the PR; no public deployment is claimed until its workflow succeeds.
