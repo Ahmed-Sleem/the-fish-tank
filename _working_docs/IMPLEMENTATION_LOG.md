@@ -43,3 +43,16 @@
 - App-source commit `3ac9509` pushed successfully to `origin/arena/f3e87408-the-fish-tank`; fetch plus SHA equality check passed.
 - `gh run list --branch arena/f3e87408-the-fish-tank`: empty list, as expected because the workflow upload was rejected. Both workflow files remain untracked in the workspace for the next authorized upload; they are not discarded or claimed to be installed remotely.
 - Original input hash checks and final local full verification still pass. Remaining external requirements have explicit GAP-007/GAP-014 owners; no Pages URL is claimed live.
+
+## 2026-11-08 — Durable Pages handoff / GAP-015
+
+- **Request:** make the missing workflow download visible in the repo, show exactly where to upload, and remove unnecessary ZIP artifacts.
+- **Reality:** new branch `arena/9da1a61d-the-fish-tank` contains merged PR #2. No `.github/workflows` directory or prior `pages-workflows.zip` was present; earlier untracked files were not carried forward. No unrelated cleanup or user-file deletion performed.
+- **Files:** plain inert copies `docs/github-pages-setup/ci.yml` and `pages.yml`; setup README with raw-download instructions, prefilled GitHub Create-file links and upload destinations; refreshed root README/deployment guide/roadmap, decisions, audit, plan, changelog and existing docs verifier.
+- **Policy:** templates install on main at `.github/workflows/{ci,pages}.yml` and publish main after verified merges, replacing the stale session-branch draft. They are not active in docs and do not change integration permissions. No active workflow path, token or archive included in this push.
+- **Verification:** `npm ci` succeeded (152 packages, 0 findings). YAML parsed with PyYAML 6.0.3 installed only in /tmp; main triggers, callable boolean input, CI dependency, dist-only artifact, conditional upload, minimal deploy permissions and pinned action SHAs asserted. A first attempt to use js-yaml found it was not installed; no dependency was added just for this temporary parser check.
+- **New check proof:** docs verifier now requires all three handoff files and 14 workflow contract clauses. Removed each clause one at a time: all 14 exited 1 with the intended missing-contract diagnostic; emptied setup README: missing/empty error. Restored all files and reran green.
+- **Full command:** `LD_LIBRARY_PATH=/tmp/al2023/lib:/tmp CHROMIUM_EXECUTABLE_PATH=/tmp/chromium npm run verify`: PASS, including 11 unit cases, 6 real Chromium desktop/mobile cases, formatting/lint/types/architecture/audit/build/docs/credential-pattern scan. Browser and YAML parser installed outside repo; no app code or dependency changes.
+- **Cleanup proof:** exact obsolete archive paths checked; neither exists. No ZIP created, no active duplicate workflows installed; docs handoff files are the only new workflow copies. Original input hashes still pass.
+- **Self-check:** the download/folder-clarity gap is fixed and verified. Workflow configuration is structurally validated, not claimed to have run on GitHub. Pages/CI installation still requires owner action (GAP-007/GAP-014); no live site or further gameplay claimed.
+- **Publish:** verified changes committed/pushed only to the fixed Arena branch; final response supplies direct folder/file links after remote confirmation.

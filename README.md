@@ -4,13 +4,24 @@ A full-screen living aquarium where a player's drawing becomes the seed for AI-d
 
 **Current build: S01 foundation.** A real Vite/TypeScript/PixiJS app scaffold and responsive development page. Drawing, living fish, AI, saves and other game systems are **not implemented yet**. Phase 1 continues in S02–S04.
 
-## See the current build
+## GitHub Pages: download and install the two files
 
-- **Arena preview:** open the running “Tank — Phase 1 preview”; Vite serves `/the-fish-tank/` and hot-reloads local edits.
-- **GitHub Pages:** expected address https://ahmed-sleem.github.io/the-fish-tank/. Activation and workflow upload are blocked by integration permissions—this address is not a claim of successful deployment. See [one-time setup and actual delivery process](docs/DEPLOYMENT.md).
-- **Publishing branch:** `arena/f3e87408-the-fish-tank`. Once the workflow publication blocker is resolved, verified pushes will run Deploy Pages; refresh after success. The public build displays its source commit. No main-branch merge is needed for this configured publishing branch.
+**[Open `docs/github-pages-setup/`](docs/github-pages-setup/README.md)** for the plain `ci.yml` and `pages.yml` files and step-by-step instructions. **No ZIP needed.**
 
-**Publishing blocker:** GitHub rejected workflow files because the Arena connection lacks `workflows` permission. App source can be pushed, but `.github/workflows/ci.yml` and `pages.yml` remain saved locally until authorization is updated. No remote CI run or live deployment is claimed.
+Download them, then install them on GitHub's **main** branch at these exact paths:
+
+```text
+.github/workflows/ci.yml
+.github/workflows/pages.yml
+```
+
+The guide has direct **Create file** links that create the missing folders for you. Do not upload the files into the repository root. The copies under `docs/` are inert; they must be installed by the owner because the integration cannot currently write active workflows.
+
+Then choose **GitHub Actions** in [Pages settings](https://github.com/Ahmed-Sleem/the-fish-tank/settings/pages) and run **Deploy Pages** on main. Expected URL after success: https://ahmed-sleem.github.io/the-fish-tank/. This is not a claim of a live deployment.
+
+## See development changes
+
+Use Arena's preview while an app server is running (`npm run dev`, `/the-fish-tank/`) for immediate local edits. The new manual-install templates publish **main** after merges and successful verification, not a temporary Arena branch. See [deployment details](docs/DEPLOYMENT.md).
 
 ## Run and verify
 
