@@ -9,3 +9,6 @@ test-results/
 *.tsbuildinfo
 .DS_Store
 _working_docs/thinking/
+
+# Python documentation-regression test bytecode.
+__pycache__/

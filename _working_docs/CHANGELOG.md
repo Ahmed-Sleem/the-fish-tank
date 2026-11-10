@@ -27,3 +27,12 @@
 - Validation: YAML parse/contract assertions, 15 controlled negative documentation checks, full npm verify (11 unit + 6 browser cases), source hashes and heuristic secret scan passed.
 - Publication: current Arena branch only, inert docs templates only; Pages enablement/active workflow installation remains owner action, not a completed deployment.
 - Next: owner install templates and enable Pages; then observe real CI/deployment before closing S01 publication gates.
+
+## 2026-11-08 session 4 — Repair verification after owner workflow installation
+
+- Owner installed workflows and enabled Pages; diagnosed failed verification as stale required paths/links to moved doc copies, not a Pages configuration mistake.
+- Validate installed workflows directly without duplicate files; add 4 Python regression cases and controlled-failure proof to central verification. Keep workflow YAML unchanged.
+- Rewrite README as the player guide and move dev setup to docs; add standing requirement to refresh it with every user-visible change.
+- Local full verification passes: 4 Python + 11 TypeScript unit + 6 real-browser cases, build, hashes, architecture, audit and formatting.
+- Release remains pending repaired PR verification/main merge and successful Pages deployment; no gameplay advance or live-site success claimed.
+- Next: observe repaired CI/release, then S02.
