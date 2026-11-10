@@ -1,5 +1,7 @@
 /** English copy is centralized so the overlay can be translated later. */
 export const strings = {
+  loading: 'Let the water settle…',
+  loadingHint: 'Move through the water',
   brand: 'tank',
   brandDetail: 'HUMAN × AI · A LIVING EXPERIMENT',
   stage: 'DEVELOPMENT JOURNAL',

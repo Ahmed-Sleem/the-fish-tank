@@ -36,3 +36,9 @@
 - Local full verification passes: 4 Python + 11 TypeScript unit + 6 real-browser cases, build, hashes, architecture, audit and formatting.
 - Hosted verification run 42735606550 passed on PR #4. Release remains pending main merge and successful Pages deployment; no gameplay advance or live-site success claimed.
 - Next: observe repaired CI/release, then S02.
+
+## Circular favicon and interactive startup splash
+
+Added original lightweight CSS water drop and bounded pointer ripples; waits for both 1500ms and page/renderer initialization. Reduced motion is static; startup failures expose existing fallback. Pixi downloads dynamically. Collected pinned Apache-2.0 Paper water reference with LICENSE/NOTICE and documented five-site research and sequential reuse gates. Updated player README. S02–S39 remain future bounded sessions; no new gameplay or public deployment claimed.
+
+Verification: full `npm run verify` passed (4 Python docs regressions, 13 unit tests, 8 desktop/mobile Chromium cases, audit 0). Removing minimum-delay and readiness gates separately made the respective unit tests fail (exit 1), then restored green. Browser checks cover delayed renderer download, pointer/reduced-motion behavior, Pages favicon path, graphics failure and keyboard release. Removed obsolete docs/github-pages-setup/README.md and updated verifier required paths; active workflow YAML untouched. No physical-device performance or public deployment claim.

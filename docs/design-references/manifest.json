@@ -1,0 +1,23 @@
+[
+  {
+    "file": "paper-water.ts.txt",
+    "sha256": "270800f06395b7645c286b22b1b3853d77644bc81628c412a82370914e073d48",
+    "source": "https://github.com/paper-design/shaders/blob/3f29ea8391addaea459b22caf5e1e8ccabfbd4ee/packages/shaders/src/shaders/water.ts",
+    "license": "Apache-2.0",
+    "use": "reference-only"
+  },
+  {
+    "file": "paper-LICENSE.txt",
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "source": "https://github.com/paper-design/shaders/blob/3f29ea8391addaea459b22caf5e1e8ccabfbd4ee/LICENSE",
+    "license": "Apache-2.0",
+    "use": "reference-only"
+  },
+  {
+    "file": "paper-NOTICE.txt",
+    "sha256": "c3155d6a359d9841d63f7feb4938d2c99bb4ef681fa20be1eb4bfa71307f746b",
+    "source": "https://github.com/paper-design/shaders/blob/3f29ea8391addaea459b22caf5e1e8ccabfbd4ee/NOTICE",
+    "license": "Apache-2.0",
+    "use": "reference-only"
+  }
+]

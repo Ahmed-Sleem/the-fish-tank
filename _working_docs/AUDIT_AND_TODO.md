@@ -44,3 +44,7 @@ Owner installation is now complete (GAP-014); `.github/workflows/` is canonical.
 | ------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | GAP-016 | CLOSED — repaired PR CI passed | Docs verifier and setup links required duplicate workflow files after owner moved them into active paths. Verification exited 1 and deployment was skipped. | Validate installed sources, remove stale instructions, add 4 isolated regression tests; reproduce failing base and passing repair. GitHub Verify run 42735606550 passed on PR #4; main deployment remains GAP-007. |
 | GAP-017 | CLOSED                         | Root README was developer-oriented and not a current player guide.                                                                                          | Rewrite with current usable behavior, limits, browser help and privacy/cost; developer material moved to docs/DEVELOPMENT.md; mandatory update/review policy in CONTRIBUTING.md.                                   |
+
+## Startup follow-up
+
+GAP-018 — OPEN: complete S02 schemas/config/shared UI next, then S03 and S04 in order; design-reference ledger records required source/license/performance review. Startup addition does not close these gameplay gates.

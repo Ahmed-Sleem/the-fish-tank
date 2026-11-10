@@ -10,7 +10,8 @@ Tank is a browser aquarium being built around a simple idea: **you draw the begi
 
 ## What you can do now
 
-- Open the underwater-styled development page on desktop or mobile.
+- Open the underwater-styled development page on desktop or mobile. Look for the aqua-circle tab icon.
+- During startup, move your cursor through the water-splash screen to leave ripples. It stays for at least 1.5 seconds and until the page and graphics startup have settled; slower connections take longer. Touch movement also creates ripples where supported.
 - Check the build identifier and graphics status under **Current build**.
 - Follow **Explore the source** or **Read the build plan** to see how the project is progressing.
 - Use a keyboard: press **Tab** for the “Skip to build status” link and the other page links.
@@ -23,9 +24,10 @@ Drawing creatures, swimming fish, feeding, growth, offspring, plants, creature h
 
 ## Browser help
 
-Use a current browser with JavaScript and WebGL enabled. The page supports mouse, touch and keyboard navigation. The current preview has no animation to reduce.
+Use a current browser with JavaScript and WebGL enabled. The page supports mouse, touch and keyboard navigation. The splash respects your system’s reduced-motion setting: the drop stays still and cursor ripples are disabled.
 
 - **“PixiJS renderer ready”** means the empty graphics canvas started successfully. It does not mean fish gameplay is available.
+- **Loading never finishes?** Check your connection and reload. No artificial timeout pretends a stalled download is complete.
 - **“Graphics unavailable…”**: enable hardware acceleration/WebGL or try another up-to-date browser. The page text and links remain usable without the graphics canvas.
 - **“Graphics context interrupted…”**: reload the page to restart the renderer.
 - **Older build after an update?** Refresh once publication finishes; compare the build identifier shown on the page. Updates appear after a successful release, not on every development edit.
