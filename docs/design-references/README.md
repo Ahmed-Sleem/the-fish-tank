@@ -16,9 +16,9 @@ Paper's [water shader](https://github.com/paper-design/shaders/blob/3f29ea8391ad
 | [Three.js Lab Water](https://www.threejslab.com/water.html)                                                                                                                                             | Dual normal-field flow and isolated effect controls      | Advertised vibecodersph/threejs-lab repository returned 404. Reference-only; no verified source license, no copied code. No Three/WebGPU replacement for Pixi.                                                           |
 | [GSAP demos](https://demos.gsap.com/), [interruptible UI](https://demos.gsap.com/demo/interruptible-single-timeline-enterexit/), [license](https://gsap.com/community/standard-license/)                | Reverse/cancel transitions without conflicting tweens    | Custom standard no-charge license, not MIT. Prefer CSS/WAAPI for simple UI. Library code and third-party demo artwork have separate rights. No GSAP dependency added.                                                    |
 
-## This change
+## Initial startup design (superseded)
 
-Startup uses original CSS drop squash/stretch and pointer-spawned expanding rings. The adaptation is architectural: a bounded effect pool, disposable listeners, reduced-motion handling and independent readiness gates. No third-party shader code was copied into runtime. This intentionally keeps the loader independent of graphics initialization/failure. Maximum 12 rings; input sampled at 90ms; no extra canvas or requestAnimationFrame loop. Static circular favicon uses Tank's mint/aqua/deep-water palette.
+The original startup used CSS drop squash/stretch and pointer-spawned expanding rings; the owner rejected that design. Current runtime uses the actual Oimo Water solver/shader adaptation documented in the canonical reuse ledger. The following original analysis is historical, not current behavior. The adaptation is architectural: a bounded effect pool, disposable listeners, reduced-motion handling and independent readiness gates. No third-party shader code was copied into runtime. This intentionally keeps the loader independent of graphics initialization/failure. Maximum 12 rings; input sampled at 90ms; no extra canvas or requestAnimationFrame loop. Static circular favicon uses Tank's mint/aqua/deep-water palette.
 
 ## Required reuse cycle for every following session
 
@@ -31,3 +31,7 @@ Search existing project primitives and upstream implementations; pin source revi
 - **Zod:** reuse the already pinned MIT dependency 4.6.7 for strict objects, refinements and schema-derived types. Studied installed v4 type declarations for numeric minValue/maxValue and prefault. AI normalization derives ranges from canonical strict schemas/registry, supplies missing fields and then revalidates; save parsing never clamps or guesses a migration.
 - **Dialog:** studied [W3C APG modal-dialog pattern](https://github.com/w3c/aria-practices/blob/main/content/patterns/dialog-modal/dialog-modal-pattern.html) for initial focus, Escape, inert background and return focus. No APG example code copied. Use native HTML dialog/showModal rather than hand-building a modal overlay; browser chrome can remain keyboard-reachable. The labelled control group intentionally uses role=group, not a false ARIA toolbar that lacks arrow-key navigation. No animation library needed for this foundational step.
 - Paper/Seer/Codrops/GSAP effect references remain queued for the rendering/interaction steps; S02 does not import graphics showcase code into data contracts or UI primitives.
+
+## Current canonical adoption list
+
+See [the reuse ledger](../REUSE_LEDGER.md) for shipped Oimo Water and mitt adaptations, versions/licenses, modifications, runtime paths, distribution notices and study-only candidates. The owner’s heavy-reuse/dark-blue/the fish tank identity requirements are binding in CONTRIBUTING.md and DEC-019.

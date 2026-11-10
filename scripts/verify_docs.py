@@ -17,7 +17,7 @@ REQUIRED = [*SOURCES, 'README.md', 'IMPLEMENTATION_PLAN.md', 'DECISIONS.md',
             'THIRD_PARTY_NOTICES.md', '_working_docs/AUDIT_AND_TODO.md',
             '_working_docs/IMPLEMENTATION_LOG.md', '_working_docs/CHANGELOG.md',
             '_working_docs/NEXT_SESSIONS_ROADMAP.md',
-            'docs/design-references/README.md', 'docs/DEPLOYMENT.md',
+            'docs/design-references/README.md', 'docs/REUSE_LEDGER.md', 'docs/STYLE_VERIFICATION.md', 'docs/DEPLOYMENT.md',
             'docs/DEVELOPMENT.md', 'docs/S01_VERIFICATION.md', 'docs/S02_VERIFICATION.md', 'CONTRIBUTING.md',
             '.github/workflows/ci.yml', '.github/workflows/pages.yml']
 

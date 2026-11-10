@@ -70,6 +70,10 @@ export function createShell(root: HTMLElement, revision: string, signal: AbortSi
     strings.close,
     [
       element('p', '', strings.capabilities),
+      link(
+        strings.credits,
+        `${appConfig.repository}/blob/${appConfig.branch}/docs/REUSE_LEDGER.md`,
+      ),
       stat(strings.schemaLabel, `${strings.dataFormat} ${String(domainConfig.schemaVersion)}`).node,
       graphics.node,
     ],

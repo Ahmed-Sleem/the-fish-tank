@@ -54,3 +54,7 @@ GAP-018 — OPEN: complete S02 schemas/config/shared UI next, then S03 and S04 i
 GAP-018 — S02 portion complete: strict schemas (including root-percentage ancestry, jobs, corpse and inventory), separate AI normalization, configuration registries, resumable RNG, lifecycle events, shared controls and architecture regression fixtures. S03/S04 remain future work, now next in order. See docs/S02_VERIFICATION.md. GAP-009 still covers later identity continuity/image safety; GAP-008 still covers real storage/migration recovery. GAP-002 pricing clarification still blocks S05, not S03.
 
 The earlier S01 publication-blocked rows are historical: PR #5 is merged in the current base and Pages run 42738724731 reports SUCCESS. Public S02 acceptance is not claimed before its own merge/deploy.
+
+## Owner style correction
+
+GAP-019 — implemented: initial splash/gradient-circle/mint branding rejected. Replaced with flat blue-circle favicon, the fish tank name, dark-blue global theme, incremental loading word and actual pinned MIT Oimo APIC fluid/shader adaptation. Source/edit/path/license ledger is docs/REUSE_LEDGER.md; distribution includes full adaptation licenses. Test limitations: headless/SwiftShader observations, not physical-device certification. S03 remains next. Owner authorized merging PR6 after verified correction.

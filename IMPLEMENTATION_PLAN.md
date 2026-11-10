@@ -1,4 +1,4 @@
-# Implementation Plan — Human × AI Evolution Tank
+# Implementation Plan — the fish tank
 
 Prepared 2026-11-08. **Status: S01 hosted CI/deployment succeeded; S02 implemented and verified locally; S03–S39 not started.**
 
@@ -589,3 +589,9 @@ Use the [five-site research/reuse ledger](docs/design-references/README.md) at e
 ## S02 handoff
 
 S02 contracts/config/RNG/events/shared controls are implemented; see [verification and limitations](docs/S02_VERIFICATION.md). S03 is the next bounded session. Earlier startup notes saying S02 is not started describe the prior handoff, not current state. No S03–S39 gameplay is completed here.
+
+## Permanent visual identity and reuse policy — owner correction
+
+**the fish tank** is the product name everywhere in UI/metadata/docs (historical/original requirement documents remain preserved). Theme: mysterious dark blue across screens, controls and dialogs. Favicon: flat solid blue circle, never gradients or decorative highlights. Loading: incremental `l → lo → loa → … → loading`, repeating; actual licensed Oimo Water solver/shader adaptation supplies interactive background. Retain minimum/readiness/accessibility and disposal rules. This correction supersedes the earlier original CSS-droplet/mint direction.
+
+Heavy code reuse is mandatory in each session: search → collect pinned source/license → study → adapt → test → document. Maintain [the canonical reuse ledger](docs/REUSE_LEDGER.md), listing source, edits and exact runtime paths. S03 should reuse S02 components and the newly adapted fluid's lifecycle/quality learnings without claiming the loader completes fixed-step tank gameplay. S04 should evaluate reusing the actual water solver where suitable, plus Paper caustics/rays; do not rebuild decorative substitutes for proven source. Main scene remains Pixi; a temporary startup WebGL context is an explicit owner-requested exception and must always be released. S03–S39 remain unimplemented.

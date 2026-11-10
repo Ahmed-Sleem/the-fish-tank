@@ -91,3 +91,12 @@ Verification: full `npm run verify` passed (4 Python docs regressions, 13 unit t
 Final local verification: 76 unit tests, 11 architecture fixtures, 4 Python documentation regressions, 10 real Chromium browser cases; audit 0. All formatting/lint/strict types/build/docs/architecture gates passed. Library-only contracts are exercised by tests; only genuine build-info UI is exposed.
 
 S02 source published as cb5c0d2 on arena/b46a5b8f-the-fish-tank. PR #6: https://github.com/Ahmed-Sleem/the-fish-tank/pull/6 (open, not merged). Hosted Verify run https://github.com/Ahmed-Sleem/the-fish-tank/actions/runs/42739909257 passed in 1m1s, including full npm run verify. No workflow artifacts were deployed from the PR. Next session is S03 after the owner's Continue action.
+
+## Owner style correction on PR6
+
+- Checked active PR6 branch; downloaded saharan/works Oimo Water at f34a4951a95ba178bfc9964d08dc898795ea4736 and root MIT license. Studied Main.hx/WaterShader.hx, APIC transfer/pressure/aeration/boundaries and renderer; reviewed Codrops water hub alternatives.
+- Ported actual algorithms/shader into src/render/water; replaced CSS droplet/rings with transient WebGL2 fluid. Adapted to 4000-cell budget, 30Hz, bounded hover input, theme uniforms, deterministic jitter, resize/reduced-motion/hidden/context-loss/disposal and static failure fallback. No full-demo iframe, external CDN, WASM, accelerometer or Three dependency.
+- Set global dark-blue palette and the fish tank identity; favicon is one solid circle. Loading letters reveal and repeat; timing gates preserved. Player README, standing rules/plan and canonical source/edit/path ledger updated; licenses included in public distribution.
+- Measured 8094-particle, two-substep solver in headless Chromium on this 2-vCPU sandbox: median 16.1ms / p95 44.8ms over 25 samples (includes warmup), not mobile-device performance proof. Inspected actual rendered loader screenshot; this is particle fluid, not CSS rings.
+
+Final style evidence: docs/STYLE_VERIFICATION.md. Local full verification passes 78 unit + 11 architecture + 4 Python + 12 browser cases; audit 0. Controlled hover, simulation, mount, lettering and favicon regressions all failed as intended, with lettering/icon exercised separately; exact sources restored. Immutable snapshot hashes and distributed-license equality verified. No physical-device guarantee or later gameplay completion claimed.

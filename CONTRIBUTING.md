@@ -15,3 +15,9 @@ Do not turn the README into an agent diary, deployment checklist or list of tech
 - Keep gameplay rules, UI primitives, tokens and strings centralized. Validate external input and never execute AI output.
 - Commit no credentials, exports with private data, generated browser archives, node_modules or dist artifacts. No application secrets are required for the current preview.
 - Work only on the active Arena session branch. Open a PR for main; deployment is gated on verification and occurs after main updates. Do not merge without authorization.
+
+## Permanent identity and reuse-first direction
+
+The product name is **the fish tank**, not Tank. Use a mysterious **dark-blue** palette across every screen/control/dialog; no mint/green styling. The favicon is one **flat, solid blue circle**: no gradient, highlight, texture or border. Loader copy is **loading**, revealed one letter at a time then repeated; reduced motion shows it statically. Use the licensed Oimo Water adaptation for loader interaction, not CSS droplet/ring substitutes. Retain the 1500ms minimum plus real readiness gates and readable failure fallback.
+
+**Heavy code reuse is the default working method.** Before new nontrivial work, search existing project primitives and suitable GitHub/reference implementations, collect pinned useful source with licenses, study it, adapt it, test it and update [the reuse ledger](docs/REUSE_LEDGER.md) with exactly what changed and where it is used. Do not claim study-only code as shipped. Preserve notices in both repository and distributed site. This direction is binding for all later phases, not just this restyle.

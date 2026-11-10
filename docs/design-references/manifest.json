@@ -33,5 +33,54 @@
     "source": "https://github.com/developit/mitt/blob/6b41670516ed8e8b738612f60491995470aa63b3/LICENSE",
     "license": "MIT",
     "use": "license for shipped adaptation"
+  },
+  {
+    "file": "oimo/Main.hx.txt",
+    "sha256": "dcfe7e5f4e1c1851be514f2c255ddc03d27fba5008c29316e16a63bba5f0993d",
+    "source": "https://github.com/saharan/works/blob/f34a4951a95ba178bfc9964d08dc898795ea4736/water/src/Main.hx",
+    "license": "MIT",
+    "use": "source snapshot for adapted loading-screen fluid; see REUSE_LEDGER"
+  },
+  {
+    "file": "oimo/Cell.hx.txt",
+    "sha256": "06591001cef3a52906fbc193b74c58334a7d39dd4d6995c19978ec2d609924f9",
+    "source": "https://github.com/saharan/works/blob/f34a4951a95ba178bfc9964d08dc898795ea4736/water/src/Cell.hx",
+    "license": "MIT",
+    "use": "source snapshot for adapted loading-screen fluid; see REUSE_LEDGER"
+  },
+  {
+    "file": "oimo/Particle.hx.txt",
+    "sha256": "5f2bd3b1dc6f89fdaaac4cfc8fed066a469bf1e4c733c0b9b2c8b2c86d6edd78",
+    "source": "https://github.com/saharan/works/blob/f34a4951a95ba178bfc9964d08dc898795ea4736/water/src/Particle.hx",
+    "license": "MIT",
+    "use": "source snapshot for adapted loading-screen fluid; see REUSE_LEDGER"
+  },
+  {
+    "file": "oimo/WaterShader.hx.txt",
+    "sha256": "a84e55503c59546614714a866a81b3dd5b27e10434445bb517ffbb020ff19c2c",
+    "source": "https://github.com/saharan/works/blob/f34a4951a95ba178bfc9964d08dc898795ea4736/water/src/WaterShader.hx",
+    "license": "MIT",
+    "use": "source snapshot for adapted loading-screen fluid; see REUSE_LEDGER"
+  },
+  {
+    "file": "oimo/index.html.txt",
+    "sha256": "7aa1fa07646a5332987f36d66363f3fdaa03f53f4b7c772a3d4841b74fe47f31",
+    "source": "https://github.com/saharan/works/blob/f34a4951a95ba178bfc9964d08dc898795ea4736/water/bin/index.html",
+    "license": "MIT",
+    "use": "source snapshot for adapted loading-screen fluid; see REUSE_LEDGER"
+  },
+  {
+    "file": "oimo/build.hxml.txt",
+    "sha256": "50d980a4e8156488568e18382fe037dcaa00c6255accc0b4e12214e4f4e956d5",
+    "source": "https://github.com/saharan/works/blob/f34a4951a95ba178bfc9964d08dc898795ea4736/water/build.hxml",
+    "license": "MIT",
+    "use": "source snapshot for adapted loading-screen fluid; see REUSE_LEDGER"
+  },
+  {
+    "file": "oimo/LICENSE.txt",
+    "sha256": "9b012a9420b8930af8fd93dbbe3e4036f0d7c3de58764842a3368fbe2df47a7b",
+    "source": "https://github.com/saharan/works/blob/f34a4951a95ba178bfc9964d08dc898795ea4736/LICENSE",
+    "license": "MIT",
+    "use": "source snapshot for adapted loading-screen fluid; see REUSE_LEDGER"
   }
 ]

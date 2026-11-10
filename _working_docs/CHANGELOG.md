@@ -46,3 +46,7 @@ Verification: full `npm run verify` passed (4 Python docs regressions, 13 unit t
 ## S02 — Shared contracts, configuration and accessible UI
 
 Added complete strict v1 save/entity/trait schemas and bounded AI normalization; ancestry roots, inventory, corpse and persisted job metadata included. Added seeded RNG/state, lifecycle events, canonical balance/range configuration and negative-tested architecture guards. Shared native controls power the new About-this-build dialog with current graphics status, format version and limitations. Updated player guide and source/license ledger. S03 remains next; drawing, fish, saving and provider calls are not available yet.
+
+## Owner-directed style correction — the fish tank
+
+Renamed product UI/metadata to the fish tank; replaced mint/green palette with mysterious dark blue and the gradient favicon with a single solid blue circle. Replaced original droplet/DOM rings with actual MIT Oimo Water solver/shader adaptation, bounded for startup and interactive on hover/touch. Loading reveals successive letters and loops; reduced motion is static. Added canonical reuse ledger and shipped license files; permanent reuse-first/design policy now applies to all later phases. No gameplay phase beyond S02 is claimed.

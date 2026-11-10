@@ -20,3 +20,7 @@ S01 and its favicon/interactive splash addition are merged. S02 contracts/config
 - GAP-002 owner pricing clarification before S05. GAP-009 identity/image pipelines, GAP-003 provider capability and GAP-005 device budgets remain open for their later sessions.
 - Pages workflow run 42738724731 for merged PR5 reports success; S02 deployment requires its own reviewed merge and observed release. Never merge without authorization.
 - After S02 verification/push and PR handoff, tell the owner to click **Continue** to begin S03 on the next session branch.
+
+## Binding owner correction before S03
+
+Product name: **the fish tank**. Mysterious dark-blue theme throughout; single flat-circle favicon. The loader is now adapted MIT Oimo APIC water with sequential **loading** text, not the rejected CSS droplet/rings. Read CONTRIBUTING.md, DEC-019 and docs/REUSE_LEDGER.md before further work. **Heavy source reuse** is mandatory: search/download/study/adapt/verify and record exact changes/locations. Owner authorized merge of PR6 after this correction and verification; do not ask again for that merge.
