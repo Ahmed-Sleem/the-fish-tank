@@ -19,5 +19,6 @@ export const waterConfig = {
   grain: 0.45, // static fragment dither: no texture allocation or animation pass
   letterMs: 170,
   endHold: 3,
+  initialPush: 0.22,
   seed: 2026,
 } as const;

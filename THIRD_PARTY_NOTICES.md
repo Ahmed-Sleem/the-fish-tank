@@ -48,3 +48,9 @@ Complete distribution license texts are included under `public/licenses/{oimo,mi
 ## MainLoop.js — S03 loop pattern adaptation
 
 Copyright (c) 2016 Isaac Sukin. MIT. `src/core/loop.ts` adapts accumulator/catch-up/interpolation patterns from IceCreamYou/MainLoop.js commit `3ddadf0ab902da96af7077be40206ac27ba1b1d3`. Full upstream license: `public/licenses/mainloop.txt`; pinned source/license: `docs/design-references/mainloop{.js,-LICENSE}.txt`. Changed to a bounded 30Hz TypeScript simulation helper; no upstream scheduler/global API or runtime package shipped.
+
+## S04 shipped wave and caustic adaptations
+
+`src/render/effects/shaders.ts` adapts jeantimex/threejs-water commit `f35a700a16fe386beac997806ed4471018c93ef7`, MIT: Original work Copyright (c) 2011 Evan Wallace; Modified work Copyright (c) 2026 Yong Su. Complete license: `public/licenses/threejs-water.txt`. Height/velocity stencil and raised-cosine impulse ported from Three to bounded Pixi8 ping-pong filters.
+
+Caustic function adapted from `@screenjoy/fishtank` 0.1.0, `src/reef-environment.ts`, MIT, Copyright 2026 Steven Partridge. Complete license: `public/licenses/screenjoy.txt`. Changed to dark-blue Pixi filter uniforms, quality budgets and reduced-motion lifecycle; no upstream fish models/reef assets/custom-element runtime shipped. Original source/license snapshots and hash manifest are under `docs/design-references/`. Installed simplex-noise (MIT, Jonas Wagner) is now used for the shared seeded curl flow; no additional package installed.

@@ -3,7 +3,7 @@ import { createFixedLoop } from '../../src/core/loop';
 import { createParticles } from '../../src/render/particles';
 import { sceneConfig } from '../../src/config/scene.config';
 import { OimoFluid } from '../../src/render/water/oimo-fluid';
-it('loader starts as a zero-velocity floor pool, not a suspended falling box', () => {
+it('loader starts as a pushed floor pool, not a suspended falling box', () => {
   const fluid = new OimoFluid(40, 26);
   let minX = Infinity,
     maxX = 0,
@@ -16,8 +16,9 @@ it('loader starts as a zero-velocity floor pool, not a suspended falling box', (
     maxX = Math.max(maxX, x);
     minY = Math.min(minY, y);
     maxY = Math.max(maxY, y);
-    expect(fluid.particles[p + 3]).toBe(0);
-    expect(fluid.particles[p + 4]).toBe(0);
+    expect(fluid.particles[p + 3]).toBeGreaterThan(0);
+    expect(fluid.particles[p + 3]).toBeLessThanOrEqual(0.22);
+    expect(fluid.particles[p + 4]).toBeLessThan(0);
   }
   expect(minX).toBeLessThan(1.1);
   expect(maxX).toBeGreaterThan(fluid.width - 2);

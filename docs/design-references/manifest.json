@@ -96,5 +96,89 @@
     "license": "MIT",
     "use": "adapted accumulator/interpolation pattern in src/core/loop.ts",
     "sha256": "cc1792d6ce1bd8e03ed5c88fc1a3976334c864da8cee3ba677539e9ffa97e6f4"
+  },
+  {
+    "file": "threejs-water/LICENSE.txt",
+    "source": "https://github.com/jeantimex/threejs-water/blob/f35a700a16fe386beac997806ed4471018c93ef7/LICENSE",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "f50bbc0f2cbca1fb64d0e6133329a309a88bd6bfd92b80fcb103119aca3e0e1c"
+  },
+  {
+    "file": "threejs-water/README.md.txt",
+    "source": "https://github.com/jeantimex/threejs-water/blob/f35a700a16fe386beac997806ed4471018c93ef7/README.md",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "5c2c8010462ef2b8e0b1f9073d1af94d195b63a00fc21b8c582f3cb7820389ef"
+  },
+  {
+    "file": "threejs-water/src--Water.ts.txt",
+    "source": "https://github.com/jeantimex/threejs-water/blob/f35a700a16fe386beac997806ed4471018c93ef7/src/Water.ts",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "930e92f140be5308c96acc823bc1645f26c01fd3889b0849afde6b302b381680"
+  },
+  {
+    "file": "threejs-water/src--app--InteractionController.ts.txt",
+    "source": "https://github.com/jeantimex/threejs-water/blob/f35a700a16fe386beac997806ed4471018c93ef7/src/app/InteractionController.ts",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "0f9dd2c74a143c84080e5ba8c770002cafc99d507e5da8aa5e6df26ff29fc822"
+  },
+  {
+    "file": "threejs-water/src--shaders--WaveSimulation.frag.txt",
+    "source": "https://github.com/jeantimex/threejs-water/blob/f35a700a16fe386beac997806ed4471018c93ef7/src/shaders/WaveSimulation.frag",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "3c933cf631428edd0ce731580e537840e5b1434ec54ceffd4a4664f85e897823"
+  },
+  {
+    "file": "threejs-water/src--shaders--WaterRipple.frag.txt",
+    "source": "https://github.com/jeantimex/threejs-water/blob/f35a700a16fe386beac997806ed4471018c93ef7/src/shaders/WaterRipple.frag",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "5483fd36eb0e7bb52e60abcbe871985def4e61d39940179df834a40c5d389aea"
+  },
+  {
+    "file": "threejs-water/src--shaders--Caustics.frag.txt",
+    "source": "https://github.com/jeantimex/threejs-water/blob/f35a700a16fe386beac997806ed4471018c93ef7/src/shaders/Caustics.frag",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "33ac616ed8ee6901799c3e2b854cae5110832267ea9aa0027024fe427de97b43"
+  },
+  {
+    "file": "screenjoy/LICENSE.txt",
+    "source": "https://registry.npmjs.org/@screenjoy/fishtank/-/fishtank-0.1.0.tgz#LICENSE",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "5c097bd57f9961a82a18623d84e4f1d428793abd9bbfd5e5e323d7860dad0274"
+  },
+  {
+    "file": "screenjoy/README.md.txt",
+    "source": "https://registry.npmjs.org/@screenjoy/fishtank/-/fishtank-0.1.0.tgz#README.md",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "fbeb27b872bf12b0a486b6a2a9675910d6116844129b67dea5946885d2db421c"
+  },
+  {
+    "file": "screenjoy/package.json.txt",
+    "source": "https://registry.npmjs.org/@screenjoy/fishtank/-/fishtank-0.1.0.tgz#package.json",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "da511dae0cc266eff697676723cf1a8084bfd3f027bd599164c3dcc20e834df2"
+  },
+  {
+    "file": "screenjoy/src--reef-environment.ts.txt",
+    "source": "https://registry.npmjs.org/@screenjoy/fishtank/-/fishtank-0.1.0.tgz#src/reef-environment.ts",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "b46164cf27268a48b93498ef4b066c6f1c11d6e4078c357783dd13e968a82ead"
+  },
+  {
+    "file": "screenjoy/src--fish-tank.ts.txt",
+    "source": "https://registry.npmjs.org/@screenjoy/fishtank/-/fishtank-0.1.0.tgz#src/fish-tank.ts",
+    "license": "MIT",
+    "use": "S04 preparation only; not shipped/runtime",
+    "sha256": "774537288564a4dee57cbaba61bc4bee43a8316a3496df9ff4f1191add0374d1"
   }
 ]

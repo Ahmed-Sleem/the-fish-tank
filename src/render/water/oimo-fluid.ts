@@ -34,11 +34,12 @@ export class OimoFluid {
     this.width = Math.min(cfg.maxWidth, Math.max(8, Math.floor(width)));
     this.height = Math.min(cfg.maxHeight, Math.max(8, Math.floor(height)));
     const positions: number[] = [];
-    // Start at rest against the floor, not as a suspended box that drops on entry.
-    // Half-tank volume, full usable width; same density and zero initial momentum.
+    // Start pooled against the floor, not as a suspended box that drops on entry.
+    // Half-tank volume, full usable width; same density with a small bounded sideways startup impulse.
     for (let y = this.height * 0.5; y < this.height - 1.001; y += cfg.spacing) {
       for (let x = 1.001; x < this.width - 1.001; x += cfg.spacing) {
-        positions.push(0, x, y, 0, 0, 0, 0, 0, 0, cfg.density);
+        const push = Math.sin((y / this.height) * Math.PI) * cfg.initialPush;
+        positions.push(0, x, y, push, -push * 0.35, 0, 0, 0, 0, cfg.density);
       }
     }
     this.particles = new Float64Array(positions);

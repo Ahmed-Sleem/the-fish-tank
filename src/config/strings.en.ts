@@ -7,7 +7,7 @@ export const strings = {
   qualityHigh: 'High',
   reducedMotion: 'Reduce motion',
   settingsHelp:
-    'Quality changes particle density and pixel resolution, not simulation speed. Your system reduced-motion preference is always respected. Settings apply for this visit.',
+    'Quality changes particle density, ripple detail and lighting resolution, not simulation speed. Your system reduced-motion preference is always respected. Settings apply for this visit.',
   credits: 'Open-source credits',
   buildDetails: 'About this build',
   close: 'Close',
@@ -20,7 +20,8 @@ export const strings = {
   loading: 'loading',
   brand: 'the fish tank',
   aquarium: 'Aquarium',
-  emptyTank: 'An empty aquarium. Your first creatures will arrive in a future build.',
+  emptyTank:
+    'Move your cursor through the water, or tap and drag to make ripples. Your creatures will arrive in a future build.',
   interfaceTools: 'Aquarium controls',
   fullscreen: 'Fullscreen',
   exitFullscreen: 'Exit fullscreen',

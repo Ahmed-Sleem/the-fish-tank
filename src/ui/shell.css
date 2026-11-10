@@ -25,6 +25,7 @@ h2 {
   isolation: isolate;
 }
 .aquarium {
+  touch-action: pinch-zoom;
   position: relative;
   min-height: 100svh;
   outline: none;

@@ -2,7 +2,7 @@
 
 ## Latest startup/GUI revision
 
-Minimum loading duration is now **3000ms**, still gated by actual page/renderer readiness. Oimo budget is 1100 cells (formerly 4000), DPR≤1 (formerly 1.5), target 24Hz (formerly 30). Static integer-hash fragment grain adds no animated noise texture or extra render pass; GPU vertex storage is allocated on resize and reused. Duplicate unchanged resize notifications do not recreate fluid/buffers. After loading the full-window aquarium opens directly: floating identity/Fullscreen/About controls, bottom graphics status and a quiet empty-tank note. No hero, journal, footer, fake wallet or nonfunctional gameplay tools.
+Minimum loading duration is now **5000ms**, still gated by actual page/renderer readiness. Oimo budget is 1100 cells (formerly 4000), DPR≤1 (formerly 1.5), target 24Hz (formerly 30). Static integer-hash fragment grain adds no animated noise texture or extra render pass; GPU vertex storage is allocated on resize and reused. Duplicate unchanged resize notifications do not recreate fluid/buffers. After loading the full-window aquarium opens directly: floating identity/Fullscreen/About controls, bottom graphics status and a quiet empty-tank note. No hero, journal, footer, fake wallet or nonfunctional gameplay tools.
 
 Observed profile: 2146 particles at 41×26 cells, 25 two-substep samples in headless Chromium on a 2-vCPU sandbox, median 4.3ms / p95 10.6ms including warmup. Earlier 8094-particle profile below is historical, not a paired same-device speed guarantee. Layout/grain screenshots inspected; physical-device profiling remains a later gate.
 
@@ -26,3 +26,5 @@ A real 1440×900 rendered loader screenshot was inspected locally (temporary/ign
 ## Next sessions
 
 Permanent identity/reuse requirements are in CONTRIBUTING.md, DEC-019 and IMPLEMENTATION_PLAN.md. Heavy source search/collection/study/adaptation is the default for every phase. S03 remains next; a cosmetic loader does not implement fixed-step aquarium gameplay or S04 water physics.
+
+S04: floor-pooled loader now receives a bounded initial sideways push, no warmup/drop. After loading, native Pixi height-field refraction and credited caustic/depth effects show the tank directly; cursor/touch disturbances apply in the tank, not on HUD controls. See `docs/S04_VERIFICATION.md` for current evidence and hardware-performance limitations.
