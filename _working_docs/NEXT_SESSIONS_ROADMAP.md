@@ -24,3 +24,7 @@ S01 and its favicon/interactive splash addition are merged. S02 contracts/config
 ## Binding owner correction before S03
 
 Product name: **the fish tank**. Mysterious dark-blue theme throughout; single flat-circle favicon. The loader is now adapted MIT Oimo APIC water with sequential **loading** text, not the rejected CSS droplet/rings. Read CONTRIBUTING.md, DEC-019 and docs/REUSE_LEDGER.md before further work. **Heavy source reuse** is mandatory: search/download/study/adapt/verify and record exact changes/locations. Owner authorized merge of PR6 after this correction and verification; do not ask again for that merge.
+
+## Latest owner direction
+
+No landing page: startup now opens the aquarium GUI directly. Loading minimum is **3 seconds** (plus real readiness), with lightweight grainy Oimo water. Preserve 1100-cell/DPR≤1/24Hz budgets, static grain and buffer/lifecycle reuse until measurements justify changes. Extend this direct GUI in S03; do not revive hero/journal pages or add fake wallet/tool actions. See DEC-020 and latest verification log. Owner authorized merging the startup/GUI PR once checks pass.

@@ -58,3 +58,7 @@ The earlier S01 publication-blocked rows are historical: PR #5 is merged in the 
 ## Owner style correction
 
 GAP-019 — implemented: initial splash/gradient-circle/mint branding rejected. Replaced with flat blue-circle favicon, the fish tank name, dark-blue global theme, incremental loading word and actual pinned MIT Oimo APIC fluid/shader adaptation. Source/edit/path/license ledger is docs/REUSE_LEDGER.md; distribution includes full adaptation licenses. Test limitations: headless/SwiftShader observations, not physical-device certification. S03 remains next. Owner authorized merging PR6 after verified correction.
+
+## Direct aquarium startup correction
+
+GAP-020 — implemented: loader minimum 3000ms, low-budget grainy Oimo water and direct full-window aquarium GUI, no landing page or fake gameplay controls. S03 fixed-step tank layers/particles/quality work remains next, with physical-device profiling still GAP-005. Owner explicitly authorized merging this correction after checks pass.

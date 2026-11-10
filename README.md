@@ -10,12 +10,12 @@ the fish tank is a browser aquarium being built around a simple idea: **you draw
 
 ## What you can do now
 
-- Open the underwater-styled development page on desktop or mobile. Look for the flat blue-circle tab icon.
-- During startup, **loading** appears one letter at a time and repeats. Move your cursor through the blue particle water to stir it; the fluid is adapted from [Oimo Water](https://oimo.io/works/water/). It stays for at least 1.5 seconds and until the page and graphics startup have settled; slower connections take longer. Touch movement also creates ripples where supported.
-- Open **About this build** in the footer to see the data-format version, graphics status and current limitations. Press **Escape** or **Close** to dismiss it; keyboard focus returns to the opener.
-- Check the build identifier and graphics status under **Current build**.
-- Follow **Explore the source** or **Read the build plan** to see how the project is progressing.
-- Use a keyboard: press **Tab** for the “Skip to build status” link and the other page links.
+- Open straight into the full-window aquarium interface on desktop or mobile—there is no landing page. Look for the flat blue-circle tab icon.
+- During startup, **loading** appears one letter at a time and repeats. Move your cursor through the lightweight, grainy blue particle water to stir it; the fluid is adapted from [Oimo Water](https://oimo.io/works/water/). It stays for at least 3 seconds and until the page and graphics startup have settled; slower connections take longer. Touch movement also creates ripples where supported.
+- Open **About this build** in the top-right controls to see the data-format version, graphics status and current limitations. Press **Escape** or **Close** to dismiss it; keyboard focus returns to the opener.
+- See graphics status along the bottom; the build identifier, source links and plan are inside **About this build**.
+- Use **Fullscreen** where your browser supports it; click **Exit fullscreen** or press **Escape** to leave it.
+- Use a keyboard: press **Tab** for the “Skip to aquarium” link and the other page links.
 
 There is nothing to buy, feed or draw in this version yet. You do not need an AI key.
 

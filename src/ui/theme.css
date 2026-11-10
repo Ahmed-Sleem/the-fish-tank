@@ -1,4 +1,4 @@
-/* Single source for shell colors, type, spacing and decorative water values. */
+/* Single source for aquarium colors, type, spacing and decorative water values. */
 :root {
   color-scheme: dark;
   --font-body: 'Segoe UI', Arial, sans-serif;
@@ -6,8 +6,6 @@
   --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   --color-ink: #dce7fa;
   --color-muted: #94a9ca;
-  --color-faint: #8ba2c5;
-  --color-blue: #90b7ed;
   --color-dark: #030916;
   --color-focus: #bdd7ff;
   --color-line: #7199d438;
@@ -28,63 +26,22 @@
     );
   --water-grain: repeating-linear-gradient(0deg, transparent, transparent 3px, #bfd7ff03 4px);
   --water-mask: radial-gradient(ellipse at 65% 20%, #000, transparent 75%);
-  --shell-width: 90rem;
-  --page-pad: clamp(1.5rem, 4vw, 4.5rem);
-  --page-gap: clamp(2rem, 4vw, 4rem);
-  --header-height: 6.5rem;
-  --intro-padding: clamp(3.5rem, 10vh, 7.5rem);
-  --intro-bottom: clamp(4rem, 12vh, 9rem);
-  --title-size: clamp(3.1rem, 7.6vw, 7.5rem);
-  --title-line-height: 1.05;
-  --title-tracking: -0.045em;
-  --title-top-gap: 1.8rem;
   --wordmark-size: clamp(1.3rem, 3.2vw, 2.2rem);
   --wordmark-tracking: -0.025em;
   --body-size: 1rem;
   --body-leading: 1.8;
-  --description-size: clamp(1rem, 1.5vw, 1.15rem);
-  --description-width: 30rem;
-  --label-size: 0.625rem;
-  --label-tracking: 0.16em;
-  --label-leading: 1.7;
-  --phase-size: 0.7rem;
-  --label-gap: 0.45rem;
   --space-tiny: 0.5rem;
   --space-small: 1rem;
-  --space-medium: 1.5rem;
   --space-large: 2rem;
-  --chapter-grid: minmax(7.5rem, 0.65fr) minmax(17rem, 2.7fr) minmax(12rem, 1fr);
-  --chapter-padding: 2.25rem;
-  --chapter-title-size: 1.8rem;
-  --chapter-copy-width: 35rem;
-  --chapter-copy-size: 0.875rem;
-  --footer-padding: 2.1rem;
+  --dialog-title-size: 1.8rem;
   --footer-copy-size: 0.75rem;
   --link-size: 0.8rem;
   --line-width: 1px;
   --focus-width: 2px;
   --focus-offset: 6px;
   --z-water: -1;
-  --z-content: 0;
   --z-skip: 2;
   --skip-offset: -200%;
-  --footer-min-width: 15rem;
-}
-
-/* Breakpoints live with the design tokens, not repeated across components. */
-@media (width <= 700px) {
-  :root {
-    --header-height: 7rem;
-    --chapter-grid: 1fr;
-    --intro-padding: 3.8rem;
-    --intro-bottom: 4rem;
-    --chapter-padding: 1.7rem;
-    --page-gap: 1.5rem;
-  }
-
-  .brand-detail {
-    display: none;
-  }
 }
 
 /* Permanent mysterious dark-blue identity; static favicon matches --color-accent. */
@@ -105,4 +62,16 @@
   --control-disabled-opacity: 0.5;
   --dialog-width: 32rem;
   --dialog-backdrop: #010510cc;
+}
+
+/* Aquarium HUD uses safe-area-aware spacing without reserving page sections. */
+:root {
+  --hud-pad: max(
+    1.25rem,
+    env(safe-area-inset-left),
+    env(safe-area-inset-right),
+    env(safe-area-inset-top),
+    env(safe-area-inset-bottom)
+  );
+  --empty-bottom: 4rem;
 }

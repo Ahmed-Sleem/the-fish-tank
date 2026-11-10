@@ -50,3 +50,7 @@ Added complete strict v1 save/entity/trait schemas and bounded AI normalization;
 ## Owner-directed style correction — the fish tank
 
 Renamed product UI/metadata to the fish tank; replaced mint/green palette with mysterious dark blue and the gradient favicon with a single solid blue circle. Replaced original droplet/DOM rings with actual MIT Oimo Water solver/shader adaptation, bounded for startup and interactive on hover/touch. Loading reveals successive letters and loops; reduced motion is static. Added canonical reuse ledger and shipped license files; permanent reuse-first/design policy now applies to all later phases. No gameplay phase beyond S02 is claimed.
+
+## Lightweight grainy startup and direct aquarium GUI
+
+Raised minimum loading duration to 3 seconds while retaining readiness gates. Reduced Oimo simulation/pixel/frame budgets, added static fragment grain and reused GPU storage. Removed landing-page hero/journal/footer and unused layout tokens; open directly into a full-window aquarium with floating working Fullscreen/About controls, graphics status and honest empty-tank message. Drawing/fish/economy remain future gameplay.

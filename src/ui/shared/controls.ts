@@ -33,7 +33,7 @@ export function dialog(
   signal: AbortSignal,
 ) {
   const node = element('dialog', 'ui-dialog');
-  const heading = element('h2', 'chapter-title', title);
+  const heading = element('h2', 'dialog-title', title);
   heading.id = `shared-dialog-${String(++dialogId)}`;
   node.setAttribute('aria-labelledby', heading.id);
   let returnFocus: HTMLElement | null = null;

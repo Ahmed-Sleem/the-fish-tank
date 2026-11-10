@@ -27,3 +27,22 @@ test('shared controls expose genuine build information and restore keyboard focu
   await expect(open).toBeFocused();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+test('fullscreen control works or stays hidden when browser API is unavailable', async ({
+  page,
+}) => {
+  await page.goto('./');
+  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  const enabled = await page.evaluate(() => document.fullscreenEnabled);
+  const control = page.getByRole('button', { name: strings.fullscreen, exact: true });
+  if (!enabled) {
+    await expect(control).toHaveCount(0);
+    return;
+  }
+  await control.click();
+  await expect(
+    page.getByRole('button', { name: strings.exitFullscreen, exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: strings.exitFullscreen, exact: true }).click();
+  await expect(control).toBeVisible();
+});

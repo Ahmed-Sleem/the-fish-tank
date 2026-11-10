@@ -17,13 +17,11 @@ test('the project subpath renders, reloads and never calls external services', a
   });
   await page.goto('./');
   await expect(page.locator('.loading-screen')).toHaveCount(0);
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Every world begins');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings.brand);
   await expect(page.getByRole('status')).toHaveText(strings.rendererReady);
   await expect(page.locator('canvas')).toHaveCount(1);
-  await expect(page.getByRole('link', { name: strings.source })).toHaveAttribute(
-    'href',
-    'https://github.com/Ahmed-Sleem/the-fish-tank',
-  );
+  await expect(page.getByRole('main', { name: strings.aquarium })).toBeVisible();
+  await expect(page.locator('.intro, .hero-title, .chapter, .footer')).toHaveCount(0);
   await expect(page.getByRole('button', { name: strings.buildDetails })).toHaveCount(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
@@ -36,7 +34,7 @@ test('the project subpath renders, reloads and never calls external services', a
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: strings.skip })).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(page.locator('#build-status')).toBeFocused();
+  await expect(page.locator('#aquarium')).toBeFocused();
   expect(external).toEqual([]);
   expect(failures).toEqual([]);
 });
@@ -53,6 +51,7 @@ test('graphics failure leaves accessible status and working navigation', async (
   await expect(page.locator('.loading-screen')).toHaveCount(0);
   await expect(page.getByRole('status')).toHaveText(strings.rendererFailed);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await page.getByRole('button', { name: strings.buildDetails }).click();
   await expect(page.getByRole('link', { name: strings.plan })).toHaveAttribute(
     'href',
     /IMPLEMENTATION_PLAN\.md$/,

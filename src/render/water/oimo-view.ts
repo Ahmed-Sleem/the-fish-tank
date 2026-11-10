@@ -14,13 +14,16 @@ void main() {
 }`;
 const fragment = `#version 300 es
 precision mediump float;
+precision highp int;
 in vec3 color;
+uniform float grainAmount;
 out vec4 outputColor;
 void main() {
   float weight = 1.0 - length(2.0 * gl_PointCoord - 1.0);
   float alpha = clamp(10.0 * weight, 0.0, 1.0);
   if (alpha == 0.0) discard;
-  outputColor = vec4(color * alpha, 1.0);
+  float grain = fract(sin(dot(floor(gl_FragCoord.xy), vec2(12.9898, 78.233))) * 43758.5453);
+  outputColor = vec4(color * alpha * (1.0 - grainAmount + 2.0 * grainAmount * grain), 1.0);
   gl_FragDepth = 0.5 - weight * 0.1;
 }`;
 function palette(host: HTMLElement, token: string): number[] {
@@ -87,6 +90,7 @@ export function mountOimoWater(host: HTMLElement, signal: AbortSignal) {
     gl.vertexAttribPointer(location, 4, gl.FLOAT, false, 0, 0);
     gl.uniform3fv(gl.getUniformLocation(program, 'deep'), palette(host, '--water-body'));
     gl.uniform3fv(gl.getUniformLocation(program, 'foam'), palette(host, '--water-foam'));
+    gl.uniform1f(gl.getUniformLocation(program, 'grainAmount'), cfg.grain);
     gl.enable(gl.DEPTH_TEST);
     gl.clearColor(0, 0, 0, 0);
     let fluid = new OimoFluid(16, 16),
@@ -96,13 +100,21 @@ export function mountOimoWater(host: HTMLElement, signal: AbortSignal) {
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
     const draw = () => {
       fluid.writeVertices(vertices, pixelScale);
-      gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, vertices);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       gl.drawArrays(gl.POINTS, 0, fluid.count);
     };
+    let previousWidth = 0,
+      previousHeight = 0,
+      previousRatio = 0;
     const resize = () => {
       const { width, height } = host.getBoundingClientRect();
       if (disposed || width <= 0 || height <= 0) return;
+      const ratio = Math.min(devicePixelRatio, cfg.maxResolution);
+      if (width === previousWidth && height === previousHeight && ratio === previousRatio) return;
+      previousWidth = width;
+      previousHeight = height;
+      previousRatio = ratio;
       const cell = Math.max(
         width / cfg.maxWidth,
         height / cfg.maxHeight,
@@ -110,7 +122,7 @@ export function mountOimoWater(host: HTMLElement, signal: AbortSignal) {
       );
       fluid = new OimoFluid(width / cell, height / cell);
       vertices = new Float32Array(fluid.count * 4);
-      const ratio = Math.min(devicePixelRatio, cfg.maxResolution);
+      gl.bufferData(gl.ARRAY_BUFFER, vertices.byteLength, gl.DYNAMIC_DRAW);
       canvas.width = Math.max(1, Math.floor(width * ratio));
       canvas.height = Math.max(1, Math.floor(height * ratio));
       pixelScale = (width / fluid.width) * ratio;
