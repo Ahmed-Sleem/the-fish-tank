@@ -6,7 +6,7 @@ Tank is a browser aquarium being built around a simple idea: **you draw the begi
 
 **[Open the browser build](https://ahmed-sleem.github.io/the-fish-tank/)** — no installation or account required.
 
-**Release status:** the first public deployment is being repaired. If the link returns a missing-page error, the site has not been published successfully yet. The current version is an early foundation preview, **not a playable aquarium**.
+**Release status:** the first public deployment is awaiting publication of a verified repair. If the link returns a missing-page error, the site has not been published successfully yet. The current version is an early foundation preview, **not a playable aquarium**.
 
 ## What you can do now
 

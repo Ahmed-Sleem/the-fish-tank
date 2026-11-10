@@ -13,6 +13,8 @@ The latest inspected main runs were [Verify 42734845206](https://github.com/Ahme
 
 Reproducing the docs verifier at that exact checkout immediately failed: it required `docs/github-pages-setup/{ci,pages}.yml`, which the owner had moved to `.github/workflows/`. Broken links to the moved files failed too. This was **our checker/handoff lifecycle bug**, not a bad Pages setting. The repair validates the installed files and links directly to them. It does not disable verification or reintroduce duplicates.
 
+The repair passed actual hosted [Verify run 42735606550](https://github.com/Ahmed-Sleem/the-fish-tank/actions/runs/42735606550) on [PR #4](https://github.com/Ahmed-Sleem/the-fish-tank/pull/4). Public main deployment remains pending merge and a successful Deploy Pages run.
+
 ## Publish the repair and later updates
 
 1. Open a PR from the current Arena branch to main and wait for **Verify / verify** to pass.

@@ -67,3 +67,9 @@
 - **Failure proof:** mutate checker to use old doc location -> healthy-install test fails; remove installed-file requirements -> missing-workflow test fails; bypass contract validation -> contract test fails; bypass link guard -> guide-link test fails. All changes restored, all four tests then pass.
 - **Local validation:** npm ci (152 packages, 0 audit findings), full npm run verify passes: 4 Python regressions, 11 TypeScript unit cases, 6 actual Chromium desktop/mobile cases, source hashes/links/workflow contracts/style/lint/type/architecture/audit/build. Browser is separately extracted Chromium153 under /tmp with software WebGL; no real-phone/performance claim. App code and dependency versions unchanged.
 - **Self-check:** code/checker and README gaps fixed locally and reachable in verification. No verification bypass. Remote CI success, main merge and actual Pages release are separate evidence gates; further S02 implementation waits for delivery gate. No public deployment success claimed yet.
+
+### Observed remote repair evidence
+
+- Source repair commit `43dc965` pushed to arena/e967afb3-the-fish-tank; PR #4: https://github.com/Ahmed-Sleem/the-fish-tank/pull/4.
+- GitHub Verify run **42735606550**, job **129563957712**, concluded **success** (1m51s): https://github.com/Ahmed-Sleem/the-fish-tank/actions/runs/42735606550. `gh pr checks 4 --watch` exited 0 with verify pass. This is real hosted verification using the installed workflow, not a local mock. GAP-016 code/checker repair is closed.
+- GAP-007 remains: the fixed PR is not merged, so main's previously failed commit still cannot deploy. Owner should review/merge PR #4, then observe Deploy Pages and live smoke. No main merge, workflow edit or public deployment was performed by this session.

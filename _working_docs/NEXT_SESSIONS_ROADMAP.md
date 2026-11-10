@@ -4,11 +4,11 @@
 
 S01 app scaffold exists; all gameplay sessions S02–S39 remain not started. Owner installed **both workflows** and enabled Pages with GitHub Actions. Do not ask for another upload or PAT. `.github/workflows/{ci,pages}.yml` are canonical, not documentation copies.
 
-Initial main CI failed at `npm run verify` because our docs checker still required the moved handoff files. GAP-016 repairs that checker/links and adds regression coverage. Current branch is `arena/e967afb3-the-fish-tank`; no workflow YAML modifications are needed. Consult the latest implementation log for actual PR/run outcomes, not older permission-blocked handoffs.
+Initial main CI failed at `npm run verify` because our docs checker still required the moved handoff files. GAP-016 repairs that checker/links and adds regression coverage; PR #4 has passed actual hosted Verify run 42735606550. Current branch is `arena/e967afb3-the-fish-tank`; no workflow YAML modifications are needed. Consult the latest implementation log for actual PR/run outcomes, not older permission-blocked handoffs.
 
 ## Next actions
 
-1. Complete PR verification for the repair, then have the owner review/merge to main. No unauthorized main merge or switch.
+1. Hosted PR verification passed. Have the owner review/merge PR #4 to main. No unauthorized main merge or switch.
 2. Observe **Deploy Pages** on the new main commit; check the build/artifact/deploy jobs and public URL before calling it live. Old failed commits still contain the old bug.
 3. After first successful delivery, execute **S02 — schemas, configuration and shared UI library**, only that bounded step. S03/S04 later add fixed-step water/current/ripple behavior.
 4. Read rules/idea/spec/audit/log/changelog/plan and [contributor policy](../CONTRIBUTING.md); inspect Git reality and write the session checklist.
@@ -20,7 +20,7 @@ Initial main CI failed at `npm run verify` because our docs checker still requir
 
 ## Continuing gates
 
-- GAP-007 first successful Pages release and GAP-016 remote repaired-build validation remain to be observed.
+- GAP-016 repaired-build validation passed on GitHub. GAP-007 first successful Pages release and live acceptance remain to be observed after main merge.
 - Owner ink-pricing clarification for GAP-002 before S05.
 - Licenses/provider browser support/performance and no-key playable fallback remain future feature gates.
 - No further gameplay phase acceptance is implied by publishing the S01 shell.
