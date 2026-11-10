@@ -31,3 +31,7 @@ Each mutation was applied to real source, command observed exit 1, then exact go
 ## Limits and next step
 
 This completes foundational contracts/UI only, not persistence, simulation, provider access or playable gameplay. S03 next adds fixed-step scene/layers/particles/quality settings; S04 later adds measured interactive water. GAP-009 remains open for actual later identity/image pipelines; GAP-008 remains for storage/migrations. No public S02 deployment is claimed before PR merge and actual Pages acceptance.
+
+## Hosted proof
+
+[PR #6](https://github.com/Ahmed-Sleem/the-fish-tank/pull/6), implementation commit `cb5c0d2`: [GitHub Verify run 42739909257](https://github.com/Ahmed-Sleem/the-fish-tank/actions/runs/42739909257) passed (1m1s). This proves hosted PR verification, not a merged/public S02 release.
