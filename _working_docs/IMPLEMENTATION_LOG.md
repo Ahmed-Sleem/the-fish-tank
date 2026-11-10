@@ -110,3 +110,7 @@ Measured 2146-particle two-substep solver on this 2-vCPU headless Chromium sandb
 Controlled source regressions: restoring 1500ms failed minimum-delay tests; restoring 4000-cell budget failed budget regression; inserting a landing hero failed direct-GUI browser test; replacing requestFullscreen with no-op failed the real fullscreen browser test. All exited 1 for their guarded behavior and exact sources were restored before final verification. No new source/license adoption; existing pinned MIT notices remain unchanged.
 
 Final local verification passed: 79 unit tests, 11 architecture fixtures, 4 Python docs regressions and 14 desktop/mobile Chromium cases; audit 0, strict types/lint/format/docs/build all green. This verifies the startup/UI correction, not S03 gameplay completion. Hosted PR verification/merge outcome is tracked on the PR; no public deployment is claimed until its workflow succeeds.
+
+## S03 — pooled loader and fixed-step scene
+
+Implemented seeded pooled particles, ordered layers/surface, bounded 30Hz loop and quality/reduced-motion controls. Loader begins pooled at the bottom with no warmup. See `docs/S03_VERIFICATION.md` for tests, controlled regressions, source reuse and software-browser measurements. Real-device GAP-005 remains open; no creatures/storage/economy or S04 currents implemented. Full local verify passed: 84 unit/16 browser/11 architecture/4 documentation tests, build/lint/typecheck/hash checks and audit zero. Publishing S03 for review; hosted verification and merge/deployment pending.

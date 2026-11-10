@@ -68,3 +68,49 @@ export function dialog(
     },
   };
 }
+
+export function selectField<T extends string>(
+  label: string,
+  options: readonly { value: T; label: string }[],
+  value: T,
+  change: (value: T) => void,
+  signal: AbortSignal,
+) {
+  const wrapper = element('label', 'ui-field', label);
+  const select = element('select', 'ui-button');
+  select.setAttribute('aria-label', label);
+  for (const option of options) {
+    const node = element('option', '', option.label);
+    node.value = option.value;
+    select.append(node);
+  }
+  select.value = value;
+  select.addEventListener(
+    'change',
+    () => {
+      const selected = options.find((option) => option.value === select.value);
+      if (selected) change(selected.value);
+    },
+    { signal },
+  );
+  wrapper.append(select);
+  return { node: wrapper, input: select };
+}
+export function checkboxField(
+  label: string,
+  change: (value: boolean) => void,
+  signal: AbortSignal,
+) {
+  const wrapper = element('label', 'ui-field');
+  const input = element('input', '');
+  input.type = 'checkbox';
+  input.addEventListener(
+    'change',
+    () => {
+      change(input.checked);
+    },
+    { signal },
+  );
+  wrapper.append(input, document.createTextNode(label));
+  return { node: wrapper, input };
+}

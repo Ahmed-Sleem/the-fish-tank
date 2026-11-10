@@ -62,3 +62,7 @@ GAP-019 — implemented: initial splash/gradient-circle/mint branding rejected. 
 ## Direct aquarium startup correction
 
 GAP-020 — implemented: loader minimum 3000ms, low-budget grainy Oimo water and direct full-window aquarium GUI, no landing page or fake gameplay controls. S03 fixed-step tank layers/particles/quality work remains next, with physical-device profiling still GAP-005. Owner explicitly authorized merging this correction after checks pass.
+
+## S03 — pooled loader and fixed-step scene
+
+Implemented seeded pooled particles, ordered layers/surface, bounded 30Hz loop and quality/reduced-motion controls. Loader begins pooled at the bottom with no warmup. See `docs/S03_VERIFICATION.md` for tests, controlled regressions, source reuse and software-browser measurements. Real-device GAP-005 remains open; no creatures/storage/economy or S04 currents implemented. Full local verify passed: 84 unit/16 browser/11 architecture/4 documentation tests, build/lint/typecheck/hash checks and audit zero. Publishing S03 for review; hosted verification and merge/deployment pending.

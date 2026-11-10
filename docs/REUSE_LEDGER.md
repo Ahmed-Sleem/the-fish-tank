@@ -38,3 +38,9 @@ Reviewed [Codrops water hub](https://tympanus.net/codrops/hub/tag/water/): Ultra
 ## Reuse-first working cycle (mandatory)
 
 Search the existing library and upstream GitHub/design references **before building a nontrivial component or effect** → download/pin useful code with its license → study data flow, numerical behavior, security, lifecycle and compatibility → adapt substantial compatible parts into existing boundaries → verify positive and deliberate-negative cases → record changes and exact locations in this ledger. Prefer extensive, deliberate reuse over rebuilding established effects. Reuse is not indiscriminate dependency installation: reject incompatible/unlicensed code explicitly and keep study-only assets out of the runtime.
+
+## S03 fixed-step adaptation
+
+- Search → download → study → adapt: IceCreamYou/MainLoop.js, commit `3ddadf0ab902da96af7077be40206ac27ba1b1d3`, `src/mainloop.js` accumulator/catch-up/interpolated draw. MIT; source and complete license in `docs/design-references/mainloop{.js,-LICENSE}.txt`, distribution license `public/licenses/mainloop.txt`; hashes in snapshot manifest.
+- Used in `src/core/loop.ts`: compact typed adaptation with canonical 30Hz, five-step cap, 200ms clamp, explicit reset and no scheduler/global API. No package installed. Pixi 8.22.0 Ticker source inspected for elapsed clamp; existing Container/Graphics/Application APIs reused in `src/render/scene.ts` without another renderer or ticker. Existing seeded RNG/events/dialogs/shared controls reused for particles/settings.
+- Security/compatibility: no network, dynamic code or added runtime dependency; license preserved, Pixi8 typed build and browser lifecycle exercised. Prior five-site visual research remains reference-only; no new unlicensed asset adoption.

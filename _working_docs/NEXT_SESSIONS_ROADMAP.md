@@ -2,9 +2,9 @@
 
 ## Current state
 
-S01 and its favicon/interactive splash addition are merged. S02 contracts/configuration/shared UI are implemented on `arena/b46a5b8f-the-fish-tank`; see [verification](../docs/S02_VERIFICATION.md) and latest implementation log for final PR/check outcomes. S03–S39 have not started. Active canonical workflows remain unchanged.
+S01 and its favicon/interactive splash addition are merged. S02 contracts/configuration/shared UI are implemented on `arena/b46a5b8f-the-fish-tank`; see [verification](../docs/S02_VERIFICATION.md) and latest implementation log for final PR/check outcomes. S03 is implemented; see docs/S03_VERIFICATION.md. S04–S39 have not started. Active canonical workflows remain unchanged.
 
-## Next: S03 — Fixed-step tank scene and quality controls
+## Completed locally: S03 — Fixed-step tank scene and quality controls
 
 1. Read rules, original idea/spec, plan, audit/log/changelog and actual Git state; write a bounded checklist.
 2. Reuse S02 canonical schemas, RNG, typed events, balance/domain configuration, shared controls, tokens and strings. Do not fork them.
@@ -28,3 +28,7 @@ Product name: **the fish tank**. Mysterious dark-blue theme throughout; single f
 ## Latest owner direction
 
 No landing page: startup now opens the aquarium GUI directly. Loading minimum is **3 seconds** (plus real readiness), with lightweight grainy Oimo water. Preserve 1100-cell/DPR≤1/24Hz budgets, static grain and buffer/lifecycle reuse until measurements justify changes. Extend this direct GUI in S03; do not revive hero/journal pages or add fake wallet/tool actions. See DEC-020 and latest verification log. Owner authorized merging the startup/GUI PR once checks pass.
+
+## Next: S04
+
+Water currents, ripples and credited compatible caustics; preserve S03 quality/motion/lifecycle limits. Await S03 review/merge before starting another numbered session.

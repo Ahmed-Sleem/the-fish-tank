@@ -35,3 +35,7 @@ Search existing project primitives and upstream implementations; pin source revi
 ## Current canonical adoption list
 
 See [the reuse ledger](../REUSE_LEDGER.md) for shipped Oimo Water and mitt adaptations, versions/licenses, modifications, runtime paths, distribution notices and study-only candidates. The owner’s heavy-reuse/dark-blue/the fish tank identity requirements are binding in CONTRIBUTING.md and DEC-019.
+
+### S03 MainLoop study
+
+Pinned IceCreamYou/MainLoop.js `3ddadf0ab902da96af7077be40206ac27ba1b1d3`, MIT. Downloaded `src/mainloop.js` and `LICENSE.txt`, studied update accumulator, catch-up panic and render interpolation, adapted in `src/core/loop.ts`. Snapshots `mainloop.js.txt` and `mainloop-LICENSE.txt` are hash-registered; full distribution license in `public/licenses/mainloop.txt`. See [reuse ledger](../REUSE_LEDGER.md) and `docs/S03_VERIFICATION.md`.

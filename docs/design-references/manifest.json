@@ -82,5 +82,19 @@
     "source": "https://github.com/saharan/works/blob/f34a4951a95ba178bfc9964d08dc898795ea4736/LICENSE",
     "license": "MIT",
     "use": "source snapshot for adapted loading-screen fluid; see REUSE_LEDGER"
+  },
+  {
+    "file": "mainloop.js.txt",
+    "source": "https://github.com/IceCreamYou/MainLoop.js/blob/3ddadf0ab902da96af7077be40206ac27ba1b1d3/src/mainloop.js",
+    "license": "MIT",
+    "use": "adapted accumulator/interpolation pattern in src/core/loop.ts",
+    "sha256": "ca6afe362b5592cf3158eb1e2c5823bb14f66bd44b020d0405523f007962f10a"
+  },
+  {
+    "file": "mainloop-LICENSE.txt",
+    "source": "https://github.com/IceCreamYou/MainLoop.js/blob/3ddadf0ab902da96af7077be40206ac27ba1b1d3/LICENSE.txt",
+    "license": "MIT",
+    "use": "adapted accumulator/interpolation pattern in src/core/loop.ts",
+    "sha256": "cc1792d6ce1bd8e03ed5c88fc1a3976334c864da8cee3ba677539e9ffa97e6f4"
   }
 ]

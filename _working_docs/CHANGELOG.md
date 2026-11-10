@@ -54,3 +54,7 @@ Renamed product UI/metadata to the fish tank; replaced mint/green palette with m
 ## Lightweight grainy startup and direct aquarium GUI
 
 Raised minimum loading duration to 3 seconds while retaining readiness gates. Reduced Oimo simulation/pixel/frame budgets, added static fragment grain and reused GPU storage. Removed landing-page hero/journal/footer and unused layout tokens; open directly into a full-window aquarium with floating working Fullscreen/About controls, graphics status and honest empty-tank message. Drawing/fish/economy remain future gameplay.
+
+## S03 — pooled loader and fixed-step scene
+
+Implemented seeded pooled particles, ordered layers/surface, bounded 30Hz loop and quality/reduced-motion controls. Loader begins pooled at the bottom with no warmup. See `docs/S03_VERIFICATION.md` for tests, controlled regressions, source reuse and software-browser measurements. Real-device GAP-005 remains open; no creatures/storage/economy or S04 currents implemented. Full local verify passed: 84 unit/16 browser/11 architecture/4 documentation tests, build/lint/typecheck/hash checks and audit zero. Publishing S03 for review; hosted verification and merge/deployment pending.
