@@ -2,6 +2,8 @@
 import { appConfig } from '../../config/app.config';
 import { strings } from '../../config/strings.en';
 import { element } from './dom';
+import { mountOimoWater } from '../../render/water/oimo-view';
+import { waterConfig } from '../../config/water.config';
 
 /** Both conditions must finish; no arbitrary maximum hides unfinished initialization. */
 export async function waitForStartup(ready: Promise<unknown>, minimumMs: number): Promise<void> {
@@ -14,46 +16,37 @@ export function createLoadingScreen(root: HTMLElement) {
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const overlay = element('div', 'loading-screen');
   overlay.setAttribute('aria-label', strings.loading);
-  const pool = element('div', 'loading-pool');
-  pool.setAttribute('aria-hidden', 'true');
-  const drop = element('div', 'loading-drop');
-  pool.append(drop);
   const caption = element('div', 'loading-caption');
-  caption.append(element('span', 'wordmark', strings.brand), element('p', '', strings.loading));
-  const hint = element('p', 'loading-hint', strings.loadingHint);
-  hint.setAttribute('aria-hidden', 'true');
-  caption.append(hint);
-  overlay.append(pool, caption);
+  const word = element('span', 'loading-word', strings.loading.slice(0, 1));
+  word.setAttribute('aria-hidden', 'true');
+  const accessible = element('span', 'sr-only', strings.loading);
+  accessible.setAttribute('role', 'status');
+  caption.append(word, accessible);
+  overlay.append(caption);
   document.body.append(overlay);
+  mountOimoWater(overlay, signal);
   root.inert = true;
   root.setAttribute('aria-busy', 'true');
-  let lastRipple = -Infinity;
-  const clearRipples = () => {
-    pool.querySelectorAll('.loading-ripple').forEach((node) => {
-      node.remove();
-    });
+  let letter = 1;
+  let interval: number | undefined;
+  const updateMotion = () => {
+    clearInterval(interval);
+    letter = 1;
+    word.textContent = motion.matches ? strings.loading : strings.loading.slice(0, 1);
+    if (!motion.matches)
+      interval = window.setInterval(() => {
+        letter = (letter % (strings.loading.length + waterConfig.endHold)) + 1;
+        word.textContent = strings.loading.slice(0, Math.min(letter, strings.loading.length));
+      }, waterConfig.letterMs);
   };
-  motion.addEventListener('change', clearRipples, { signal });
-  overlay.addEventListener(
-    'pointermove',
-    (event) => {
-      if (motion.matches || event.timeStamp - lastRipple < appConfig.loading.rippleIntervalMs)
-        return;
-      lastRipple = event.timeStamp;
-      if (pool.childElementCount > appConfig.loading.maxRipples) pool.children[1]?.remove();
-      const ripple = element('span', 'loading-ripple');
-      ripple.style.left = `${String(event.clientX)}px`;
-      ripple.style.top = `${String(event.clientY)}px`;
-      ripple.addEventListener(
-        'animationend',
-        () => {
-          ripple.remove();
-        },
-        { once: true, signal },
-      );
-      pool.append(ripple);
+  motion.addEventListener('change', updateMotion, { signal });
+  updateMotion();
+  signal.addEventListener(
+    'abort',
+    () => {
+      clearInterval(interval);
     },
-    { signal },
+    { once: true },
   );
   const pageReady =
     document.readyState === 'complete'

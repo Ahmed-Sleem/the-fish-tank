@@ -79,3 +79,24 @@
 Added original lightweight CSS water drop and bounded pointer ripples; waits for both 1500ms and page/renderer initialization. Reduced motion is static; startup failures expose existing fallback. Pixi downloads dynamically. Collected pinned Apache-2.0 Paper water reference with LICENSE/NOTICE and documented five-site research and sequential reuse gates. Updated player README. S02–S39 remain future bounded sessions; no new gameplay or public deployment claimed.
 
 Verification: full `npm run verify` passed (4 Python docs regressions, 13 unit tests, 8 desktop/mobile Chromium cases, audit 0). Removing minimum-delay and readiness gates separately made the respective unit tests fail (exit 1), then restored green. Browser checks cover delayed renderer download, pointer/reduced-motion behavior, Pages favicon path, graphics failure and keyboard release. Removed obsolete docs/github-pages-setup/README.md and updated verifier required paths; active workflow YAML untouched. No physical-device performance or public deployment claim.
+
+## S02 — Contracts, configuration and UI foundations
+
+- Read original idea/spec, rules, audit/log/roadmap and checked active arena/b46a5b8f-the-fish-tank at merged PR5 base.
+- Implemented canonical Zod contracts, all Trait Card parameters, ancestry list/percentages, inventory/jobs/corpse/runtime fields, strict imports and separate finite AI normalization. Added resumable RNG and typed lifecycle bus, shared native controls/theme tokens and real About-this-build integration.
+- Studied mitt, seedrandom, Zod v4 numeric/default facilities and W3C APG dialog guidance; adapted pinned MIT mitt source with retained license. No new dependencies or graphics libraries. Shader references deferred to rendering sessions deliberately.
+- Controlled source mutations for AI bounds, strict save parsing, RNG, snapshot events, architecture guards and dialog showModal all failed their tests (exit 1), then restored exact sources. Full verification/evidence and limitations in docs/S02_VERIFICATION.md.
+- No ink formula chosen; GAP-002 remains for S05. No persistence/provider/gameplay or physical-device/performance/public-S02-deployment claims. S03 next, S04 later.
+
+Final local verification: 76 unit tests, 11 architecture fixtures, 4 Python documentation regressions, 10 real Chromium browser cases; audit 0. All formatting/lint/strict types/build/docs/architecture gates passed. Library-only contracts are exercised by tests; only genuine build-info UI is exposed.
+
+S02 source published as cb5c0d2 on arena/b46a5b8f-the-fish-tank. PR #6: https://github.com/Ahmed-Sleem/the-fish-tank/pull/6 (open, not merged). Hosted Verify run https://github.com/Ahmed-Sleem/the-fish-tank/actions/runs/42739909257 passed in 1m1s, including full npm run verify. No workflow artifacts were deployed from the PR. Next session is S03 after the owner's Continue action.
+
+## Owner style correction on PR6
+
+- Checked active PR6 branch; downloaded saharan/works Oimo Water at f34a4951a95ba178bfc9964d08dc898795ea4736 and root MIT license. Studied Main.hx/WaterShader.hx, APIC transfer/pressure/aeration/boundaries and renderer; reviewed Codrops water hub alternatives.
+- Ported actual algorithms/shader into src/render/water; replaced CSS droplet/rings with transient WebGL2 fluid. Adapted to 4000-cell budget, 30Hz, bounded hover input, theme uniforms, deterministic jitter, resize/reduced-motion/hidden/context-loss/disposal and static failure fallback. No full-demo iframe, external CDN, WASM, accelerometer or Three dependency.
+- Set global dark-blue palette and the fish tank identity; favicon is one solid circle. Loading letters reveal and repeat; timing gates preserved. Player README, standing rules/plan and canonical source/edit/path ledger updated; licenses included in public distribution.
+- Measured 8094-particle, two-substep solver in headless Chromium on this 2-vCPU sandbox: median 16.1ms / p95 44.8ms over 25 samples (includes warmup), not mobile-device performance proof. Inspected actual rendered loader screenshot; this is particle fluid, not CSS rings.
+
+Final style evidence: docs/STYLE_VERIFICATION.md. Local full verification passes 78 unit + 11 architecture + 4 Python + 12 browser cases; audit 0. Controlled hover, simulation, mount, lettering and favicon regressions all failed as intended, with lettering/icon exercised separately; exact sources restored. Immutable snapshot hashes and distributed-license equality verified. No physical-device guarantee or later gameplay completion claimed.

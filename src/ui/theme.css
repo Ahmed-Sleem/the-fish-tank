@@ -4,29 +4,29 @@
   --font-body: 'Segoe UI', Arial, sans-serif;
   --font-display: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
   --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
-  --color-ink: #e3ede4;
-  --color-muted: #a5b9b8;
-  --color-faint: #92adac;
-  --color-mint: #b8dbbe;
-  --color-dark: #071e25;
-  --color-focus: #d6f8c4;
-  --color-line: #a7c9bc30;
+  --color-ink: #dce7fa;
+  --color-muted: #94a9ca;
+  --color-faint: #8ba2c5;
+  --color-blue: #90b7ed;
+  --color-dark: #030916;
+  --color-focus: #bdd7ff;
+  --color-line: #7199d438;
   --water-background:
-    radial-gradient(ellipse at 76% 20%, #1d63645c, transparent 47%),
-    linear-gradient(155deg, #123c44, #071e25 61%, #061c25);
+    radial-gradient(ellipse at 76% 20%, #102b5b60, transparent 47%),
+    linear-gradient(155deg, #0a1b39, #030916 61%, #020713);
   --water-light:
-    radial-gradient(ellipse at 77% 43%, #6eb7a821, transparent 43%),
+    radial-gradient(ellipse at 77% 43%, #32579721, transparent 43%),
     conic-gradient(
       from 171deg at 82% -8%,
       transparent 0deg,
-      #95c8aa09 4deg,
+      #4c78c509 4deg,
       transparent 11deg,
-      #9de3c710 18deg,
+      #6392e010 18deg,
       transparent 26deg,
-      #a8d4b009 32deg,
+      #5c80b909 32deg,
       transparent 41deg
     );
-  --water-grain: repeating-linear-gradient(0deg, transparent, transparent 3px, #cde5cc03 4px);
+  --water-grain: repeating-linear-gradient(0deg, transparent, transparent 3px, #bfd7ff03 4px);
   --water-mask: radial-gradient(ellipse at 65% 20%, #000, transparent 75%);
   --shell-width: 90rem;
   --page-pad: clamp(1.5rem, 4vw, 4.5rem);
@@ -38,8 +38,8 @@
   --title-line-height: 1.05;
   --title-tracking: -0.045em;
   --title-top-gap: 1.8rem;
-  --wordmark-size: 2.6rem;
-  --wordmark-tracking: -0.07em;
+  --wordmark-size: clamp(1.3rem, 3.2vw, 2.2rem);
+  --wordmark-tracking: -0.025em;
   --body-size: 1rem;
   --body-leading: 1.8;
   --description-size: clamp(1rem, 1.5vw, 1.15rem);
@@ -87,23 +87,22 @@
   }
 }
 
-/* Splash tokens; the favicon is a self-contained static representation of this palette. */
+/* Permanent mysterious dark-blue identity; static favicon matches --color-accent. */
 :root {
+  --color-accent: #396aab;
+  --water-body: #102a5d;
+  --water-foam: #80ade4;
   --z-loading: 10;
-  --loading-caption-offset: 8rem;
-  --loading-drop-size: 2.5rem;
-  --loading-ripple-size: 4rem;
-  --loading-cycle: 1.5s;
-  --loading-ripple-duration: 1.2s;
-  --loading-drop-fill: linear-gradient(135deg, var(--color-ink), #439c9c);
-  --loading-glow: 0 0 2rem #b8dbbe30;
+  --loading-word-width: 10ch;
+  --loading-word-size: clamp(1.1rem, 3vw, 1.6rem);
+  --loading-tracking: 0.14em;
+  --loading-text-shadow: 0 2px 12px #020713;
 }
-@media (prefers-reduced-motion: reduce) {
-  .loading-drop {
-    animation: none;
-  }
-  .loading-ripple,
-  .loading-hint {
-    display: none;
-  }
+
+:root {
+  --control-radius: 0.6rem;
+  --control-hit-size: 2.75rem;
+  --control-disabled-opacity: 0.5;
+  --dialog-width: 32rem;
+  --dialog-backdrop: #010510cc;
 }

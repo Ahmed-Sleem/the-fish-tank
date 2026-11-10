@@ -93,7 +93,7 @@ h2 {
   color: var(--color-faint);
 }
 .phase-label {
-  color: var(--color-mint);
+  color: var(--color-blue);
   font-size: var(--phase-size);
   letter-spacing: var(--label-tracking);
 }
@@ -101,7 +101,7 @@ h2 {
   padding-block: var(--intro-padding) var(--intro-bottom);
 }
 .eyebrow {
-  color: var(--color-mint);
+  color: var(--color-blue);
 }
 .hero-title {
   margin-top: var(--title-top-gap);
@@ -115,7 +115,7 @@ h2 {
   display: block;
 }
 .ink-word {
-  color: var(--color-mint);
+  color: var(--color-blue);
   font-weight: normal;
 }
 .description {
@@ -156,7 +156,7 @@ h2 {
 .renderer-status {
   font-size: var(--chapter-copy-size);
   line-height: var(--body-leading);
-  color: var(--color-mint);
+  color: var(--color-blue);
 }
 .build-id {
   font-family: var(--font-mono);

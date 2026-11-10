@@ -1,6 +1,6 @@
-# Implementation Plan — Human × AI Evolution Tank
+# Implementation Plan — the fish tank
 
-Prepared 2026-11-08. **Status: S01 app scaffold verified locally; workflows installed by owner; verification repair pending main release. S02–S39 not started.**
+Prepared 2026-11-08. **Status: S01 hosted CI/deployment succeeded; S02 implemented and verified locally; S03–S39 not started.**
 
 ## 1. Authority, scope and hosting
 
@@ -83,7 +83,7 @@ All paths below are intended implementation targets, **not claims that files alr
 
 ### S01 — Toolchain and verification foundation
 
-- **Phase:** 1. **Dependency:** approved plan and clean repository. **Status:** IMPLEMENTED LOCALLY; CI publication BLOCKED (GAP-014; docs/S01_VERIFICATION.md).
+- **Phase:** 1. **Dependency:** approved plan and clean repository. **Status:** IMPLEMENTED; workflows installed and hosted verification passed (see docs/S01_VERIFICATION.md and subsequent release logs).
 - **Read first:** TECH_SPEC §4, §21; relevant GAME_IDEA philosophy/feature sections and current audit.
 - **Bounded work:** Pin supported Node/npm and exact TypeScript/Vite/PixiJS v8/Paper.js/Dexie/Zod/test/lint versions after registry and compatibility review; create strict TS app shell and lockfile; establish npm run verify and CI. Owner-requested exception DEC-013 brings Pages workflow setup forward here; public activation is tracked separately in GAP-007.
 - **Deliverables / likely paths:** `src/core/, package.json, lockfile, tsconfig, eslint/prettier, .github/workflows/ci.yml`. Update existing shared primitives and contracts rather than copying them.
@@ -93,7 +93,7 @@ All paths below are intended implementation targets, **not claims that files alr
 
 ### S02 — Schemas, configuration and shared UI library
 
-- **Phase:** 1. **Dependency:** S01 complete. **Status:** NOT STARTED.
+- **Phase:** 1. **Dependency:** S01 complete. **Status:** IMPLEMENTED — verification evidence in [S02 verification](docs/S02_VERIFICATION.md).
 - **Read first:** TECH_SPEC §5–6, §15, §18; relevant GAME_IDEA philosophy/feature sections and current audit.
 - **Bounded work:** Define Zod-derived save/entity/trait schemas, seeded RNG, events and configuration registries; include missing humanAncestry, inventory, job and corpse fields; centralize balance, theme and English strings; build reusable button/dialog/toolbar/stat primitives and architectural checks.
 - **Deliverables / likely paths:** `src/core/, src/config/, src/ui/shared/, src/ai/schemas/`. Update existing shared primitives and contracts rather than copying them.
@@ -585,3 +585,13 @@ Owner installed both workflows and enabled Pages Actions. The missing-template v
 The owner requested a circular aqua favicon and cursor-reactive splash with a 1500ms minimum and actual-page/startup readiness gate. This is a bounded S01 enhancement, not completion of S02. Renderer import is deferred so the lightweight splash can appear during its download. Startup errors release the overlay to readable fallback status.
 
 Use the [five-site research/reuse ledger](docs/design-references/README.md) at every step. Next is **S02**, unchanged in scope: shared schemas/config/UI primitives, including common accessible motion/cancellation rules. **S03** follows only after S02 acceptance: depth gradient, pooled particles/bubbles, quality controls and lifecycle, informed by Seer without importing Three. **S04** follows S03: inspect collected Paper water GLSL, port compatible caustic/ray/ripple concepts to Pixi with notices, benchmark low/high tiers and retain a static fallback. Later inspector/polish sessions study Codrops viewport-safe reveals and GSAP interruption patterns; prefer native transitions. No effect may obscure creature identity, move hit targets, trap focus or ignore reduced motion. Each step remains one bounded verified session. S02–S39 remain not started; do not claim all phases complete in this startup update.
+
+## S02 handoff
+
+S02 contracts/config/RNG/events/shared controls are implemented; see [verification and limitations](docs/S02_VERIFICATION.md). S03 is the next bounded session. Earlier startup notes saying S02 is not started describe the prior handoff, not current state. No S03–S39 gameplay is completed here.
+
+## Permanent visual identity and reuse policy — owner correction
+
+**the fish tank** is the product name everywhere in UI/metadata/docs (historical/original requirement documents remain preserved). Theme: mysterious dark blue across screens, controls and dialogs. Favicon: flat solid blue circle, never gradients or decorative highlights. Loading: incremental `l → lo → loa → … → loading`, repeating; actual licensed Oimo Water solver/shader adaptation supplies interactive background. Retain minimum/readiness/accessibility and disposal rules. This correction supersedes the earlier original CSS-droplet/mint direction.
+
+Heavy code reuse is mandatory in each session: search → collect pinned source/license → study → adapt → test → document. Maintain [the canonical reuse ledger](docs/REUSE_LEDGER.md), listing source, edits and exact runtime paths. S03 should reuse S02 components and the newly adapted fluid's lifecycle/quality learnings without claiming the loader completes fixed-step tank gameplay. S04 should evaluate reusing the actual water solver where suitable, plus Paper caustics/rays; do not rebuild decorative substitutes for proven source. Main scene remains Pixi; a temporary startup WebGL context is an explicit owner-requested exception and must always be released. S03–S39 remain unimplemented.

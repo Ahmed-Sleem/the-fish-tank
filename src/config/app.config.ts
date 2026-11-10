@@ -2,7 +2,7 @@
 export const appConfig = {
   repository: 'https://github.com/Ahmed-Sleem/the-fish-tank',
   branch: 'main',
-  loading: { minimumMs: 1500, rippleIntervalMs: 90, maxRipples: 12 },
+  loading: { minimumMs: 1500 },
   renderer: {
     maxResolution: 2,
     backgroundAlpha: 0,

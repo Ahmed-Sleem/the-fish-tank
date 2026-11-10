@@ -1,17 +1,18 @@
-# Tank — a world from a little ink
+# the fish tank — a world from a little ink
 
-Tank is a browser aquarium being built around a simple idea: **you draw the beginning, then discover what it becomes.** In the planned game, your handmade creatures will develop personalities, grow, and pass features on to their offspring without losing their hand-drawn identity.
+the fish tank is a browser aquarium being built around a simple idea: **you draw the beginning, then discover what it becomes.** In the planned game, your handmade creatures will develop personalities, grow, and pass features on to their offspring without losing their hand-drawn identity.
 
-## Open Tank
+## Open the fish tank
 
 **[Open the browser build](https://ahmed-sleem.github.io/the-fish-tank/)** — no installation or account required.
 
-**Release status:** the first public deployment is awaiting publication of a verified repair. If the link returns a missing-page error, the site has not been published successfully yet. The current version is an early foundation preview, **not a playable aquarium**.
+**Release status:** public updates appear after a verified pull request is merged and deployment succeeds. The current version is an early foundation preview, **not a playable aquarium**. Unmerged changes are available in the development preview, not necessarily on the public site.
 
 ## What you can do now
 
-- Open the underwater-styled development page on desktop or mobile. Look for the aqua-circle tab icon.
-- During startup, move your cursor through the water-splash screen to leave ripples. It stays for at least 1.5 seconds and until the page and graphics startup have settled; slower connections take longer. Touch movement also creates ripples where supported.
+- Open the underwater-styled development page on desktop or mobile. Look for the flat blue-circle tab icon.
+- During startup, **loading** appears one letter at a time and repeats. Move your cursor through the blue particle water to stir it; the fluid is adapted from [Oimo Water](https://oimo.io/works/water/). It stays for at least 1.5 seconds and until the page and graphics startup have settled; slower connections take longer. Touch movement also creates ripples where supported.
+- Open **About this build** in the footer to see the data-format version, graphics status and current limitations. Press **Escape** or **Close** to dismiss it; keyboard focus returns to the opener.
 - Check the build identifier and graphics status under **Current build**.
 - Follow **Explore the source** or **Read the build plan** to see how the project is progressing.
 - Use a keyboard: press **Tab** for the “Skip to build status” link and the other page links.
@@ -24,9 +25,10 @@ Drawing creatures, swimming fish, feeding, growth, offspring, plants, creature h
 
 ## Browser help
 
-Use a current browser with JavaScript and WebGL enabled. The page supports mouse, touch and keyboard navigation. The splash respects your system’s reduced-motion setting: the drop stays still and cursor ripples are disabled.
+Use a current browser with JavaScript and WebGL enabled. The page supports mouse, touch and keyboard navigation. The splash respects your system’s reduced-motion setting: the complete word **loading** and the water stay still; cursor stirring is disabled.
 
 - **“PixiJS renderer ready”** means the empty graphics canvas started successfully. It does not mean fish gameplay is available.
+- **No animated loading water?** The effect needs WebGL 2. If unavailable, the loading word stays readable against the dark-blue background. Graphics failure does not block the page text and links.
 - **Loading never finishes?** Check your connection and reload. No artificial timeout pretends a stalled download is complete.
 - **“Graphics unavailable…”**: enable hardware acceleration/WebGL or try another up-to-date browser. The page text and links remain usable without the graphics canvas.
 - **“Graphics context interrupted…”**: reload the page to restart the renderer.
@@ -43,3 +45,7 @@ This version has **no AI calls, no data uploads, no saved game and no login**. I
 - [Changelog](_working_docs/CHANGELOG.md) — what changed and what is still missing.
 
 Want to run the project yourself or contribute? See [developer setup](docs/DEVELOPMENT.md), [contributing](CONTRIBUTING.md) and [deployment notes](docs/DEPLOYMENT.md). Those details are separate from the player guide above.
+
+## Open-source credits
+
+See the [reuse ledger](docs/REUSE_LEDGER.md) for upstream sources, licenses, modifications and exact integration locations. The in-app **About this build** dialog links to the same list.

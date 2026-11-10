@@ -42,3 +42,11 @@
 Added original lightweight CSS water drop and bounded pointer ripples; waits for both 1500ms and page/renderer initialization. Reduced motion is static; startup failures expose existing fallback. Pixi downloads dynamically. Collected pinned Apache-2.0 Paper water reference with LICENSE/NOTICE and documented five-site research and sequential reuse gates. Updated player README. S02–S39 remain future bounded sessions; no new gameplay or public deployment claimed.
 
 Verification: full `npm run verify` passed (4 Python docs regressions, 13 unit tests, 8 desktop/mobile Chromium cases, audit 0). Removing minimum-delay and readiness gates separately made the respective unit tests fail (exit 1), then restored green. Browser checks cover delayed renderer download, pointer/reduced-motion behavior, Pages favicon path, graphics failure and keyboard release. Removed obsolete docs/github-pages-setup/README.md and updated verifier required paths; active workflow YAML untouched. No physical-device performance or public deployment claim.
+
+## S02 — Shared contracts, configuration and accessible UI
+
+Added complete strict v1 save/entity/trait schemas and bounded AI normalization; ancestry roots, inventory, corpse and persisted job metadata included. Added seeded RNG/state, lifecycle events, canonical balance/range configuration and negative-tested architecture guards. Shared native controls power the new About-this-build dialog with current graphics status, format version and limitations. Updated player guide and source/license ledger. S03 remains next; drawing, fish, saving and provider calls are not available yet.
+
+## Owner-directed style correction — the fish tank
+
+Renamed product UI/metadata to the fish tank; replaced mint/green palette with mysterious dark blue and the gradient favicon with a single solid blue circle. Replaced original droplet/DOM rings with actual MIT Oimo Water solver/shader adaptation, bounded for startup and interactive on hover/touch. Loading reveals successive letters and loops; reduced motion is static. Added canonical reuse ledger and shipped license files; permanent reuse-first/design policy now applies to all later phases. No gameplay phase beyond S02 is claimed.

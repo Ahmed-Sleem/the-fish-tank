@@ -1,8 +1,16 @@
 /** English copy is centralized so the overlay can be translated later. */
 export const strings = {
-  loading: 'Let the water settle…',
-  loadingHint: 'Move through the water',
-  brand: 'tank',
+  credits: 'Open-source credits',
+  buildDetails: 'About this build',
+  close: 'Close',
+  buildTools: 'Build information',
+  schemaLabel: 'Data format',
+  dataFormat: 'Version',
+  runtimeLabel: 'Graphics',
+  capabilities:
+    'This is a foundation preview. Drawing, fish and saved tanks are not available yet. No AI calls or uploads are made.',
+  loading: 'loading',
+  brand: 'the fish tank',
   brandDetail: 'HUMAN × AI · A LIVING EXPERIMENT',
   stage: 'DEVELOPMENT JOURNAL',
   phase: '01 / FOUNDATION',

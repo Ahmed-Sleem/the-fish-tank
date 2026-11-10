@@ -16,6 +16,7 @@ test('the project subpath renders, reloads and never calls external services', a
     if (response.status() >= 400) failures.push(`${String(response.status())} ${response.url()}`);
   });
   await page.goto('./');
+  await expect(page.locator('.loading-screen')).toHaveCount(0);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Every world begins');
   await expect(page.getByRole('status')).toHaveText(strings.rendererReady);
   await expect(page.locator('canvas')).toHaveCount(1);
@@ -23,11 +24,12 @@ test('the project subpath renders, reloads and never calls external services', a
     'href',
     'https://github.com/Ahmed-Sleem/the-fish-tank',
   );
-  await expect(page.getByRole('button')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: strings.buildDetails })).toHaveCount(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
   await page.reload();
+  await expect(page.locator('.loading-screen')).toHaveCount(0);
   await expect(page.getByRole('status')).toHaveText(strings.rendererReady);
   await expect(page.locator('canvas')).toHaveCount(1);
   await expect(page.locator('.loading-screen')).toHaveCount(0);
@@ -48,6 +50,7 @@ test('graphics failure leaves accessible status and working navigation', async (
     HTMLCanvasElement.prototype.getContext = () => null;
   });
   await page.goto('./');
+  await expect(page.locator('.loading-screen')).toHaveCount(0);
   await expect(page.getByRole('status')).toHaveText(strings.rendererFailed);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.getByRole('link', { name: strings.plan })).toHaveAttribute(
@@ -60,6 +63,7 @@ test('graphics failure leaves accessible status and working navigation', async (
 
 test('lost graphics context is not falsely reported as ready', async ({ page }) => {
   await page.goto('./');
+  await expect(page.locator('.loading-screen')).toHaveCount(0);
   await expect(page.getByRole('status')).toHaveText(strings.rendererReady);
   await page.locator('canvas').dispatchEvent('webglcontextlost');
   await expect(page.getByRole('status')).toHaveText(strings.rendererLost);
