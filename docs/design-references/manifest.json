@@ -19,5 +19,19 @@
     "source": "https://github.com/paper-design/shaders/blob/3f29ea8391addaea459b22caf5e1e8ccabfbd4ee/NOTICE",
     "license": "Apache-2.0",
     "use": "reference-only"
+  },
+  {
+    "file": "mitt-index.ts.txt",
+    "sha256": "1536a2dd71d64785d811076beee6d970583ca555dd34ce839face641a200054b",
+    "source": "https://github.com/developit/mitt/blob/6b41670516ed8e8b738612f60491995470aa63b3/src/index.ts",
+    "license": "MIT",
+    "use": "source snapshot for shipped adapted event bus"
+  },
+  {
+    "file": "mitt-LICENSE.txt",
+    "sha256": "1cab22f196264195a4caec8ca5630170fdde76ee8f43346e47021d087332d3b0",
+    "source": "https://github.com/developit/mitt/blob/6b41670516ed8e8b738612f60491995470aa63b3/LICENSE",
+    "license": "MIT",
+    "use": "license for shipped adaptation"
   }
 ]

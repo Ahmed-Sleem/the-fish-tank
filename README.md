@@ -6,12 +6,13 @@ Tank is a browser aquarium being built around a simple idea: **you draw the begi
 
 **[Open the browser build](https://ahmed-sleem.github.io/the-fish-tank/)** — no installation or account required.
 
-**Release status:** the first public deployment is awaiting publication of a verified repair. If the link returns a missing-page error, the site has not been published successfully yet. The current version is an early foundation preview, **not a playable aquarium**.
+**Release status:** public updates appear after a verified pull request is merged and deployment succeeds. The current version is an early foundation preview, **not a playable aquarium**. Unmerged changes are available in the development preview, not necessarily on the public site.
 
 ## What you can do now
 
 - Open the underwater-styled development page on desktop or mobile. Look for the aqua-circle tab icon.
 - During startup, move your cursor through the water-splash screen to leave ripples. It stays for at least 1.5 seconds and until the page and graphics startup have settled; slower connections take longer. Touch movement also creates ripples where supported.
+- Open **About this build** in the footer to see the data-format version, graphics status and current limitations. Press **Escape** or **Close** to dismiss it; keyboard focus returns to the opener.
 - Check the build identifier and graphics status under **Current build**.
 - Follow **Explore the source** or **Read the build plan** to see how the project is progressing.
 - Use a keyboard: press **Tab** for the “Skip to build status” link and the other page links.

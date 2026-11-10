@@ -2,29 +2,21 @@
 
 ## Current state
 
-S01 app scaffold exists; all gameplay sessions S02–S39 remain not started. Owner installed **both workflows** and enabled Pages with GitHub Actions. Do not ask for another upload or PAT. `.github/workflows/{ci,pages}.yml` are canonical, not documentation copies.
+S01 and its favicon/interactive splash addition are merged. S02 contracts/configuration/shared UI are implemented on `arena/b46a5b8f-the-fish-tank`; see [verification](../docs/S02_VERIFICATION.md) and latest implementation log for final PR/check outcomes. S03–S39 have not started. Active canonical workflows remain unchanged.
 
-Initial main CI failed at `npm run verify` because our docs checker still required the moved handoff files. GAP-016 repairs that checker/links and adds regression coverage; PR #4 has passed actual hosted Verify run 42735606550. Current branch is `arena/5e6a285a-the-fish-tank`; no workflow YAML modifications are needed. Consult the latest implementation log for actual PR/run outcomes, not older permission-blocked handoffs.
+## Next: S03 — Fixed-step tank scene and quality controls
 
-## Next actions
+1. Read rules, original idea/spec, plan, audit/log/changelog and actual Git state; write a bounded checklist.
+2. Reuse S02 canonical schemas, RNG, typed events, balance/domain configuration, shared controls, tokens and strings. Do not fork them.
+3. Build Pixi layer hierarchy, resize/DPR lifecycle, 30Hz accumulator/interpolation, gradient/surface, pooled particles and real quality settings. Bound background catch-up.
+4. Revisit [source/reuse ledger](../docs/design-references/README.md), inspect compatible implementations, preserve licenses and measure actual workloads. Seer-like calm depth/bubbles are inspiration, not permission to import Three alongside Pixi.
+5. Verify seeded state at different render rates, resize/context/disposal, reduced motion, quality settings and recorded frame costs before completion.
+6. S04 then adds water currents, ripples and credited Paper-compatible caustics/rays. Do not implement S04 ahead of S03 acceptance.
 
-1. PR #4 is merged in the current base. No unauthorized main merge or branch switch. Startup splash/favicon are the current bounded addition; see latest log.
-2. Observe **Deploy Pages** on the new main commit; check the build/artifact/deploy jobs and public URL before calling it live. Old failed commits still contain the old bug.
-3. After first successful delivery, execute **S02 — schemas, configuration and shared UI library**, only that bounded step. S03/S04 later add fixed-step water/current/ripple behavior.
-4. Read rules/idea/spec/audit/log/changelog/plan and [contributor policy](../CONTRIBUTING.md); inspect Git reality and write the session checklist.
-5. Reuse existing safe DOM/theme/strings/startup/verification components. No fake UI or unsupported provider claims.
+## Standing gates
 
-## Standing player-documentation requirement
-
-**Update README.md with every user-visible change in the same work.** It is for the person using/playing Tank: how to open the current build, what actually works, controls, troubleshooting, privacy/cost and limitations. Never present future gameplay as shipped. Technical install/deployment instructions belong under docs. If internal-only changes need no README edit, record that reason explicitly. Review README against actual behavior before handoff/release.
-
-## Continuing gates
-
-- GAP-016 repaired-build validation passed on GitHub. GAP-007 first successful Pages release and live acceptance remain to be observed after main merge.
-- Owner ink-pricing clarification for GAP-002 before S05.
-- Licenses/provider browser support/performance and no-key playable fallback remain future feature gates.
-- No further gameplay phase acceptance is implied by publishing the S01 shell.
-
-## Startup handoff
-
-S01 startup enhancement verified: circular aqua favicon, bounded pointer ripples, 1500ms + readiness gates, reduced motion and graphics fallback. Next: S02 only, then S03/S04. Follow docs/design-references/README.md for the mandatory search → source/license review → study → adapt → verify reuse loop. No gameplay session is marked complete by this addition.
+- README is the player guide: update with every visible change, never describe future gameplay as available.
+- S02 data format exists as a contract, not an implemented storage/export interface. S11–S13 own persistence/recovery/migrations.
+- GAP-002 owner pricing clarification before S05. GAP-009 identity/image pipelines, GAP-003 provider capability and GAP-005 device budgets remain open for their later sessions.
+- Pages workflow run 42738724731 for merged PR5 reports success; S02 deployment requires its own reviewed merge and observed release. Never merge without authorization.
+- After S02 verification/push and PR handoff, tell the owner to click **Continue** to begin S03 on the next session branch.

@@ -1,10 +1,12 @@
 /** Honest early-build overlay, with working repository links instead of unfinished tools. */
+import { button, dialog, stat, toolbar } from './shared/controls';
+import { domainConfig } from '../config/domain.config';
 import { appConfig } from '../config/app.config';
 import { strings } from '../config/strings.en';
 import { buildLabel } from '../core/build';
 import { element, link } from './shared/dom';
 
-export function createShell(root: HTMLElement, revision: string) {
+export function createShell(root: HTMLElement, revision: string, signal: AbortSignal) {
   const skip = link(strings.skip, '#build-status', 'skip-link');
   const water = element('div', 'water');
   water.setAttribute('aria-hidden', 'true');
@@ -62,8 +64,33 @@ export function createShell(root: HTMLElement, revision: string) {
     link(strings.source, appConfig.repository),
     link(strings.plan, `${appConfig.repository}/blob/${appConfig.branch}/IMPLEMENTATION_PLAN.md`),
   );
-  footer.append(footerCopy, links);
-  root.replaceChildren(skip, water, header, main, chapter, footer);
+  const graphics = stat(strings.runtimeLabel, strings.rendererStarting);
+  const details = dialog(
+    strings.buildDetails,
+    strings.close,
+    [
+      element('p', '', strings.capabilities),
+      stat(strings.schemaLabel, `${strings.dataFormat} ${String(domainConfig.schemaVersion)}`).node,
+      graphics.node,
+    ],
+    signal,
+  );
+  const about = button(
+    strings.buildDetails,
+    () => {
+      details.open(about);
+    },
+    signal,
+  );
+  footer.append(footerCopy, links, toolbar(strings.buildTools, [about]));
+  root.replaceChildren(skip, water, header, main, chapter, footer, details.node);
 
-  return { canvasHost, status };
+  return {
+    canvasHost,
+    status,
+    setStatus: (value: string) => {
+      status.textContent = value;
+      graphics.update(value);
+    },
+  };
 }

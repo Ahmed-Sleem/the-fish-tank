@@ -107,3 +107,11 @@
     display: none;
   }
 }
+
+:root {
+  --control-radius: 0.6rem;
+  --control-hit-size: 2.75rem;
+  --control-disabled-opacity: 0.5;
+  --dialog-width: 32rem;
+  --dialog-backdrop: #03161cbb;
+}

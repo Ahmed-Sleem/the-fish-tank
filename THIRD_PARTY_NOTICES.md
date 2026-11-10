@@ -34,3 +34,7 @@ Before each adoption, record source URL, immutable commit/release, exact functio
 ## Research snapshots (not app runtime)
 
 `docs/design-references/paper-water.ts.txt` is unmodified source from paper-design/shaders commit `3f29ea8391addaea459b22caf5e1e8ccabfbd4ee`, Apache-2.0. Its license and NOTICE are adjacent. See the [reuse ledger](docs/design-references/README.md) for provenance, limitations and future adaptation gates. The splash loader itself is original project code; no external effect library was added.
+
+## mitt adaptation — S02
+
+`src/core/events.ts` adapts the Map/subscription/snapshot-dispatch pattern from developit/mitt, `src/index.ts`, commit `6b41670516ed8e8b738612f60491995470aa63b3`. MIT, Copyright (c) 2021 Jason Miller. Full license: `docs/design-references/mitt-LICENSE.txt`; exact research snapshot: `mitt-index.ts.txt`. Modified to use sets, typed lifecycle events, returned idempotent unsubscribe closures and explicit cleanup; wildcard API omitted. This code is included in the application. No additional npm dependency was installed.

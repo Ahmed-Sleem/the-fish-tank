@@ -1,0 +1,55 @@
+.ui-button {
+  font: inherit;
+  color: var(--color-ink);
+  border: var(--line-width) solid var(--color-line);
+  border-radius: var(--control-radius);
+  padding: var(--space-tiny) var(--space-small);
+  min-height: var(--control-hit-size);
+  background: var(--color-dark);
+  cursor: pointer;
+}
+.ui-button:hover {
+  border-color: var(--color-focus);
+}
+.ui-button:disabled {
+  cursor: not-allowed;
+  opacity: var(--control-disabled-opacity);
+}
+.ui-button:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: var(--focus-offset);
+}
+.ui-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-small);
+}
+.ui-dialog {
+  margin: auto;
+  padding: var(--space-large);
+  width: min(var(--dialog-width), calc(100% - var(--space-large)));
+  max-height: calc(100% - var(--space-large));
+  overflow: auto;
+  border: var(--line-width) solid var(--color-line);
+  border-radius: var(--control-radius);
+  color: var(--color-ink);
+  background: var(--color-dark);
+}
+.ui-dialog::backdrop {
+  background: var(--dialog-backdrop);
+}
+.ui-dialog > * + * {
+  margin-top: var(--space-small);
+}
+.ui-stat {
+  display: flex;
+  gap: var(--space-small);
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.ui-stat dt {
+  color: var(--color-muted);
+}
+.ui-stat dd {
+  margin: 0;
+}

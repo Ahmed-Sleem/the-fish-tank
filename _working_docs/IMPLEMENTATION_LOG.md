@@ -79,3 +79,13 @@
 Added original lightweight CSS water drop and bounded pointer ripples; waits for both 1500ms and page/renderer initialization. Reduced motion is static; startup failures expose existing fallback. Pixi downloads dynamically. Collected pinned Apache-2.0 Paper water reference with LICENSE/NOTICE and documented five-site research and sequential reuse gates. Updated player README. S02–S39 remain future bounded sessions; no new gameplay or public deployment claimed.
 
 Verification: full `npm run verify` passed (4 Python docs regressions, 13 unit tests, 8 desktop/mobile Chromium cases, audit 0). Removing minimum-delay and readiness gates separately made the respective unit tests fail (exit 1), then restored green. Browser checks cover delayed renderer download, pointer/reduced-motion behavior, Pages favicon path, graphics failure and keyboard release. Removed obsolete docs/github-pages-setup/README.md and updated verifier required paths; active workflow YAML untouched. No physical-device performance or public deployment claim.
+
+## S02 — Contracts, configuration and UI foundations
+
+- Read original idea/spec, rules, audit/log/roadmap and checked active arena/b46a5b8f-the-fish-tank at merged PR5 base.
+- Implemented canonical Zod contracts, all Trait Card parameters, ancestry list/percentages, inventory/jobs/corpse/runtime fields, strict imports and separate finite AI normalization. Added resumable RNG and typed lifecycle bus, shared native controls/theme tokens and real About-this-build integration.
+- Studied mitt, seedrandom, Zod v4 numeric/default facilities and W3C APG dialog guidance; adapted pinned MIT mitt source with retained license. No new dependencies or graphics libraries. Shader references deferred to rendering sessions deliberately.
+- Controlled source mutations for AI bounds, strict save parsing, RNG, snapshot events, architecture guards and dialog showModal all failed their tests (exit 1), then restored exact sources. Full verification/evidence and limitations in docs/S02_VERIFICATION.md.
+- No ink formula chosen; GAP-002 remains for S05. No persistence/provider/gameplay or physical-device/performance/public-S02-deployment claims. S03 next, S04 later.
+
+Final local verification: 76 unit tests, 11 architecture fixtures, 4 Python documentation regressions, 10 real Chromium browser cases; audit 0. All formatting/lint/strict types/build/docs/architecture gates passed. Library-only contracts are exercised by tests; only genuine build-info UI is exposed.

@@ -48,3 +48,9 @@ Owner installation is now complete (GAP-014); `.github/workflows/` is canonical.
 ## Startup follow-up
 
 GAP-018 — OPEN: complete S02 schemas/config/shared UI next, then S03 and S04 in order; design-reference ledger records required source/license/performance review. Startup addition does not close these gameplay gates.
+
+## S02 outcome
+
+GAP-018 — S02 portion complete: strict schemas (including root-percentage ancestry, jobs, corpse and inventory), separate AI normalization, configuration registries, resumable RNG, lifecycle events, shared controls and architecture regression fixtures. S03/S04 remain future work, now next in order. See docs/S02_VERIFICATION.md. GAP-009 still covers later identity continuity/image safety; GAP-008 still covers real storage/migration recovery. GAP-002 pricing clarification still blocks S05, not S03.
+
+The earlier S01 publication-blocked rows are historical: PR #5 is merged in the current base and Pages run 42738724731 reports SUCCESS. Public S02 acceptance is not claimed before its own merge/deploy.

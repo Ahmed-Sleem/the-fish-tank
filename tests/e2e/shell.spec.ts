@@ -23,7 +23,7 @@ test('the project subpath renders, reloads and never calls external services', a
     'href',
     'https://github.com/Ahmed-Sleem/the-fish-tank',
   );
-  await expect(page.getByRole('button')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: strings.buildDetails })).toHaveCount(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
