@@ -25,3 +25,24 @@ test('allows canonical primitives, registries, theme and schema-derived consumer
   ])
     assert.deepEqual(architectureErrors(file, code), []);
 });
+import { faviconAccentError } from '../../scripts/architecture-rules.mjs';
+const theme = ':root { --color-accent: #396aab; }';
+test('rejects a favicon whose brand fill drifted from the theme token', () => {
+  assert.match(
+    faviconAccentError('<circle r="30" fill="#00ff00"/>', theme) ?? '',
+    /must equal --color-accent/,
+  );
+});
+test('rejects a favicon with more than one filled shape', () => {
+  assert.match(
+    faviconAccentError('<circle r="30" fill="#396aab"/><circle r="4" fill="#396aab"/>', theme) ??
+      '',
+    /exactly one shape/,
+  );
+});
+test('rejects a theme without a usable accent token', () => {
+  assert.match(faviconAccentError('<circle fill="#396aab"/>', ':root{}') ?? '', /must define/);
+});
+test('accepts the shipped asset and token, case-insensitively', () => {
+  assert.equal(faviconAccentError('<circle r="30" fill="#396AAB"/>', theme), undefined);
+});

@@ -6,7 +6,7 @@ the fish tank is a browser aquarium being built around a simple idea: **you draw
 
 **[Open the browser build](https://ahmed-sleem.github.io/the-fish-tank/)** — no installation or account required.
 
-**Release status:** public updates appear after a verified pull request is merged and deployment succeeds. The current version is an early foundation preview, **not a playable aquarium**. Unmerged changes are available in the development preview, not necessarily on the public site.
+**Release status:** the public site is live and serves the current merged build. The current version is an early foundation preview, **not a playable aquarium** — water, light and controls only. Public updates appear after a verified pull request is merged and deployment succeeds; unmerged changes are available in the development preview, not necessarily on the public site.
 
 ## What you can do now
 

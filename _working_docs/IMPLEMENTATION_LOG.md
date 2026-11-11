@@ -118,3 +118,54 @@ Implemented seeded pooled particles, ordered layers/surface, bounded 30Hz loop a
 ## S04 water implementation and loader adjustment
 
 Implemented native Pixi half-float ping-pong ripples and refraction, seeded shared curl current, owner-source credited caustics/depth/rays, coalesced cursor/touch impulses and cleanup/quality/motion handling. Loader minimum now five seconds, bottom pool receives a bounded initial push. No Three dependency or placeholder fish. See `docs/S04_VERIFICATION.md` for exact scope, regression proof and honest software-renderer timings. Hardware <1.5ms GPU/60fps targets remain open GAP-005 (software RAF does NOT meet them); S05 pricing still blocked GAP-002. Full local verify passed: 86 unit, 22 browser, 11 architecture, 4 documentation tests; format/lint/typecheck/build/hash checks and audit zero. Publishing on arena/4cbba201-the-fish-tank for review; no auto-merge authorization assumed.
+
+## Repository study and rules reconciliation (2026-11-11)
+
+- **Scope.** Read the entire repository (29 source files, 13 test files, 3 verification scripts,
+  all product/process/evidence documents) and the four owner attachments; ran every verification
+  gate individually and inspected the running app and the live public site.
+- **Rules reconciliation.** `AGENT_RULES.md` and `CHUNKING_MECHANISM.md` were already present and
+  byte-identical (sha256 `6ddd622a…`, `f76e629d…`). `GENERAL_GUI_AGENT_RULES.md` was **missing**;
+  added verbatim with pinned hash `d68ff737…`. The owner's design-resource list was preserved as
+  `docs/design-references/owner-web-design-resources.txt` (`0212fdf0…`); its five sites were
+  already researched and licence-verdicted there.
+- **Files changed.** `_working_docs/REPO_STUDY.md` (new), `_working_docs/GENERAL_GUI_AGENT_RULES.md`
+  (new, verbatim), `docs/design-references/owner-web-design-resources.txt` (new, verbatim),
+  `scripts/verify_docs.py` (two pinned hashes, three newly required evidence documents),
+  `.prettierignore`, `CONTRIBUTING.md`, `IMPLEMENTATION_PLAN.md` (status + phase-gate note),
+  `docs/DEVELOPMENT.md`, `docs/design-references/README.md`, `README.md`,
+  `_working_docs/{AUDIT_AND_TODO,NEXT_SESSIONS_ROADMAP,CHANGELOG,IMPLEMENTATION_LOG}.md`.
+- **Reality corrections.** GAP-007 closed: Deploy Pages runs for PRs #5–#9 all `success` and the
+  live URL serves build `ead47c8`, equal to `origin/main`. S02–S04 statuses corrected from
+  "NOT STARTED"/"IMPLEMENTED LOCALLY"/"pending" to merged; DEVELOPMENT no longer calls the product
+  the S01 shell; README now states the site is live.
+- **New gaps.** GAP-021 automated accessibility/contrast/responsive-matrix checks absent;
+  GAP-022 the required light/dark decision is undocumented for a deliberately single-theme product.
+- **Verification observed.** `npm run verify` green after the edits (86 unit, 22 browser, 11
+  architecture, 4 documentation tests, format, lint, strict types, audit zero, build). Browser
+  suite needed the documented `@sparticuz/chromium@153.0.0` override because the Playwright CDN is
+  blocked in this sandbox; those results are software-renderer observations, not device proof.
+- **Self-check.** Is the study complete? Yes — every tracked file was read and every gate run,
+  not inferred. Is the reconciliation wired in? Yes — the two new pinned hashes and three new
+  required documents fail the build if removed (observed). Nothing gameplay-related was claimed.
+
+## GAP-025 — brand colour defined once and guarded (2026-11-11)
+
+- **Root cause.** `--color-accent: #396aab` in `theme.css` was duplicated as the literal `fill`
+  in `public/favicon.svg`. A static SVG cannot read the theme, and nothing compared the two —
+  only a CSS comment asserted they matched ("a comment is not a check", rules §0.2/§0.3).
+- **Fix.** `faviconAccentError(faviconSvg, themeCss)` in `scripts/architecture-rules.mjs` parses
+  the token and the favicon's fills: exactly one fill must exist and equal the token,
+  case-insensitively. Wired into `scripts/verify-architecture.mjs`, so it runs in `npm run verify`
+  and in CI. Four fixtures in `tests/architecture/rules.test.mjs`.
+- **Files.** `scripts/architecture-rules.mjs`, `scripts/verify-architecture.mjs`,
+  `tests/architecture/rules.test.mjs`, docs/audit/log/changelog.
+- **Controlled evidence.** Favicon fill mutated `#396aab` → `#396aac`: verifier printed
+  `public/favicon.svg: favicon.svg fill #396aac must equal --color-accent #396aab` and exited 1.
+  Restored: `PASS` exit 0. Architecture fixtures 15 pass / 0 fail.
+- **A mistake worth recording.** The first drift fixture used `#396aab` — the _matching_ colour —
+  so it failed. The check was right and the fixture was wrong; the fixture was changed to a truly
+  different colour rather than the check being weakened.
+- **Self-check.** Fixed everywhere? Yes — one definition, one guard, all entry points through
+  `npm run verify`. Wired? Yes, verified through the real command, not the unit test alone.
+  Does the test validate behaviour? Yes, observed failing for the intended reason.

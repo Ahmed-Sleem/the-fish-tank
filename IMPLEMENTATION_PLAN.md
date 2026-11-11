@@ -1,6 +1,6 @@
 # Implementation Plan — the fish tank
 
-Prepared 2026-11-08. **Status: S01 hosted CI/deployment succeeded; S02 implemented and verified locally; S03 implemented locally; S04 water implementation complete with hardware performance gate open; S05–S39 not started.**
+Prepared 2026-11-08; status revised 2026-11-11. **Status: S01–S04 merged and deployed (PRs #1–#9, Verify and Deploy Pages green; the public site serves the merged build). Phase 1's recorded-target 60 fps gate remains open as GAP-005 because it needs physical hardware. S05 is next and is blocked on owner ink-pricing decision GAP-002. S05–S39 not started.**
 
 ## 1. Authority, scope and hosting
 
@@ -37,11 +37,11 @@ Actual session capacity varies. Before starting, compare scope with available to
 
 | Session | Phase | Deliverable                                     | Depends on | Status                     |
 | ------- | ----- | ----------------------------------------------- | ---------- | -------------------------- |
-| S01     | 1     | Toolchain and verification foundation           | None       | BLOCKED (publication)      |
-| S02     | 1     | Schemas, configuration and shared UI library    | S01        | NOT STARTED                |
-| S03     | 1     | Fixed-step tank scene and quality controls      | S02        | IMPLEMENTED LOCALLY        |
-| S04     | 1     | Shared currents and interactive water           | S03        | IMPLEMENTED; GPU GATE OPEN |
-| S05     | 2     | Drawing transactions and ink pricing            | S04        | NOT STARTED                |
+| S01     | 1     | Toolchain and verification foundation           | None       | MERGED; deployed           |
+| S02     | 1     | Schemas, configuration and shared UI library    | S01        | MERGED (PR #6)             |
+| S03     | 1     | Fixed-step tank scene and quality controls      | S02        | MERGED (PR #8)             |
+| S04     | 1     | Shared currents and interactive water           | S03        | MERGED (PR #9); GAP-005    |
+| S05     | 2     | Drawing transactions and ink pricing            | S04        | NEXT; GAP-002 blocks start |
 | S06     | 2     | Paper.js drawing interface                      | S05        | NOT STARTED                |
 | S07     | 2     | Cutout pipeline and Stage 0 birth               | S06        | NOT STARTED                |
 | S08     | 3     | Steering, spatial grid and fish decisions       | S07        | NOT STARTED                |
@@ -488,7 +488,7 @@ All paths below are intended implementation targets, **not claims that files alr
 | 11 Sync           | S32–S33  | Explicit consent gates every upload; zero credentials uploaded; deletion tested; empty endpoint disables feature.  |
 | 12 Polish/release | S34–S39  | Balance, soak, visual/audio/accessibility/device budgets and actual Pages acceptance all evidenced.                |
 
-S01 implementation is locally verified, but its CI publication gate is blocked; no whole phase is currently accepted. These are gates for later work, not a statement that the current repository is playable.
+S01–S04 are merged and deployed, but phase 1 is **not yet accepted**: its checkpoint requires a 60 fps recorded-target result, and GAP-005 has only software-renderer timings. These are gates for later work, not a statement that the current repository is playable.
 
 ## 6. Requirements traceability
 

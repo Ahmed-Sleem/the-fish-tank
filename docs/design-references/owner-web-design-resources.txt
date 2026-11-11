@@ -1,0 +1,6 @@
+web design resources i like them and there styles you can get codes and reuse from them :
+- https://shaders.paper.design/
+- https://seer-js.com/
+- https://tympanus.net/codrops/hub/
+- https://www.threejslab.com/
+- https://demos.gsap.com/

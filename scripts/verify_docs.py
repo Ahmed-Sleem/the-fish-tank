@@ -12,14 +12,17 @@ SOURCES = {
     'TECH_SPEC.md': 'e6f31557d9b7be31a707489bb00073e15d776423b75d438df18626a8b3bb5b6f',
     '_working_docs/AGENT_RULES.md': '6ddd622a91c177c07ecb10e33bd1a4c324f5ef0056e6f6b51ed7866a027c3f29',
     '_working_docs/CHUNKING_MECHANISM.md': 'f76e629d1d39b477ab6a824a5b6e0459fd306f324c1de756769fbf019308b104',
+    '_working_docs/GENERAL_GUI_AGENT_RULES.md': 'd68ff7372869fc79a55711d5cd3009e3255ddebf557886be592867f9eb6a4772',
+    'docs/design-references/owner-web-design-resources.txt': '0212fdf0c60ceb378fb3d2f8e62d24bd0713e57982eee45b49c5de6fcb3e4a01',
 }
 REQUIRED = [*SOURCES, 'README.md', 'IMPLEMENTATION_PLAN.md', 'DECISIONS.md',
-            'THIRD_PARTY_NOTICES.md', '_working_docs/AUDIT_AND_TODO.md',
+            'THIRD_PARTY_NOTICES.md', '_working_docs/REPO_STUDY.md', '_working_docs/AUDIT_AND_TODO.md',
             '_working_docs/IMPLEMENTATION_LOG.md', '_working_docs/CHANGELOG.md',
             '_working_docs/NEXT_SESSIONS_ROADMAP.md',
             'docs/design-references/README.md', 'docs/REUSE_LEDGER.md', 'docs/STYLE_VERIFICATION.md', 'docs/DEPLOYMENT.md',
-            'docs/DEVELOPMENT.md', 'docs/S01_VERIFICATION.md', 'docs/S02_VERIFICATION.md', 'CONTRIBUTING.md',
-            '.github/workflows/ci.yml', '.github/workflows/pages.yml']
+            'docs/DEVELOPMENT.md', 'docs/S01_VERIFICATION.md', 'docs/S02_VERIFICATION.md',
+            'docs/S03_VERIFICATION.md', 'docs/S04_VERIFICATION.md', 'docs/S04_PREPARATION.md',
+            'CONTRIBUTING.md', '.github/workflows/ci.yml', '.github/workflows/pages.yml']
 
 WORKFLOW_RULES = {
     'ci.yml': ['branches: [main]', 'workflow_call:', 'publish:',

@@ -2,21 +2,43 @@
 
 ## Current state
 
-S01–S03 are merged; S03 PR #8 hosted verification passed. S04 feature implementation is complete on `arena/4cbba201-the-fish-tank`, with full local verification (86 unit/22 browser/11 architecture/4 documentation tests), credited source adaptations and direct cursor/touch tank effects. See `docs/S04_VERIFICATION.md`. Existing CI/Pages workflows are unchanged.
+S01–S04 are merged and deployed: PRs #1–#9 all merged, Verify and Deploy Pages runs green, and
+the public site serves the merged build (`ead47c8`). Local full verification passes on
+`arena/0fb511c8-the-fish-tank`: 86 unit / 22 browser / 11 architecture / 4 documentation tests,
+format, lint, strict types, audit zero, build. Phase 1 is **not yet accepted** because its
+checkpoint requires a recorded-target 60 fps result and only software-renderer timings exist.
+Start every session with `_working_docs/REPO_STUDY.md`.
 
-## S04 acceptance still open
+## Blocking the next step
 
-GAP-005: certify actual <1.5ms GPU ripple and 60fps laptop/mobile performance on physical hardware. Software Chromium submission timings do not certify GPU execution; measured 1000×700 software frame rate misses the target. Do not claim this gate passed or silently bypass it. Review/hosted checks/merge are separate from local verification.
+GAP-002 must be answered by the owner before S05 implementation: does ink cost follow drawn
+length only (original idea, DEC-010 default), or length × width plus a per-stroke charge
+(TECH_SPEC §8.1)? And are colours free (GAME_IDEA §18 question 7)? No pricing will be invented.
 
 ## Next numbered implementation: S05 — drawing transactions and ink pricing
 
-Resolve owner pricing decision GAP-002 before implementation. Reuse existing contracts/configuration/UI primitives and download/study suitable licensed drawing code before adapting it. No invented pricing. Do not skip S04 acceptance gates or implement later-session creatures/storage/economy prematurely.
+After GAP-002 is resolved: one centralized formula and one evaluator shared by the live
+estimate and the final simplified strokes; wallet reservation/commit/cancel with no overspend;
+free undo/clear with exact refunds; minimum-complexity rejection that never charges;
+boundary/property tests proving the wallet cannot go negative. Reuse existing contracts,
+configuration and UI primitives; download and study suitable licensed drawing code before
+adapting it. Do not implement later-session creatures/storage/economy prematurely.
 
 ## Standing gates
 
-- Follow the requested reuse-first development style: search, download, study, adapt, use; preserve license, pin, edits and exact integration paths.
-- README remains player-facing and changes with visible features. Never describe future gameplay as available.
-- Maintain direct tank reveal, mysterious dark-blue identity, five-second minimum loader, initial pooled-water push, real readiness, reduced-motion and lifecycle handling.
-- Every new check requires break/fail/restore proof; update ignored atomic checklist and remove only after verified push.
-- S02 schema is a contract, not a storage/export interface; S11–S13 own persistence/recovery/migrations.
+- GAP-005: certify the <1.5 ms GPU ripple and 60 fps laptop/mobile targets on physical
+  hardware with a recorded device report. Software Chromium timings do not certify GPU
+  execution. Do not claim this gate passed or silently bypass it.
+- GAP-021: automated accessibility/contrast/responsive-matrix checking is required by the GUI
+  production standard but not yet implemented; manual checks are not a substitute.
+- Follow the reuse-first style: search, download, study, adapt, use; preserve licence, pin,
+  edits and exact integration paths.
+- README stays player-facing and changes with every visible feature; never describe future
+  gameplay as available.
+- Maintain direct tank reveal, mysterious dark-blue identity, five-second minimum loader,
+  initial pooled-water push, real readiness, reduced-motion and lifecycle handling.
+- Every new check requires break/fail/restore proof; tick the ignored atomic checklist only
+  when a command proved it, and delete it only after a verified push.
+- S02 schemas are a contract, not a storage/export interface; S11–S13 own
+  persistence/recovery/migrations.
 - GAP-009 identity/image pipelines and GAP-003 provider capability remain later-session gates.

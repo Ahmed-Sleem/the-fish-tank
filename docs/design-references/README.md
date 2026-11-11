@@ -2,6 +2,8 @@
 
 Reviewed 2026-11-08. Source review, not a claim of visual/device benchmarking.
 
+Owner-supplied taste list (five sites, verbatim): [`owner-web-design-resources.txt`](owner-web-design-resources.txt). It is a preference list, not a licence. Each entry's verdict is in the five-site table below and in the reuse ledger.
+
 ## Collected source
 
 Paper's [water shader](https://github.com/paper-design/shaders/blob/3f29ea8391addaea459b22caf5e1e8ccabfbd4ee/packages/shaders/src/shaders/water.ts) is saved verbatim as `paper-water.ts.txt`, with upstream LICENSE and NOTICE from that same commit. Apache-2.0; research-only, not imported or served as executable code. Reviewed its six-iteration layered noise, image sampling, GLSL 300 inputs and shader-utils dependencies. It cannot simply be pasted into Pixi. Preserve upstream attribution and review embedded credits when porting. Avoid loading Paper React or a second WebGL canvas just for startup.
