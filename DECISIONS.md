@@ -123,7 +123,7 @@ Order: after the drawing path produces a real fish (S07), so the animated backgr
 
 The owner likes the pool on the loading screen and wants it in the tank, but does not know where. That indecision is answered here rather than being carried forward.
 
-The loader water is **not** a different effect to be dropped somewhere new. It is the *same* physics the tank's water already uses: the tank runs a curl-current flow field plus pointer impulses (`src/sim/water/flow.ts`, `input.ts`) and a GPU ripple field, and the loader runs the Oimo APIC solver that DEC-019 adapted for exactly this purpose. The loader shows it as a bed of point sprites because during loading there is **no tank yet** — it has to be the whole picture. In the tank there is a picture, so the same motion has to appear as *displacement in it*, not as grains in front of it.
+The loader water is **not** a different effect to be dropped somewhere new. It is the _same_ physics the tank's water already uses: the tank runs a curl-current flow field plus pointer impulses (`src/sim/water/flow.ts`, `input.ts`) and a GPU ripple field, and the loader runs the Oimo APIC solver that DEC-019 adapted for exactly this purpose. The loader shows it as a bed of point sprites because during loading there is **no tank yet** — it has to be the whole picture. In the tank there is a picture, so the same motion has to appear as _displacement in it_, not as grains in front of it.
 
 So the answer to "where": **inside the tank's existing lighting and refraction, driven by one shared flow.** Three places, in order of value:
 
