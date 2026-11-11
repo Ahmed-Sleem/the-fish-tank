@@ -183,6 +183,7 @@ export function createDrawing(options: DrawingOptions): DrawingSurface {
   let held = 0;
   let cssWidth = 0;
   let cssHeight = 0;
+  let queued = 0;
 
   /** Board coordinates, scaled from the pointer's CSS position. */
   function toPoint(event: PointerEvent): Point {
@@ -290,13 +291,22 @@ export function createDrawing(options: DrawingOptions): DrawingSurface {
       drawing = false;
       return;
     }
-    render();
+    requestRender();
   }
 
-  function updatePreview() {
-    // Throttled so a fast pointer cannot turn pricing into the expensive part of drawing.
-    if (!drawing) return;
-    render();
+  /**
+   * Repaint at most once per frame.
+   *
+   * Pointer events arrive far faster than frames (a coarser device can deliver dozens between two
+   * paints), and each repaint walks every committed stroke. Coalescing keeps a long drawing as
+   * responsive as a short one instead of getting slower the more the player draws.
+   */
+  function requestRender() {
+    if (queued !== 0) return;
+    queued = requestAnimationFrame(() => {
+      queued = 0;
+      render();
+    });
   }
 
   function finishStroke() {
@@ -357,15 +367,9 @@ export function createDrawing(options: DrawingOptions): DrawingSurface {
     onDone(strokes, cost);
   }
 
-  let estimate = 0;
   const onPointerMove = (event: PointerEvent) => {
     if (!drawing) return;
-    const now = performance.now();
     extend(event);
-    if (now - estimate >= penOptions.estimateIntervalMs) {
-      estimate = now;
-      updatePreview();
-    }
   };
 
   board.addEventListener('pointerdown', begin, { signal });
@@ -387,6 +391,8 @@ export function createDrawing(options: DrawingOptions): DrawingSurface {
         });
 
   function dispose() {
+    cancelAnimationFrame(queued);
+    queued = 0;
     observer?.disconnect();
     purse.release(held);
     held = 0;

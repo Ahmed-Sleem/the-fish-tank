@@ -37,6 +37,4 @@ export const penOptions = {
   defaultWidth: 5,
   colours: ['#14384d', '#1f6f6b', '#e0a33c', '#c8563f', '#6d5a8c', '#ffffff'] as const,
   defaultColour: '#14384d',
-  /** How often the live price is recomputed while the pointer moves, in milliseconds. */
-  estimateIntervalMs: 60,
 } as const;

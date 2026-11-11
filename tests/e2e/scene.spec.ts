@@ -63,3 +63,27 @@ test('scene quality, motion, resize and context-loss lifecycle', async ({ page }
   await page.waitForTimeout(200);
   expect(errors).toEqual([]);
 });
+
+test('the cycle reaches night on its own, without interaction', async ({ page }) => {
+  // The owner's report: leave the tab open and night never comes. The cycle used to advance on
+  // *simulated* seconds, which stop while the tab is hidden, while the tank pauses behind a
+  // dialog, and whenever frames are dropped. It now follows real time.
+  //
+  // This asserts the transition rather than a starting phase: a slow runner can free the loader
+  // well into the first fade, so demanding "day" first would fail for the machine, not the code.
+  test.setTimeout(150000);
+  await page.goto('./');
+  await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 30000 });
+  // Reduced motion deliberately freezes the tank at night with no cycle at all, so the transition
+  // is only meaningful where motion is allowed. Asserting it here would test the wrong contract.
+  test.skip(
+    await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches),
+    'reduced motion holds the tank at night instead of cycling',
+  );
+  const root = page.locator('html');
+  await expect(root).toHaveAttribute('data-mood', /day|dusk|night|dawn/);
+  const first = await root.getAttribute('data-mood');
+  // Within one full cycle plus a fade the mood must become night, whatever it started as.
+  await expect(root).toHaveAttribute('data-mood', 'night', { timeout: 100000 });
+  expect(first).not.toBeNull();
+});
