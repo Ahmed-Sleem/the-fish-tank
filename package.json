@@ -20,7 +20,8 @@
     "test:e2e": "playwright test",
     "verify:docs": "python3 scripts/verify_docs.py && python3 -m unittest discover -s tests/docs -p 'test_*.py'",
     "verify:architecture": "node scripts/verify-architecture.mjs && node --test tests/architecture/*.test.mjs",
-    "verify": "npm run verify:docs && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run verify:architecture && npm audit --audit-level=high && npm run build && npm run test:e2e"
+    "verify": "node scripts/verify-step.mjs npm run verify:docs && node scripts/verify-step.mjs npm run format:check && node scripts/verify-step.mjs npm run lint && node scripts/verify-step.mjs npm run typecheck && node scripts/verify-step.mjs npm run test && node scripts/verify-step.mjs npm run verify:architecture && node scripts/verify-step.mjs npm run audit:high && node scripts/verify-step.mjs npm run build && node scripts/verify-step.mjs npm run test:e2e",
+    "audit:high": "npm audit --audit-level=high"
   },
   "dependencies": {
     "@fontsource/inter": "5.3.0",
