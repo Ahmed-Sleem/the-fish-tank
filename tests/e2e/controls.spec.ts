@@ -12,7 +12,13 @@ test('the single settings icon opens one dialog that holds every control and res
   await page.keyboard.press('Enter');
   const dialog = page.getByRole('dialog', { name: strings.settings });
   await expect(dialog).toBeVisible();
-  await expect(dialog).toContainText(strings.rendererReady);
+  // The graphics line must tell the truth about whichever path the browser is on: a full water
+  // scene reports Ready, a browser without float render targets reports the real degradation.
+  const degraded = await page
+    .locator('.canvas-host')
+    .getAttribute('data-effects')
+    .then((value) => value === 'unavailable');
+  await expect(dialog).toContainText(degraded ? strings.rendererDegraded : strings.rendererReady);
   await expect(dialog.getByLabel(strings.quality, { exact: true })).toBeVisible();
   await expect(dialog.getByLabel(strings.reducedMotion, { exact: true })).toBeVisible();
   // Honest about what is not available, but no developer dashboard copy or build hash.

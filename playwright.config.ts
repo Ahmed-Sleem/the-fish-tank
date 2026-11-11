@@ -7,7 +7,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: 0,
-  reporter: 'list',
+  reporter: process.env.CI ? [['list'], ['./tests/e2e/support/ci-reporter.ts']] : 'list',
   use: {
     baseURL: 'http://127.0.0.1:4173/the-fish-tank/',
     launchOptions: {

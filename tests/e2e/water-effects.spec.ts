@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
+import { hasWebgl2 } from './support/capabilities';
 
 // Freeze RAF, not application timeouts: compare equal simulation time with/without input.
 async function controlled(page: Page) {
@@ -67,8 +68,10 @@ async function sample(page: Page, input: boolean, type = 'pointerdown', frames =
 test('equal-time rendered water changes locally for scripted touch and hover impulses', async ({
   page,
   context,
+  browser,
 }) => {
   test.setTimeout(120000);
+  test.skip(!(await hasWebgl2(browser)), 'browser has no WebGL2 float targets');
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await controlled(page);
@@ -110,7 +113,9 @@ test('equal-time rendered water changes locally for scripted touch and hover imp
 });
 test('post-loader pointer controls respect dialogs, motion, cancellation and quality', async ({
   page,
+  browser,
 }) => {
+  test.skip(!(await hasWebgl2(browser)), 'browser has no WebGL2 float targets');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('./');
   await expect(page.locator('.loading-screen')).toHaveCount(0);
