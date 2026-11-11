@@ -169,3 +169,24 @@ Implemented native Pixi half-float ping-pong ripples and refraction, seeded shar
 - **Self-check.** Fixed everywhere? Yes — one definition, one guard, all entry points through
   `npm run verify`. Wired? Yes, verified through the real command, not the unit test alone.
   Does the test validate behaviour? Yes, observed failing for the intended reason.
+
+## PR #10 merge and live acceptance (2026-11-11)
+
+- **PR.** [#10](https://github.com/Ahmed-Sleem/the-fish-tank/pull/10) from `arena/0fb511c8-the-fish-tank`;
+  hosted **Verify run 42938838482 / job 130255493024 passed in 2m55s** before merge. Merged with
+  `--merge`; owner authorized completion and merge in-session. Squash/rebase were not used, so the
+  two reviewed commits (`281e0d5`, `48b8311`) remain individually auditable.
+- **Post-merge.** `main` = `fce8bb5c0b8f16101243e662b49cd33a73b05856`. Verify run **42939240987**
+  and Deploy Pages run **42939241212** both concluded `success` (observed via `gh run watch`).
+- **Live acceptance (real evidence, not the deployment status).** Fetching
+  https://ahmed-sleem.github.io/the-fish-tank/ reports **`BUILD fce8bb5`**, which equals the first
+  seven characters of `origin/main`; the page also serves the About dialog, Settings
+  Low/Medium/High, the `loading` caption, skip link and credit links. The earlier "Graphics
+  unavailable" line in that fetch is the text-renderer having no WebGL, and is the intended
+  truthful fallback path.
+- **Tooling note.** This sandbox's `curl` and Chromium are both blocked from
+  `ahmed-sleem.github.io` by the network allowlist (`SSL_ERROR_SYSCALL` / `ERR_CONNECTION_CLOSED`);
+  the page-fetch path is available and was used. No claim of a full interactive live smoke is made
+  for real hardware; that remains part of GAP-005.
+- **Deployment gate.** GAP-007 stays CLOSED. Deployment is gated on verification: the deploy job
+  consumes the artifact produced by the passing Verify run, so a failing check cannot publish.

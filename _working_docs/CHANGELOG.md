@@ -77,3 +77,9 @@ Implemented native Pixi half-float ping-pong ripples and refraction, seeded shar
 - `--color-accent` had a second definition as the literal fill in `public/favicon.svg`; nothing kept them equal. Added `faviconAccentError` and wired it into `npm run verify:architecture`, with four fixtures.
 - Controlled proof: favicon fill changed to `#396aac` failed verification (exit 1) naming both colours; restored file passed (exit 0).
 - Note: an initial fixture asserted the _matching_ colour as a drift case and correctly failed, which is how the fixture was caught.
+
+## 2026-11-11 session 5 — merged and deployed
+
+- PR #10 merged to `main` (`fce8bb5`) after hosted Verify run 42938838482 passed (2m55s). Post-merge Verify 42939240987 and Deploy Pages 42939241212 both succeeded.
+- Live acceptance: the public site reports `BUILD fce8bb5`, matching `origin/main`; About, Settings, loading caption and credit links all present.
+- No gameplay added. S05 remains next and still needs the owner's GAP-002 ink-pricing decision; GAP-005 physical-hardware performance stays open.
