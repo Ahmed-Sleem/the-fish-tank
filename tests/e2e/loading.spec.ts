@@ -46,11 +46,17 @@ test('Oimo water, sequential loading letters, flat icon and correct identity', a
     await page.mouse.move(400, 350, { steps: 12 });
   }
   await page.setViewportSize({ width: 420, height: 820 });
-  await expect
-    .poll(async () =>
-      page.locator('.loading-water').evaluate((canvas) => (canvas as HTMLCanvasElement).width),
-    )
-    .toBe(await page.evaluate(() => Math.floor(420 * Math.min(devicePixelRatio, 1))));
+  if (water) {
+    // The fluid canvas must follow the viewport at the loader's capped device-pixel ratio.
+    await expect
+      .poll(async () =>
+        page.locator('.loading-water').evaluate((canvas) => (canvas as HTMLCanvasElement).width),
+      )
+      .toBe(await page.evaluate(() => Math.floor(420 * Math.min(devicePixelRatio, 1))));
+  } else {
+    // Without WebGL2 the splash stays readable and still lays out at the new size.
+    await expect(splash.locator('.loading-title')).toBeVisible();
+  }
   await page.waitForTimeout(1600);
   await expect(splash).toBeVisible();
   release();
