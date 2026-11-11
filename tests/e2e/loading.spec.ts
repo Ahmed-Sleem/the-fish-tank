@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { hasWebgl2 } from './support/capabilities';
 
-test('Oimo water, sequential loading letters, flat icon and correct identity', async ({ page }) => {
+test('Oimo water, sequential loading letters, flat icon and correct identity', async ({
+  page,
+  browser,
+}) => {
+  const water = await hasWebgl2(browser);
   let release = () => {};
   const gate = new Promise<void>((resolve) => {
     release = resolve;
@@ -17,7 +22,9 @@ test('Oimo water, sequential loading letters, flat icon and correct identity', a
   await expect(splash.locator('.loading-title')).toHaveCSS('text-transform', 'uppercase');
   await expect(page.locator('#app')).toHaveAttribute('inert', '');
   await expect(page.locator('.loading-drop, .loading-ripple')).toHaveCount(0);
-  await expect(page.locator('.loading-water')).toHaveCount(1);
+  // The fluid canvas only exists where the browser can render it; without WebGL2 the splash
+  // must still carry its title and the word, which the assertions below keep proving.
+  await expect(page.locator('.loading-water')).toHaveCount(water ? 1 : 0);
   const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
   if (reduced) await expect(page.locator('.loading-word')).toHaveText('loading');
   else {
@@ -39,11 +46,17 @@ test('Oimo water, sequential loading letters, flat icon and correct identity', a
     await page.mouse.move(400, 350, { steps: 12 });
   }
   await page.setViewportSize({ width: 420, height: 820 });
-  await expect
-    .poll(async () =>
-      page.locator('.loading-water').evaluate((canvas) => (canvas as HTMLCanvasElement).width),
-    )
-    .toBe(await page.evaluate(() => Math.floor(420 * Math.min(devicePixelRatio, 1))));
+  if (water) {
+    // The fluid canvas must follow the viewport at the loader's capped device-pixel ratio.
+    await expect
+      .poll(async () =>
+        page.locator('.loading-water').evaluate((canvas) => (canvas as HTMLCanvasElement).width),
+      )
+      .toBe(await page.evaluate(() => Math.floor(420 * Math.min(devicePixelRatio, 1))));
+  } else {
+    // Without WebGL2 the splash stays readable and still lays out at the new size.
+    await expect(splash.locator('.loading-title')).toBeVisible();
+  }
   await page.waitForTimeout(1600);
   await expect(splash).toBeVisible();
   release();
