@@ -16,6 +16,7 @@ const label = [command, ...args].join(' ');
 const result = spawnSync(command, args, { stdio: 'inherit', shell: process.platform === 'win32' });
 if (result.status === 0) process.exit(0);
 
-// stdout is the only channel the runner turns into an annotation.
-console.log(`not ok 1 - FAILED STAGE: ${label}`);
+// GitHub turns `::error::` workflow commands in a step's stdout into check-run annotations.
+// A plain `not ok` line is not picked up, which is why the first attempt was invisible.
+console.log(`::error title=Verification stage failed::${label}`);
 process.exit(result.status ?? 1);

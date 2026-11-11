@@ -23,12 +23,11 @@ class CiReporter implements Reporter {
 
   onEnd(): void {
     if (!this.failures.length) return;
-    // Emit as TAP-ish node:test failures so the runner annotates each one. A reporter's whole
-    // job is writing to stdout, which is why the console rule is waived for this file only.
-    this.failures.forEach((failure, index) => {
+    // Workflow commands are the only stdout the runner reliably turns into annotations.
+    for (const failure of this.failures) {
       // eslint-disable-next-line no-console -- a CI reporter exists to write to stdout
-      console.log(`not ok ${String(index + 1)} - ${failure}`);
-    });
+      console.log(`::error title=Playwright failure::${failure}`);
+    }
   }
 }
 
