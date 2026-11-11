@@ -89,3 +89,7 @@ plan-index status column and the roadmap's "Current state" block must be updated
 session that merges, not the session after it.
 
 DEC-024 records the owner's standing request that the tank background animate in its own right (swaying plants rooted in the sand, rising bubbles, depth-parallaxed far scenery). Today the art is one static 344x192 texture, so this requires splitting it into layers in `src/render/pixel/`. Scheduled after S07 produces a real fish and before S08 steering.
+
+S05 partial — ink pricing and the drawing surface are implemented and locally verified in `docs/S05_VERIFICATION.md`. GAP-002 is closed by DEC-023 (length only: width, colour and per-stroke fees do not exist in the pricing path). The purse, the pure evaluator, the white paper surface, the two-icon header and six browser tests are done, and the full gate passes at 116 unit / 32 browser / 4 capability skips. Not done, and not claimed: nothing consumes a committed drawing yet (no cutout, birth or swimming), the drawing is not saved, and Paper.js simplification is deferred to S07 where the simplified path has a consumer. GAP-005 hardware profiling is still open.
+
+DEC-024 remains scheduled: the owner asked for the tank background to animate in its own right (plants swaying from their roots with the current, rising bubbles, depth-parallaxed far scenery). If it has not happened by the time a real fish exists, it must be done before S08 steering, which assumes a living scene.

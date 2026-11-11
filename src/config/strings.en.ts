@@ -37,6 +37,24 @@ export const strings = {
   /** Honest about what is not available, in player language: no feature checklist, no roadmap. */
   capabilities: 'Fish, drawing and saved tanks arrive in later updates.',
 
+  // Drawing: the words the player reads while making a fish. Plain and few, in the same voice
+  // as the rest of the interface; nothing here describes internals.
+  drawOpen: 'Draw a fish',
+  drawTitle: 'Draw your fish',
+  drawHint: 'Draw your fish facing right.',
+  drawDone: 'Done',
+  drawUndo: 'Undo',
+  drawClear: 'Clear',
+  drawCancel: 'Cancel',
+  drawToolPen: 'Pen',
+  drawToolColour: 'Colour',
+  drawInkLabel: 'Ink',
+  drawCostLabel: 'This drawing',
+  drawTooSmall: 'Draw a little more',
+  drawTooBig: 'Not enough ink for that',
+  drawLeft: 'ink left',
+  drawNoSurface: 'The drawing surface is not ready yet.',
+
   linksSection: 'More',
   credits: 'Open-source credits',
   source: 'Source code',

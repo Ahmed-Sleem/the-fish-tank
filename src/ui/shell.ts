@@ -2,7 +2,10 @@
  * only chrome. Nothing unimplemented is shown, and no control appears that cannot work.
  */
 import { createSettings } from './settings';
-import { button, dialog, sectionTitle, stat, actionRow } from './shared/controls';
+import { button, dialog, iconButton, sectionTitle, stat, actionRow } from './shared/controls';
+import { createDrawing } from './drawing';
+import { createPurse } from '../draw/purse';
+import { inkConfig } from '../config/ink.config';
 import { domainConfig } from '../config/domain.config';
 import { appConfig } from '../config/app.config';
 import { strings } from '../config/strings.en';
@@ -32,6 +35,10 @@ export function createShell(root: HTMLElement, signal: AbortSignal) {
 
   const graphics = stat(strings.runtimeLabel, strings.rendererStarting);
   const settings = createSettings(signal);
+
+  // The purse starts full and lives as long as the page. Saving it arrives with the storage work;
+  // until then it is honestly per-visit rather than pretending to persist.
+  const purse = createPurse(inkConfig.startInk);
 
   const windowRow = element('div', 'ui-row-stack');
   if (document.fullscreenEnabled) {
@@ -92,6 +99,35 @@ export function createShell(root: HTMLElement, signal: AbortSignal) {
     signal,
   );
 
+  // Drawing is its own dialog, not a section of settings: one action, one destination. It is
+  // created lazily on first use so the tank never pays for a canvas it is not showing.
+  let drawing: ReturnType<typeof createDrawing> | null = null;
+  let drawDialog: ReturnType<typeof dialog> | null = null;
+  const drawTrigger = iconButton(
+    'brush',
+    strings.drawOpen,
+    () => {
+      openDrawing();
+    },
+    signal,
+  );
+  function openDrawing() {
+    if (!drawing) {
+      drawing = createDrawing({
+        purse,
+        signal,
+        onDone: () => {
+          // The strokes are priced and paid for, but nothing swims yet: closing on a drawing that
+          // vanishes would be a lie about what just happened.
+          drawDialog?.node.close();
+        },
+      });
+      drawDialog = dialog(strings.drawTitle, strings.close, [drawing.panel], signal);
+      root.append(drawDialog.node);
+    }
+    drawing.refresh();
+    drawDialog?.open(drawTrigger);
+  }
   const trigger = settings.button;
   trigger.addEventListener(
     'click',
@@ -102,7 +138,7 @@ export function createShell(root: HTMLElement, signal: AbortSignal) {
   );
 
   const hud = element('header', 'hud');
-  hud.append(trigger);
+  hud.append(drawTrigger, trigger);
 
   root.replaceChildren(skip, heading, main, hud, details.node);
   return {

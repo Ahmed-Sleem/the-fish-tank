@@ -23,3 +23,20 @@ export const inkConfig = {
   decimals: 0,
   startInk: balanceConfig.startMoney,
 } as const;
+
+/**
+ * Pen widths in pixels at a 1000px reference side, and the colours offered.
+ *
+ * Widths are free by design (DEC-023), so they exist for expression only and never appear in a
+ * price. Colours are plain hex so the drawing can later be snapshotted onto white exactly as it
+ * was drawn, which is what the cutout step expects.
+ */
+export const penOptions = {
+  referenceSide: 1000,
+  widths: [2.5, 5, 9] as const,
+  defaultWidth: 5,
+  colours: ['#14384d', '#1f6f6b', '#e0a33c', '#c8563f', '#6d5a8c', '#ffffff'] as const,
+  defaultColour: '#14384d',
+  /** How often the live price is recomputed while the pointer moves, in milliseconds. */
+  estimateIntervalMs: 60,
+} as const;
