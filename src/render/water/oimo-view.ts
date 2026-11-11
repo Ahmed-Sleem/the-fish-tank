@@ -5,30 +5,43 @@ import type { WaterPointer } from './oimo-fluid';
 const vertex = `#version 300 es
 in vec4 particle;
 out vec3 color;
+out float depth;
 uniform vec3 deep;
 uniform vec3 foam;
+uniform float waterline;
 void main() {
   gl_Position = vec4(particle.x * 2.0 - 1.0, 1.0 - particle.y * 2.0, 0.0, 1.0);
-  gl_PointSize = particle.z;
-  color = mix(deep, foam, particle.w);
+  gl_PointSize = max(particle.z, 2.0);
+  // 0 at the waterline, 1 at the floor: light reaches the surface, depth swallows the rest.
+  depth = clamp((particle.y - waterline) / max(1.0 - waterline, 0.001), 0.0, 1.0);
+  float surface = 1.0 - depth;
+  color = mix(deep, foam, surface * 0.62 + particle.w * 0.12);
 }`;
 const fragment = `#version 300 es
 precision mediump float;
 precision highp int;
 in vec3 color;
+in float depth;
 uniform float grainAmount;
 out vec4 outputColor;
 void main() {
-  float weight = 1.0 - length(2.0 * gl_PointCoord - 1.0);
-  float alpha = clamp(10.0 * weight, 0.0, 1.0);
+  // Square, quantised sprites keep the loader in the same pixel language as the tank art.
+  vec2 cell = floor(gl_PointCoord * 4.0) / 4.0 + 0.125;
+  float weight = 1.0 - length(2.0 * cell - 1.0);
+  float alpha = clamp(1.5 * weight, 0.0, 1.0);
   if (alpha == 0.0) discard;
-  float grain = fract(sin(dot(floor(gl_FragCoord.xy), vec2(12.9898, 78.233))) * 43758.5453);
-  outputColor = vec4(color * alpha * (1.0 - grainAmount + 2.0 * grainAmount * grain), 1.0);
-  gl_FragDepth = 0.5 - weight * 0.1;
+  float grain = fract(sin(dot(floor(gl_FragCoord.xy * 0.5), vec2(12.9898, 78.233))) * 43758.5453);
+  vec3 shaded = mix(color, vec3(1.0), 0.16 * weight * (1.0 - depth));
+  shaded *= (1.0 - grainAmount + 2.0 * grainAmount * grain);
+  outputColor = vec4(shaded, alpha * 0.16);
 }`;
+/** Reads a theme colour, failing loudly instead of drawing black when a token is renamed. */
 function palette(host: HTMLElement, token: string): number[] {
   const hex = getComputedStyle(host).getPropertyValue(token).trim().replace('#', '');
-  return [0, 2, 4].map((offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255);
+  const value = Number.parseInt(hex, 16);
+  if (!Number.isFinite(value) || hex.length !== 6)
+    throw new Error(`Missing theme token ${token} for the loading water`);
+  return [0, 2, 4].map((offset) => Number.parseInt(hex.slice(offset, offset + 2), 16) / 255);
 }
 /** A transient loader renderer, not a replacement for the main Pixi scene. */
 export function mountOimoWater(host: HTMLElement, signal: AbortSignal) {
@@ -88,10 +101,17 @@ export function mountOimoWater(host: HTMLElement, signal: AbortSignal) {
     const location = gl.getAttribLocation(program, 'particle');
     gl.enableVertexAttribArray(location);
     gl.vertexAttribPointer(location, 4, gl.FLOAT, false, 0, 0);
-    gl.uniform3fv(gl.getUniformLocation(program, 'deep'), palette(host, '--water-body'));
-    gl.uniform3fv(gl.getUniformLocation(program, 'foam'), palette(host, '--water-foam'));
+    gl.uniform3fv(gl.getUniformLocation(program, 'deep'), palette(host, '--water-deep'));
+    gl.uniform3fv(gl.getUniformLocation(program, 'foam'), palette(host, '--surface-colour'));
     gl.uniform1f(gl.getUniformLocation(program, 'grainAmount'), cfg.grain);
-    gl.enable(gl.DEPTH_TEST);
+    gl.uniform1f(gl.getUniformLocation(program, 'waterline'), 1 - cfg.fill);
+    // No depth test: with additive blending a depth buffer only rejects light and carves a dark
+    // band through the pool. Density alone should decide brightness.
+    gl.disable(gl.DEPTH_TEST);
+    // Overlapping sprites must add up, as in the upstream demo: density becomes brightness, so
+    // the pool has depth and soft edges instead of stacking into one opaque blue rectangle.
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
     gl.clearColor(0, 0, 0, 0);
     let fluid = new OimoFluid(16, 16),
       vertices = new Float32Array(0),
@@ -101,7 +121,7 @@ export function mountOimoWater(host: HTMLElement, signal: AbortSignal) {
     const draw = () => {
       fluid.writeVertices(vertices, pixelScale);
       gl.bufferSubData(gl.ARRAY_BUFFER, 0, vertices);
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.POINTS, 0, fluid.count);
     };
     let previousWidth = 0,

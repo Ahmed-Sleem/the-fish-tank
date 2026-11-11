@@ -54,3 +54,10 @@ Copyright (c) 2016 Isaac Sukin. MIT. `src/core/loop.ts` adapts accumulator/catch
 `src/render/effects/shaders.ts` adapts jeantimex/threejs-water commit `f35a700a16fe386beac997806ed4471018c93ef7`, MIT: Original work Copyright (c) 2011 Evan Wallace; Modified work Copyright (c) 2026 Yong Su. Complete license: `public/licenses/threejs-water.txt`. Height/velocity stencil and raised-cosine impulse ported from Three to bounded Pixi8 ping-pong filters.
 
 Caustic function adapted from `@screenjoy/fishtank` 0.1.0, `src/reef-environment.ts`, MIT, Copyright 2026 Steven Partridge. Complete license: `public/licenses/screenjoy.txt`. Changed to dark-blue Pixi filter uniforms, quality budgets and reduced-motion lifecycle; no upstream fish models/reef assets/custom-element runtime shipped. Original source/license snapshots and hash manifest are under `docs/design-references/`. Installed simplex-noise (MIT, Jonas Wagner) is now used for the shared seeded curl flow; no additional package installed.
+
+## Inter (interface typeface)
+
+Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter). SIL Open Font License 1.1.
+The interface uses `@fontsource/inter` 5.3.0, self-hosted from npm: latin 400/500/600/700 only, no CDN
+request, no network font. Files are bundled by Vite from `node_modules/@fontsource/inter`.
+Full license: `public/licenses/inter.txt`.

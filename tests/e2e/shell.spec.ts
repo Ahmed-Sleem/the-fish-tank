@@ -17,18 +17,25 @@ test('the project subpath renders, reloads and never calls external services', a
   });
   await page.goto('./');
   await expect(page.locator('.loading-screen')).toHaveCount(0);
+  // The title belongs to the splash, not the tank: the page keeps only an accessible heading.
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings.brand);
-  await expect(page.getByRole('status')).toHaveText(strings.rendererReady);
+  // The title is announced, not drawn: it must not occupy visible area in the tank.
+  const titleBox = await page.getByRole('heading', { level: 1 }).boundingBox();
+  expect(titleBox?.width ?? 0).toBeLessThanOrEqual(1);
+  expect(titleBox?.height ?? 0).toBeLessThanOrEqual(1);
+  // No status readout, no empty-tank note and no frames in the tank itself.
+  await expect(page.getByRole('status')).toHaveCount(0);
   await expect(page.locator('canvas')).toHaveCount(1);
   await expect(page.getByRole('main', { name: strings.aquarium })).toBeVisible();
   await expect(page.locator('.intro, .hero-title, .chapter, .footer')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: strings.buildDetails })).toHaveCount(1);
+  // Exactly one control: the settings icon, which owns every setting behind a dialog.
+  await expect(page.locator('.hud button')).toHaveCount(1);
+  await expect(page.getByRole('button', { name: strings.openSettings })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
   await page.reload();
   await expect(page.locator('.loading-screen')).toHaveCount(0);
-  await expect(page.getByRole('status')).toHaveText(strings.rendererReady);
   await expect(page.locator('canvas')).toHaveCount(1);
   await expect(page.locator('.loading-screen')).toHaveCount(0);
   await page.keyboard.press('Tab');
@@ -49,10 +56,10 @@ test('graphics failure leaves accessible status and working navigation', async (
   });
   await page.goto('./');
   await expect(page.locator('.loading-screen')).toHaveCount(0);
-  await expect(page.getByRole('status')).toHaveText(strings.rendererFailed);
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await page.getByRole('button', { name: strings.buildDetails }).click();
-  await expect(page.getByRole('link', { name: strings.plan })).toHaveAttribute(
+  await page.getByRole('button', { name: strings.openSettings }).click();
+  const dialog = page.getByRole('dialog', { name: strings.settings });
+  await expect(dialog).toContainText(strings.rendererFailed);
+  await expect(dialog.getByRole('link', { name: strings.plan })).toHaveAttribute(
     'href',
     /IMPLEMENTATION_PLAN\.md$/,
   );
@@ -60,10 +67,42 @@ test('graphics failure leaves accessible status and working navigation', async (
   expect(failures).toEqual([]);
 });
 
-test('lost graphics context is not falsely reported as ready', async ({ page }) => {
+test('lost graphics context is reported in the settings dialog, not as a silent tank', async ({
+  page,
+}) => {
   await page.goto('./');
   await expect(page.locator('.loading-screen')).toHaveCount(0);
-  await expect(page.getByRole('status')).toHaveText(strings.rendererReady);
   await page.locator('canvas').dispatchEvent('webglcontextlost');
-  await expect(page.getByRole('status')).toHaveText(strings.rendererLost);
+  await page.getByRole('button', { name: strings.openSettings }).click();
+  await expect(page.getByRole('dialog', { name: strings.settings })).toContainText(
+    strings.rendererLost,
+  );
+});
+
+test('the tank is borderless: no frames, rules or chrome, only the water and one icon', async ({
+  page,
+}) => {
+  await page.goto('./');
+  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  const offenders = await page.evaluate(() => {
+    const bad: string[] = [];
+    for (const node of document.querySelectorAll<HTMLElement>('#app *')) {
+      if (node.closest('dialog')) continue;
+      if (node.classList.contains('sr-only')) continue;
+      const style = getComputedStyle(node);
+      // A visible border, outline or a 1-2px solid strip is a frame.
+      for (const side of ['Top', 'Right', 'Bottom', 'Left'] as const) {
+        const width = Number.parseFloat(style[`border${side}Width`]);
+        if (width > 0 && style[`border${side}Style`] !== 'none') {
+          bad.push(`${node.className || node.tagName}:border-${side.toLowerCase()}`);
+        }
+      }
+    }
+    return bad;
+  });
+  expect(offenders).toEqual([]);
+  // Nothing is pinned to the edges: no HUD bar, no gravel band, no glass rim.
+  await expect(page.locator('.hud-bar, .status-bar, .glass, .rim, .frame')).toHaveCount(0);
+  await expect(page.locator('.water-surface')).toHaveCount(1);
+  await expect(page.locator('.water-vignette')).toHaveCount(1);
 });

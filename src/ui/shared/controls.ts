@@ -1,11 +1,46 @@
-/** Shared native controls: labels/text only, no unsafe markup or custom focus trap. */
+/** Shared native controls: labels/text only, no unsafe markup or custom focus trap.
+ * Every control the product shows is built here once and reused; a screen may never
+ * hand-roll a button, dialog or field of its own.
+ */
 import { element } from './dom';
+import { iconPaths } from './icons';
+import type { IconName } from './icons';
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
 export function button(label: string, action: () => void, signal: AbortSignal) {
   const node = element('button', 'ui-button', label);
   node.type = 'button';
   node.addEventListener('click', action, { signal });
   return node;
 }
+
+/** Icon-only control. `aria-label` is mandatory: an unlabelled icon is unusable by screen readers. */
+export function iconButton(name: IconName, label: string, action: () => void, signal: AbortSignal) {
+  const node = element('button', 'ui-icon-button');
+  node.type = 'button';
+  node.setAttribute('aria-label', label);
+  node.title = label;
+  node.append(icon(name));
+  node.addEventListener('click', action, { signal });
+  return node;
+}
+
+/** One SVG builder for every icon, so stroke width/cap and sizing live in one place. */
+export function icon(name: IconName) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'ui-icon');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  for (const d of iconPaths(name)) {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', d);
+    svg.append(path);
+  }
+  return svg;
+}
+
 /** A labelled group of native tab stops: do not claim ARIA toolbar without roving focus. */
 export function toolbar(label: string, controls: HTMLElement[]) {
   const node = element('div', 'ui-toolbar');
@@ -14,6 +49,7 @@ export function toolbar(label: string, controls: HTMLElement[]) {
   node.append(...controls);
   return node;
 }
+
 export function stat(label: string, value: string) {
   const node = element('dl', 'ui-stat');
   const output = element('dd', '', value);
@@ -25,6 +61,12 @@ export function stat(label: string, value: string) {
     },
   };
 }
+
+/** Section heading used by every dialog, so no dialog invents its own title size. */
+export function sectionTitle(text: string) {
+  return element('h3', 'ui-section-title', text);
+}
+
 let dialogId = 0;
 export function dialog(
   title: string,
@@ -33,7 +75,7 @@ export function dialog(
   signal: AbortSignal,
 ) {
   const node = element('dialog', 'ui-dialog');
-  const heading = element('h2', 'dialog-title', title);
+  const heading = element('h2', 'ui-dialog-title', title);
   heading.id = `shared-dialog-${String(++dialogId)}`;
   node.setAttribute('aria-labelledby', heading.id);
   let returnFocus: HTMLElement | null = null;
@@ -44,7 +86,10 @@ export function dialog(
     },
     signal,
   );
-  node.append(heading, ...content, close);
+  close.classList.add('ui-dialog-close');
+  const body = element('div', 'ui-dialog-body');
+  body.append(...content);
+  node.append(heading, body, close);
   node.addEventListener(
     'close',
     () => {
@@ -76,8 +121,9 @@ export function selectField<T extends string>(
   change: (value: T) => void,
   signal: AbortSignal,
 ) {
-  const wrapper = element('label', 'ui-field', label);
-  const select = element('select', 'ui-button');
+  const wrapper = element('label', 'ui-field');
+  const text = element('span', 'ui-field-label', label);
+  const select = element('select', 'ui-select');
   select.setAttribute('aria-label', label);
   for (const option of options) {
     const node = element('option', '', option.label);
@@ -93,17 +139,19 @@ export function selectField<T extends string>(
     },
     { signal },
   );
-  wrapper.append(select);
+  wrapper.append(text, select);
   return { node: wrapper, input: select };
 }
+
 export function checkboxField(
   label: string,
   change: (value: boolean) => void,
   signal: AbortSignal,
 ) {
-  const wrapper = element('label', 'ui-field');
-  const input = element('input', '');
+  const wrapper = element('label', 'ui-field ui-field-check');
+  const input = element('input', 'ui-checkbox');
   input.type = 'checkbox';
+  const text = element('span', 'ui-field-label', label);
   input.addEventListener(
     'change',
     () => {
@@ -111,6 +159,13 @@ export function checkboxField(
     },
     { signal },
   );
-  wrapper.append(input, document.createTextNode(label));
+  wrapper.append(text, input);
   return { node: wrapper, input };
+}
+
+/** Row that performs an action or opens a destination, used for fullscreen and links. */
+export function actionRow(label: string, control: HTMLElement) {
+  const row = element('div', 'ui-row');
+  row.append(element('span', 'ui-row-label', label), control);
+  return row;
 }

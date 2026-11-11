@@ -10,13 +10,13 @@ the fish tank is a browser aquarium being built around a simple idea: **you draw
 
 ## What you can do now
 
-- Open straight into the full-window aquarium interface on desktop or mobile—there is no landing page. Look for the flat blue-circle tab icon.
-- During startup, **loading** appears one letter at a time and repeats. The water already sits along the bottom when loading opens, with a gentle initial push to keep it moving. Move your cursor through the lightweight, grainy blue particle water to stir it; the fluid is adapted from [Oimo Water](https://oimo.io/works/water/). It stays for at least 5 seconds and until the page and graphics startup have settled; slower connections take longer. Touch movement also creates ripples where supported.
-- After loading, the tank opens directly in front of you: dark-blue depth, glass edges, caustic light and drifting particles. Hover to disturb the current; click or tap and drag through the water for stronger ripples. Controls do not disturb the tank. Effects respect reduced motion. Open **Settings** for Low/Medium/High visual quality or reduced motion. Quality also controls ripple detail and lighting cost. Settings apply for this visit; your system’s reduced-motion preference is always respected.
-- Open **About this build** in the top-right controls to see the data-format version, graphics status and current limitations. Press **Escape** or **Close** to dismiss it; keyboard focus returns to the opener.
-- See graphics status along the bottom; the build identifier, source links and plan are inside **About this build**.
-- Use **Fullscreen** where your browser supports it; click **Exit fullscreen** or press **Escape** to leave it.
-- Use a keyboard: press **Tab** for the “Skip to aquarium” link and the other page links.
+- Open straight into a full-window, **borderless** aquarium on desktop or mobile — there is no landing page and no frame around the water. Look for the flat teal-circle tab icon.
+- During startup the splash shows the product name, **the fish tank**, which appears on this screen only. Under it, **loading** is revealed one letter at a time and repeats. The water already sits as a settled, flat waterline when the splash opens, and drifts with a slow current; move your cursor through the grainy pixel water to stir it. The fluid is adapted from [Oimo Water](https://oimo.io/works/water/). The splash stays for at least 5 seconds and until the page and graphics startup have settled; slower connections take longer. Touch movement also stirs the water where supported.
+- After loading, the tank opens directly in front of you: teal water, a lit sand bed, rooted green plants, a warm shaft of light and drifting particles — with **no border, HUD bar or frame** of any kind. It moves through a full day and night: 45 seconds of warm daytime, a 15-second fade, 45 seconds of cool night, then a 15-second fade back. Hover to disturb the current; click or tap and drag through the water for stronger ripples. Effects respect reduced motion, which holds the calm night mood still.
+- One **settings icon** sits in the top-right corner and holds everything: Low/Medium/High visual quality, reduced motion, fullscreen, graphics status and the source links. Settings apply for this visit; your system’s reduced-motion preference is always respected.
+- Open the settings icon to see the data-format version, graphics status and links; nothing is drawn over the tank itself. Press **Escape** or **Close** to dismiss it; keyboard focus returns to the icon.
+- Use **Fullscreen** inside the settings dialog where your browser supports it; click **Exit fullscreen** or press **Escape** to leave it.
+- Use a keyboard: press **Tab** for the “Skip to aquarium” link and the settings icon.
 
 There is nothing to buy, feed or draw in this version yet. You do not need an AI key.
 
@@ -28,12 +28,13 @@ Drawing creatures, swimming fish, feeding, growth, offspring, plants, creature h
 
 Use a current browser with JavaScript and WebGL enabled. The page supports mouse, touch and keyboard navigation. The splash respects your system’s reduced-motion setting: the complete word **loading** and the water stay still; cursor stirring is disabled.
 
-- **“PixiJS renderer ready”** means the empty graphics canvas started successfully. It does not mean fish gameplay is available.
-- **No animated loading water?** The effect needs WebGL 2. If unavailable, the loading word stays readable against the dark-blue background. Graphics failure does not block the page text and links.
+- **“Ready”** in the settings dialog means the graphics canvas started successfully. It does not mean fish gameplay is available.
+- **No animated loading water?** The effect needs WebGL 2. If unavailable, the loading word stays readable against the dark background. Graphics failure does not block the page text and links.
 - **Loading never finishes?** Check your connection and reload. No artificial timeout pretends a stalled download is complete.
+- **“Water effects unavailable”**: the pixel tank is shown without caustics and rays; the water shader needs floating-point render targets. Enable hardware acceleration/WebGL or try another up-to-date browser.
 - **“Graphics unavailable…”**: enable hardware acceleration/WebGL or try another up-to-date browser. The page text and links remain usable without the graphics canvas.
 - **“Graphics context interrupted…”**: reload the page to restart the renderer.
-- **Older build after an update?** Refresh once publication finishes; compare the build identifier shown on the page. Updates appear after a successful release, not on every development edit.
+- **Older build after an update?** Refresh once publication finishes. Updates appear after a successful release, not on every development edit.
 
 ## Your data and cost
 

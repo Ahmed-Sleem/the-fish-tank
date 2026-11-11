@@ -1,17 +1,24 @@
 import { expect, test } from '@playwright/test';
 import { strings } from '../../src/config/strings.en';
-test('shared controls expose genuine build information and restore keyboard focus', async ({
+test('the single settings icon opens one dialog that holds every control and restores focus', async ({
   page,
 }) => {
   await page.goto('./');
   await expect(page.locator('.loading-screen')).toHaveCount(0);
-  const open = page.getByRole('button', { name: strings.buildDetails });
+  // The dialog is the only place settings live; while it is shut its controls are hidden.
+  await expect(page.getByLabel(strings.quality, { exact: true })).not.toBeVisible();
+  const open = page.getByRole('button', { name: strings.openSettings });
   await open.focus();
   await page.keyboard.press('Enter');
-  const dialog = page.getByRole('dialog', { name: strings.buildDetails });
+  const dialog = page.getByRole('dialog', { name: strings.settings });
   await expect(dialog).toBeVisible();
-  await expect(dialog).toContainText(strings.capabilities);
   await expect(dialog).toContainText(strings.rendererReady);
+  await expect(dialog.getByLabel(strings.quality, { exact: true })).toBeVisible();
+  await expect(dialog.getByLabel(strings.reducedMotion, { exact: true })).toBeVisible();
+  // Honest about what is not available, but no developer dashboard copy or build hash.
+  await expect(dialog).toContainText(strings.capabilities);
+  await expect(dialog).not.toContainText('BUILD');
+  await expect(dialog).not.toContainText('Foundation preview');
   const close = dialog.getByRole('button', { name: strings.close, exact: true });
   await expect(close).toBeFocused();
   await page.keyboard.press('Tab');
@@ -34,15 +41,16 @@ test('fullscreen control works or stays hidden when browser API is unavailable',
   await page.goto('./');
   await expect(page.locator('.loading-screen')).toHaveCount(0);
   const enabled = await page.evaluate(() => document.fullscreenEnabled);
-  const control = page.getByRole('button', { name: strings.fullscreen, exact: true });
+  await page.getByRole('button', { name: strings.openSettings }).click();
+  const dialog = page.getByRole('dialog', { name: strings.settings });
+  const control = dialog.getByRole('button', { name: strings.fullscreen, exact: true });
   if (!enabled) {
     await expect(control).toHaveCount(0);
     return;
   }
   await control.click();
-  await expect(
-    page.getByRole('button', { name: strings.exitFullscreen, exact: true }),
-  ).toBeVisible();
-  await page.getByRole('button', { name: strings.exitFullscreen, exact: true }).click();
+  const exit = dialog.getByRole('button', { name: strings.exitFullscreen, exact: true });
+  await expect(exit).toBeVisible();
+  await exit.click();
   await expect(control).toBeVisible();
 });

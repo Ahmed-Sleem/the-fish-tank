@@ -16,6 +16,34 @@ for (const [file, code, message] of [
   test(`rejects ${message}: ${code}`, () => {
     assert.ok(architectureErrors(file, code).some((e) => e.includes(message)));
   });
+test('rejects any CSS border that would draw a frame', () => {
+  for (const css of [
+    '.x { border: var(--w) solid var(--c); }',
+    '.x { border-top: var(--w) solid var(--c); }',
+    '.x { border: solid var(--c); }',
+    '.x { border-bottom: 2px solid red; }',
+    '.x { border-right: thin var(--c); }',
+  ])
+    assert.ok(
+      architectureErrors('src/ui/card.css', css).some((e) => e.includes('borders are banned')),
+      css,
+    );
+});
+test('allows border resets and radii, which paint nothing', () => {
+  for (const css of [
+    '.x { border: 0; }',
+    '.x { border: none; }',
+    '.x { border-radius: var(--radius-pill); }',
+  ])
+    assert.equal(architectureErrors('src/ui/card.css', css).length, 0, css);
+});
+test('rejects a one-pixel rule painted with a background', () => {
+  assert.ok(
+    architectureErrors('src/ui/card.css', '.x { height: 1px; background: var(--c); }').some((e) =>
+      e.includes('no one-pixel rules'),
+    ),
+  );
+});
 test('allows canonical primitives, registries, theme and schema-derived consumers', () => {
   for (const [file, code] of [
     ['src/ui/shared/controls.ts', "element('button', 'ui-button')"],

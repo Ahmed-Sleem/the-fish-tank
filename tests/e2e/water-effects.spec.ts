@@ -101,8 +101,9 @@ test('equal-time rendered water changes locally for scripted touch and hover imp
   const stressed = await sample(other, false);
   const colors = stressed.filter((_, i) => i % 4 !== 3);
   const mean = colors.reduce((a, b) => a + b, 0) / colors.length;
+  // Not black, and not blown out to white: the palette is bright but still a tank.
   expect(mean).toBeGreaterThan(5);
-  expect(mean).toBeLessThan(120);
+  expect(mean).toBeLessThan(175);
   expect(errors).toEqual([]);
   await other.close();
   await hover.close();
@@ -119,7 +120,7 @@ test('post-loader pointer controls respect dialogs, motion, cancellation and qua
   await page.mouse.move(260, 320, { steps: 5 });
   await page.mouse.up();
   await expect.poll(() => host.getAttribute('data-impulses')).not.toBeNull();
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
   const count = await host.getAttribute('data-impulses');
   await page.getByLabel('Visual quality', { exact: true }).selectOption('low');
   await expect(host).toHaveAttribute('data-ripple-grid', '48');
@@ -155,8 +156,12 @@ test('unsupported float targets leave truthful graphics status and usable contro
   });
   await page.goto('./');
   await expect(page.locator('.loading-screen')).toHaveCount(0);
-  await expect(page.getByRole('status')).toContainText('Graphics unavailable');
-  await expect(page.locator('.canvas-host canvas')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
-  await expect(page.getByRole('dialog', { name: 'Settings', exact: true })).toBeVisible();
+  // Water effects fail, the pixel tank still renders: a readable scene, never a blank window.
+  await expect(page.locator('.canvas-host')).toHaveAttribute('data-effects', 'unavailable');
+  await expect(page.locator('.canvas-host canvas')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Settings', exact: true });
+  await expect(dialog).toBeVisible();
+  // Never claims "Ready" while the water shaders are gone.
+  await expect(dialog).toContainText('Water effects unavailable');
 });

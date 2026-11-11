@@ -1,77 +1,219 @@
-/* Single source for aquarium colors, type, spacing and decorative water values. */
+/* THE single source of every design value: colour, type, spacing, radius, motion.
+ * Palette sampled from the owner's reference images (day/night moods).
+ * Nothing in any other stylesheet may write a raw colour, px/rem size, duration or breakpoint.
+ */
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/inter/latin-600.css';
+@import '@fontsource/inter/latin-700.css';
+
 :root {
   color-scheme: dark;
-  --font-body: 'Segoe UI', Arial, sans-serif;
-  --font-display: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
-  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
-  --color-ink: #dce7fa;
-  --color-muted: #94a9ca;
-  --color-dark: #030916;
-  --color-focus: #bdd7ff;
-  --color-line: #7199d438;
-  --water-background:
-    radial-gradient(ellipse at 76% 20%, #102b5b60, transparent 47%),
-    linear-gradient(155deg, #0a1b39, #030916 61%, #020713);
-  --water-light:
-    radial-gradient(ellipse at 77% 43%, #32579721, transparent 43%),
-    conic-gradient(
-      from 171deg at 82% -8%,
-      transparent 0deg,
-      #4c78c509 4deg,
-      transparent 11deg,
-      #6392e010 18deg,
-      transparent 26deg,
-      #5c80b909 32deg,
-      transparent 41deg
-    );
-  --water-grain: repeating-linear-gradient(0deg, transparent, transparent 3px, #bfd7ff03 4px);
-  --water-mask: radial-gradient(ellipse at 65% 20%, #000, transparent 75%);
-  --wordmark-size: clamp(1.3rem, 3.2vw, 2.2rem);
-  --wordmark-tracking: -0.025em;
-  --body-size: 1rem;
-  --body-leading: 1.8;
-  --space-tiny: 0.5rem;
-  --space-small: 1rem;
-  --space-large: 2rem;
-  --dialog-title-size: 1.8rem;
-  --footer-copy-size: 0.75rem;
-  --link-size: 0.8rem;
-  --line-width: 1px;
+
+  /* ---- Type: one family, one scale, one rhythm ---- */
+  --font-ui: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-wordmark: var(--font-ui);
+  --font-data: var(--font-ui);
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-strong: 600;
+  --weight-bold: 700;
+
+  --size-wordmark: clamp(1.05rem, 2.6vw, 1.5rem);
+  --size-title: clamp(1.35rem, 3.4vw, 1.9rem);
+  --size-body: 0.9375rem;
+  --size-small: 0.8125rem;
+  --size-tiny: 0.6875rem;
+  --leading-tight: 1.15;
+  --leading-body: 1.65;
+  --tracking-wordmark: 0.42em;
+  --tracking-label: 0.16em;
+  --tracking-tight: -0.011em;
+
+  /* ---- Spacing scale ---- */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.25rem;
+  --space-2xl: 3.5rem;
+
+  /* ---- Radii, lines, elevation ---- */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1.1rem;
+  --radius-pill: 999px;
+  --line-hair: 1px;
   --focus-width: 2px;
-  --focus-offset: 6px;
-  --z-water: -1;
-  --z-skip: 2;
-  --skip-offset: -200%;
-}
+  --focus-offset: 3px;
+  --shadow-soft: 0 1px 2px #0009, 0 8px 24px #0006;
 
-/* Permanent mysterious dark-blue identity; static favicon matches --color-accent. */
-:root {
-  --color-accent: #396aab;
-  --water-body: #102a5d;
-  --water-foam: #80ade4;
-  --z-loading: 10;
-  --loading-word-width: 10ch;
-  --loading-word-size: clamp(1.1rem, 3vw, 1.6rem);
-  --loading-tracking: 0.14em;
-  --loading-text-shadow: 0 2px 12px #020713;
-}
+  /* ---- Day mood: sampled from the amber-lit reference ---- */
+  --day-water-top: #8ec4c9;
+  --day-water-mid: #3d7c8a;
+  --day-water-deep: #16303c;
+  --day-light: #f7e2b0;
+  --day-ray: #ffd98a;
+  --day-surface: #cfeef2;
+  --day-water-glow: #f4d79a;
+  --night-water-glow: #63c8dc;
 
-:root {
-  --control-radius: 0.6rem;
-  --control-hit-size: 2.75rem;
-  --control-disabled-opacity: 0.5;
-  --dialog-width: 32rem;
-  --dialog-backdrop: #010510cc;
-}
+  /* ---- Night mood: sampled from the dark reference ---- */
+  --night-water-top: #14384d;
+  --night-water-mid: #0e2434;
+  --night-water-deep: #050d14;
+  --night-light: #7fd8ea;
+  --night-ray: #4fb9cf;
+  --night-surface: #8fe6f2;
 
-/* Aquarium HUD uses safe-area-aware spacing without reserving page sections. */
-:root {
+  /* ---- Art colours (plants, rock, sand) shared by both moods ---- */
+  /* Art ramps are comma-separated token lists read as one value, so a palette is edited once. */
+  --art-plant-scale: #1d5626, #2f8a38, #6fbf4a, #a8e06a;
+  --art-stem-scale: #245a2c, #388a3a, #5ab048;
+  --art-moss-scale: #10301a, #1b4f26, #2c7a30, #48a03a, #80c850;
+  --art-rock-mid: #4a4a44;
+  --art-rock-light: #8a8578;
+  --art-rock-dark: #2a2a26;
+  --art-sand-light: #e3d3b2;
+  --art-sand-mid: #c0ab86;
+  --art-sand-dark: #8f7d61;
+  --art-sand-shadow: #4e4738;
+  --art-pebble-scale: #3a5a7a, #6a5a4a, #7a7a80, #9a6a3a, #4a4a5a, #5a7a8a;
+  --art-fish-body: #2fb0bc;
+  --art-fish-shadow: #1f86a0;
+  --art-fish-fin: #e8923c;
+  --art-fish-outline: #124a5c;
+  --art-fish-glint: #ffd498;
+
+  /* ---- Active mood (driven by the day/night cycle) ---- */
+  --water-top: var(--night-water-top);
+  --water-mid: var(--night-water-mid);
+  --water-deep: var(--night-water-deep);
+  --light-colour: var(--night-light);
+  --ray-colour: var(--night-ray);
+  --surface-colour: var(--night-surface);
+  --water-glow: var(--night-water-glow);
+  --ray-strength: 0.18;
+  --caustic-strength: 0.55;
+  --vignette: 0.42;
+
+  /* ---- Brand ---- */
+  /* The favicon is a static file, so this is the one colour it may share with the theme;
+     scripts/verify-architecture.mjs fails if the two drift apart. */
+  --color-accent: #14384d;
+
+  /* ---- Surfaces and ink ---- */
+  --surface-panel: #071019f2;
+  --surface-raised: #0d1a24;
+  --surface-hover: #14232e;
+  --border-subtle: #ffffff1f;
+  --text-primary: #eef4f6;
+  --text-muted: #9fb2b9;
+  --text-inverse: #06121a;
+  --action-primary: #4fb9cf;
+  --action-text: #041419;
+  --status-good: #6fd8a0;
+  --status-warn: #f2c14e;
+  --status-bad: #e86a63;
+
+  /* ---- Motion: one set ---- */
+  --motion-fast: 120ms;
+  --motion-base: 220ms;
+  --motion-slow: 480ms;
+  --motion-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* ---- Layout ---- */
   --hud-pad: max(
-    1.25rem,
+    1rem,
     env(safe-area-inset-left),
     env(safe-area-inset-right),
     env(safe-area-inset-top),
     env(safe-area-inset-bottom)
   );
-  --empty-bottom: 4rem;
+  --control-hit: 2.5rem;
+  --icon-size: 1.125rem;
+  --dialog-blur: 14px;
+  --dialog-width: 30rem;
+
+  /* ---- Layers ---- */
+  --z-water: -1;
+  --z-hud: 2;
+  --z-skip: 3;
+  --z-loading: 10;
+  --z-loading-content: 1;
+}
+
+/* Day/night: only the mood tokens swap; every consumer reads them unchanged. */
+:root[data-mood='day'] {
+  --water-top: var(--day-water-top);
+  --water-mid: var(--day-water-mid);
+  --water-deep: var(--day-water-deep);
+  --light-colour: var(--day-light);
+  --ray-colour: var(--day-ray);
+  --surface-colour: var(--day-surface);
+  --water-glow: var(--day-water-glow);
+  --ray-strength: 0.95;
+  --caustic-strength: 0.45;
+  --vignette: 0.5;
+}
+
+/* Reduced motion freezes the cycle at night, where the UI is most legible. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 1ms;
+    --motion-base: 1ms;
+    --motion-slow: 1ms;
+  }
+  :root[data-mood='day'],
+  :root[data-mood='dusk'],
+  :root[data-mood='dawn'] {
+    --water-top: var(--night-water-top);
+    --water-mid: var(--night-water-mid);
+    --water-deep: var(--night-water-deep);
+    --light-colour: var(--night-light);
+    --ray-colour: var(--night-ray);
+    --surface-colour: var(--night-surface);
+    --water-glow: var(--night-water-glow);
+    --ray-strength: 0.18;
+    --caustic-strength: 0.55;
+    --vignette: 0.42;
+  }
+}
+
+/* ---- CSS-only ambience under the canvas (no extra render pass) ---- */
+:root {
+  --surface-bar-height: 0.9%;
+  --surface-line-height: clamp(18px, 3.2vh, 44px);
+  --surface-line-opacity: 0.42;
+  --surface-line-blur: 22px;
+  --water-light-fallback: radial-gradient(
+    ellipse 60% 45% at 50% 4%,
+    color-mix(in srgb, var(--water-glow) 26%, transparent),
+    transparent 70%
+  );
+  /* Corner shading is scenery, not chrome: it frames the water without drawing a line. */
+  --water-vignette-fallback: radial-gradient(
+    ellipse 78% 70% at 50% 46%,
+    transparent 40%,
+    #00000052 78%,
+    #0000008c 100%
+  );
+  --water-grain-fallback: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    #ffffff05 4px
+  );
+  --water-mask-fallback: radial-gradient(ellipse at 60% 30%, #000, transparent 78%);
+}
+
+:root {
+  --loading-word-width: 9ch;
+  /* Feather the loader's water on all four sides: no wall, no frame. */
+  --loading-water-mask:
+    linear-gradient(to right, transparent, #000 7%, #000 93%, transparent),
+    linear-gradient(to bottom, transparent 1%, #000 12%, #000 94%, transparent);
+  --loading-word-height: 1em;
+  --loading-text-shadow: 0 2px 18px #000000cc, 0 0 4px #000000aa;
 }

@@ -28,18 +28,25 @@ export class OimoFluid {
   readonly grid: Float64Array;
   readonly count: number;
   private random = createRandom(cfg.seed);
+  /** Ambient convection clock; increments once per step so identical step counts stay identical. */
+  private tick = 0;
   constructor(width: number, height: number) {
     if (!Number.isFinite(width) || !Number.isFinite(height))
       throw new RangeError('Invalid water bounds');
     this.width = Math.min(cfg.maxWidth, Math.max(8, Math.floor(width)));
     this.height = Math.min(cfg.maxHeight, Math.max(8, Math.floor(height)));
     const positions: number[] = [];
-    // Start pooled against the floor, not as a suspended box that drops on entry.
-    // Half-tank volume, full usable width; same density with a small bounded sideways startup impulse.
-    for (let y = this.height * 0.5; y < this.height - 1.001; y += cfg.spacing) {
-      for (let x = 1.001; x < this.width - 1.001; x += cfg.spacing) {
-        const push = Math.sin((y / this.height) * Math.PI) * cfg.initialPush;
-        positions.push(0, x, y, push, -push * 0.35, 0, 0, 0, 0, cfg.density);
+    // Start as a settled lattice: every column filled from the floor to the waterline. A dropped
+    // block or a floor pool takes seconds to flatten and leaves a lumpy silhouette in the loader,
+    // while a lattice is already at equilibrium (drift under a hundred steps stays sub-cell).
+    const waterline = this.height * (1 - cfg.fill);
+    for (let x = 1.001; x < this.width - 1.001; x += cfg.spacing) {
+      for (let y = this.height - 1.001; y > waterline; y -= cfg.spacing) {
+        // Sub-cell jitter, seeded: a perfect lattice renders as a visible grid through the
+        // additive particles. It must stay below one cell so the pool still starts settled.
+        const jx = (this.random.next() - 0.5) * cfg.jitter;
+        const jy = (this.random.next() - 0.5) * cfg.jitter;
+        positions.push(0, x + jx, y + jy, 0, 0, 0, 0, 0, 0, cfg.density);
       }
     }
     this.particles = new Float64Array(positions);
@@ -95,6 +102,7 @@ export class OimoFluid {
     }
   }
   step(pointer: WaterPointer) {
+    this.tick++;
     const data = this.particles,
       grid = this.grid;
     grid.fill(0);
@@ -147,6 +155,9 @@ export class OimoFluid {
         if (mass <= 0) continue;
         let vx = (read(grid, c + C.vx) + read(grid, c + C.dx)) / mass;
         let vy = (read(grid, c + C.vy) + read(grid, c + C.dy)) / mass + cfg.gravity;
+        // Slow convection cell: the pool breathes instead of freezing into a still image.
+        const swirl = Math.sin(this.tick * cfg.ambientPeriod + (y / this.height) * 6.28318);
+        vx += swirl * cfg.ambient * (0.25 + (y / this.height) * 0.75);
         const distance = Math.hypot(pointer.x - x - 0.5, pointer.y - y - 0.5);
         if (pointer.active && distance < cfg.pointerRadius) {
           const weight =
