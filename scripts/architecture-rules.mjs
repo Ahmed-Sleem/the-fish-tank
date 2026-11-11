@@ -18,6 +18,22 @@ export function architectureErrors(file, text) {
       'design values and breakpoints belong in theme.css',
     );
   }
+  if (file.endsWith('.css')) {
+    // The owner's ruling: no borders, no frames, no rules anywhere in the tank. A selector may
+    // not draw one; if a control needs definition it uses fill, not a line.
+    // `border: 0` is a reset, not a frame; anything that could paint a line is banned.
+    reject(
+      /(?:^|[;{\s])border(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end|width|style|color))?)?:\s*(?:[^;}]*\bsolid\b|\bdashed\b|\bdotted\b|\bdouble\b|\bgroove\b|\bridge\b|[^;}]*\b[1-9][\d.]*(?:px|rem|em|pt)\b|[^;}]*\bthin\b|[^;}]*\bmedium\b|[^;}]*\bthick\b)/.test(
+        text,
+      ),
+      'borders are banned: separate with fill and space, not frames',
+    );
+    // A one-pixel solid strip across the tank reads as a UI rule, which is a frame by another name.
+    reject(
+      /(?:height|width):\s*(?:1px|1rem|0?\.0?6rem)\s*;[^}]*background/.test(text),
+      'no one-pixel rules: use a soft gradient band from theme.css',
+    );
+  }
   if (file.endsWith('.ts')) {
     reject(
       !file.endsWith('/shared/controls.ts') &&

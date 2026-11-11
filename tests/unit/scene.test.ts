@@ -1,29 +1,43 @@
-import { expect, it } from 'vitest';
+import { expect, it, test } from 'vitest';
 import { createFixedLoop } from '../../src/core/loop';
 import { createParticles } from '../../src/render/particles';
-import { sceneConfig } from '../../src/config/scene.config';
+import { moodAt, sceneConfig } from '../../src/config/scene.config';
 import { OimoFluid } from '../../src/render/water/oimo-fluid';
-it('loader starts as a pushed floor pool, not a suspended falling box', () => {
-  const fluid = new OimoFluid(40, 26);
+it('loader starts as a settled water column, not a pushing pool that never flattens', () => {
+  const fluid = new OimoFluid(52, 33);
+  // Every column starts filled from the floor to the waterline, at rest.
+  const tops = new Map<number, number>();
   let minX = Infinity,
-    maxX = 0,
-    minY = Infinity,
-    maxY = 0;
+    maxX = 0;
   for (let p = 0; p < fluid.particles.length; p += 10) {
     const x = fluid.particles[p + 1] ?? 0,
       y = fluid.particles[p + 2] ?? 0;
     minX = Math.min(minX, x);
     maxX = Math.max(maxX, x);
-    minY = Math.min(minY, y);
-    maxY = Math.max(maxY, y);
-    expect(fluid.particles[p + 3]).toBeGreaterThan(0);
-    expect(fluid.particles[p + 3]).toBeLessThanOrEqual(0.22);
-    expect(fluid.particles[p + 4]).toBeLessThan(0);
+    tops.set(Math.floor(x), Math.min(tops.get(Math.floor(x)) ?? Infinity, y));
+    expect(fluid.particles[p + 3]).toBe(0);
+    expect(fluid.particles[p + 4]).toBe(0);
   }
   expect(minX).toBeLessThan(1.1);
   expect(maxX).toBeGreaterThan(fluid.width - 2);
-  expect(minY).toBeGreaterThanOrEqual(fluid.height / 2);
-  expect(maxY).toBeGreaterThan(fluid.height - 1.6);
+  // A flat surface: every column meets the waterline within a couple of cells, and it is a
+  // half-full tank rather than a suspended block.
+  const surface = [...tops.values()];
+  const spread = Math.max(...surface) - Math.min(...surface);
+  expect(spread).toBeLessThan(2);
+  expect(Math.min(...surface)).toBeGreaterThan(fluid.height * 0.45);
+  expect(Math.min(...surface)).toBeLessThan(fluid.height * 0.55);
+  // It stays near equilibrium: a second of idle steps must not collapse it into a lump.
+  const idle = { x: 0, y: 0, dx: 0, dy: 0, active: false };
+  for (let i = 0; i < 48; i++) fluid.step(idle);
+  const after = new Map<number, number>();
+  for (let p = 0; p < fluid.particles.length; p += 10) {
+    const x = Math.floor(fluid.particles[p + 1] ?? 0),
+      y = fluid.particles[p + 2] ?? 0;
+    after.set(x, Math.min(after.get(x) ?? Infinity, y));
+  }
+  const settled = [...after.values()];
+  expect(Math.max(...settled) - Math.min(...settled)).toBeLessThan(4);
 });
 it('seeded fixed-step particles are identical at 30, 60 and 144 render fps', () => {
   const run = (fps: number) => {
@@ -75,4 +89,45 @@ it('advances exactly 30 simulation ticks per second regardless of render cadence
   for (let i = 0; i < 144; i++) loop.advance(1 / 144);
   expect(count).toBe(30);
   expect(time).toBeCloseTo(1);
+});
+
+test('day/night cycle is exactly 45s day, 15s fade, 45s night, 15s fade', () => {
+  const { daySeconds, fadeSeconds, nightSeconds } = sceneConfig.cycle;
+  expect([daySeconds, fadeSeconds, nightSeconds]).toEqual([45, 15, 45]);
+  expect(moodAt(0)).toEqual({ mood: 'day', daylight: 1 });
+  expect(moodAt(44.999).mood).toBe('day');
+  // The fades are monotonic and land on the right endpoints.
+  expect(moodAt(45).mood).toBe('dusk');
+  expect(moodAt(45).daylight).toBe(1);
+  expect(moodAt(45 + fadeSeconds / 2).daylight).toBeCloseTo(0.5, 5);
+  expect(moodAt(60).mood).toBe('night');
+  expect(moodAt(60).daylight).toBe(0);
+  expect(moodAt(60 + 44.999).mood).toBe('night');
+  expect(moodAt(105).mood).toBe('dawn');
+  expect(moodAt(105).daylight).toBe(0);
+  expect(moodAt(119.999).daylight).toBeGreaterThan(0.99);
+  // The cycle closes: one full period returns to the start.
+  expect(moodAt(120)).toEqual(moodAt(0));
+  expect(moodAt(120 + 30)).toEqual(moodAt(30));
+  // Never a value outside the daylight range, at any time.
+  for (let t = 0; t < 240; t += 0.37) {
+    const { daylight } = moodAt(t);
+    expect(daylight).toBeGreaterThanOrEqual(0);
+    expect(daylight).toBeLessThanOrEqual(1);
+  }
+});
+
+test('daylight rises through dawn and falls through dusk, never jumping', () => {
+  let previous = moodAt(44).daylight;
+  for (let t = 44; t <= 61; t += 0.25) {
+    const { daylight } = moodAt(t);
+    expect(previous - daylight).toBeGreaterThanOrEqual(-0.02);
+    previous = daylight;
+  }
+  previous = moodAt(104).daylight;
+  for (let t = 104; t <= 121; t += 0.25) {
+    const { daylight } = moodAt(t);
+    expect(daylight - previous).toBeGreaterThanOrEqual(-0.02);
+    previous = daylight;
+  }
 });

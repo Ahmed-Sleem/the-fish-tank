@@ -1,9 +1,13 @@
+/** Scene preferences only. The settings *dialog* lives in the shell, which owns the single
+ * settings icon; this module must not create a second panel or a second button.
+ */
 import { sceneConfig } from '../config/scene.config';
 import type { ScenePreferences } from '../config/scene.config';
 import { createEvents } from '../core/events';
 import { strings } from '../config/strings.en';
-import { button, dialog, selectField, checkboxField } from './shared/controls';
+import { iconButton, selectField, checkboxField } from './shared/controls';
 import { element } from './shared/dom';
+
 export function createSettings(signal: AbortSignal) {
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const events = createEvents<{ change: ScenePreferences }>();
@@ -42,19 +46,19 @@ export function createSettings(signal: AbortSignal) {
   };
   media.addEventListener('change', syncMotion, { signal });
   syncMotion();
-  const panel = dialog(
-    strings.settings,
-    strings.close,
-    [select.node, motion.node, element('p', '', strings.settingsHelp)],
-    signal,
-  );
-  const open = button(
-    strings.settings,
+
+  const panel = element('div', 'ui-panel');
+  panel.append(select.node, motion.node);
+
+  const open = iconButton(
+    'settings',
+    strings.openSettings,
     () => {
-      panel.open(open);
+      // The shell binds the real action; keeping this a real primitive avoids a dead control.
     },
     signal,
   );
+
   signal.addEventListener(
     'abort',
     () => {
@@ -64,7 +68,7 @@ export function createSettings(signal: AbortSignal) {
   );
   return {
     button: open,
-    node: panel.node,
+    panel,
     get,
     subscribe: (callback: (value: ScenePreferences) => void) => events.on('change', callback),
   };

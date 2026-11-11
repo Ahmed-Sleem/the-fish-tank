@@ -24,7 +24,7 @@ export function createEvents<Events extends object>() {
   };
 }
 export interface AppEvents {
-  rendererStatus: { state: 'ready' | 'failed' | 'lost' };
+  rendererStatus: { state: 'ready' | 'degraded' | 'failed' | 'lost' };
   selectionChanged: { id: string | null };
   balanceChanged: { money: number };
 }

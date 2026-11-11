@@ -1,0 +1,22 @@
+/* The light band where the water meets the air. Part of the tank, not interface chrome:
+   no frame, no rule, just the brightest part of the water. */
+.water-surface {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--surface-bar-height);
+  height: var(--surface-line-height);
+  /* Three soft stops: the waterline, the sunlit layer under it, then nothing. */
+  background: linear-gradient(
+    to bottom,
+    var(--surface-colour) 0%,
+    color-mix(in srgb, var(--surface-colour) 40%, var(--water-glow)) 34%,
+    color-mix(in srgb, var(--water-glow) 30%, transparent) 66%,
+    transparent 100%
+  );
+  opacity: var(--surface-line-opacity);
+  filter: blur(var(--surface-line-blur));
+  transform: translateY(-50%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}

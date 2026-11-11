@@ -1,4 +1,7 @@
-/** Pixi-native ping-pong half-float height field: no second renderer or readback per frame. */
+/** Pixi-native ping-pong half-float height field: no second renderer or readback per frame.
+ * All colour/mood values are read from theme.css tokens, so the tank and the interface can
+ * never drift apart and the day/night cycle is a token change, not a second shader.
+ */
 import {
   Filter,
   UniformGroup,
@@ -12,8 +15,15 @@ import {
 import type { Application, Container, WebGLRenderer } from 'pixi.js';
 import { effectsConfig as cfg } from '../../config/effects.config';
 import type { Quality, ScenePreferences } from '../../config/scene.config';
+import { moodAt } from '../../config/scene.config';
 import type { Impulse } from '../../sim/water/input';
 import { waveFragment, tankFragment, refractFragment } from './shaders';
+
+type Rgb = [number, number, number];
+
+/** Tokens the tank shader reads. One list, so a missing token fails loudly instead of rendering black. */
+const tankTokens = ['--water-top', '--water-deep', '--ray-colour', '--surface-colour'] as const;
+
 export function createWaterEffects(
   app: Application,
   background: Container,
@@ -31,11 +41,19 @@ export function createWaterEffects(
     RenderTexture.create({ width: size, height: size, format: 'rgba16float', scaleMode: 'linear' });
   let read = texture(),
     write = texture();
-  const color = (name: string) => {
+
+  const readRgb = (name: string): Rgb => {
     const hex = getComputedStyle(host).getPropertyValue(name).trim().slice(1);
     const n = Number.parseInt(hex, 16);
     return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
   };
+  type Palette = Record<(typeof tankTokens)[number], Rgb>;
+  const palette = (): Palette => {
+    const out = {} as Palette;
+    for (const token of tankTokens) out[token] = readRgb(token);
+    return out;
+  };
+
   const make = (fragment: string, resources: Record<string, unknown>) =>
     new Filter({
       glProgram: GlProgram.from({
@@ -51,6 +69,7 @@ export function createWaterEffects(
       padding: 0,
       antialias: false,
     });
+
   const waveUniforms = new UniformGroup({
     uTexel: { value: [1 / size, 1 / size], type: 'vec2<f32>' },
     uImpulse: { value: [0, 0, 0, cfg.radius], type: 'vec4<f32>' },
@@ -61,22 +80,39 @@ export function createWaterEffects(
     uAspect: { value: 1, type: 'f32' },
   });
   const wave = make(waveFragment, { uState: read.source, waveUniforms });
+
+  const initial = palette();
+  type VisualUniforms = {
+    uTexel: number[];
+    uLook: number[];
+    uStyle: number[];
+    uTop: Rgb;
+    uDeep: Rgb;
+    uRay: Rgb;
+    uSurface: Rgb;
+  };
   const visualUniforms = new UniformGroup({
     uTexel: { value: [1 / size, 1 / size], type: 'vec2<f32>' },
     uLook: { value: [0, 1, 0.5, cfg.displacement], type: 'vec4<f32>' },
     uStyle: {
-      value: [cfg.causticIntensity, cfg.causticScale, cfg.causticSpeed, 0],
+      value: [cfg.causticScale, cfg.causticSpeed, 0.42, 0],
       type: 'vec4<f32>',
     },
-    uDeep: { value: color('--water-body'), type: 'vec3<f32>' },
-    uFoam: { value: color('--water-foam'), type: 'vec3<f32>' },
-  });
+    uTop: { value: initial['--water-top'], type: 'vec3<f32>' },
+    uDeep: { value: initial['--water-deep'], type: 'vec3<f32>' },
+    uRay: { value: initial['--ray-colour'], type: 'vec3<f32>' },
+    uSurface: { value: initial['--surface-colour'], type: 'vec3<f32>' },
+  }) as UniformGroup & { uniforms: VisualUniforms };
+  // The water is a light pass composited additively over the pixel-art scene.
   const visual = make(tankFragment, { uState: read.source, visualUniforms });
+  visual.blendMode = 'add';
+
   const refractUniforms = new UniformGroup({
     uTexel: { value: [1 / size, 1 / size], type: 'vec2<f32>' },
     uStrength: { value: cfg.displacement * 40, type: 'f32' },
   });
   const refract = make(refractFragment, { uState: read.source, refractUniforms });
+
   const quad = new Sprite(Texture.WHITE);
   quad.label = 'water-height-step';
   quad.width = size;
@@ -84,6 +120,7 @@ export function createWaterEffects(
   quad.filters = [wave];
   quad.filterArea = new Rectangle(0, 0, size, size);
   const tank = new Sprite(Texture.WHITE);
+  tank.alpha = 1;
   tank.filters = [visual];
   background.addChild(tank);
   particles.filters = [refract];
@@ -93,10 +130,39 @@ export function createWaterEffects(
       app.renderer.clear({ target, clear: true, clearColor: [0, 0, 0, 0] });
   };
   clear();
+
+  let reducedMotion = false;
+  let lastMood = '';
+
+  /** Re-read the live tokens and push them to the shader. Called on mood change and reconfigure. */
+  const applyTokens = () => {
+    const next = palette();
+    for (const token of tankTokens) {
+      const target =
+        token === '--water-top'
+          ? 'uTop'
+          : token === '--water-deep'
+            ? 'uDeep'
+            : token === '--ray-colour'
+              ? 'uRay'
+              : 'uSurface';
+      visualUniforms.uniforms[target] = next[token];
+    }
+  };
+
   return {
     step(impulse: Impulse | undefined, seconds: number) {
       if (disposed) return;
       time += seconds;
+      if (!reducedMotion) {
+        const { mood, daylight } = moodAt(time);
+        if (mood !== lastMood) {
+          lastMood = mood;
+          applyTokens();
+          host.dataset.mood = mood;
+        }
+        visualUniforms.uniforms.uStyle[3] = daylight;
+      }
       waveUniforms.uniforms.uImpulse = [
         impulse?.x ?? 0,
         impulse?.y ?? 0,
@@ -112,6 +178,7 @@ export function createWaterEffects(
     },
     configure(settings: ScenePreferences) {
       quality = settings.quality;
+      reducedMotion = settings.reducedMotion;
       const preset = cfg.presets[quality];
       visual.resolution = preset.resolution;
       refract.resolution = preset.resolution;
@@ -132,18 +199,27 @@ export function createWaterEffects(
         uniforms.uniforms.uTexel = [1 / size, 1 / size];
       visualUniforms.uniforms.uLook = [
         settings.reducedMotion ? 0 : time,
-        preset.caustics,
         preset.rays,
+        preset.caustics,
         settings.reducedMotion ? 0 : cfg.displacement,
       ];
       refractUniforms.uniforms.uStrength = settings.reducedMotion ? 0 : cfg.displacement * 40;
-      if (settings.reducedMotion) clear();
+      if (settings.reducedMotion) {
+        clear();
+        // Reduced motion holds the calm night palette rather than freezing mid-fade.
+        host.dataset.mood = 'night';
+        lastMood = '';
+      } else {
+        lastMood = '';
+        applyTokens();
+      }
       host.dataset.rippleGrid = String(size);
     },
     resize(width: number, height: number) {
       const preset = cfg.presets[quality];
-      visual.resolution = Math.min(preset.resolution, preset.maxWidth / width);
-      refract.resolution = Math.min(preset.resolution, preset.maxWidth / width);
+      const ceiling = Math.min(preset.resolution, preset.maxWidth / width);
+      visual.resolution = ceiling;
+      refract.resolution = ceiling;
       tank.width = width;
       tank.height = height;
       tank.filterArea = new Rectangle(0, 0, width, height);
@@ -159,7 +235,6 @@ export function createWaterEffects(
       particles.filters = [];
       tank.filters = [];
       quad.destroy();
-
       read.destroy(true);
       write.destroy(true);
       wave.destroy();

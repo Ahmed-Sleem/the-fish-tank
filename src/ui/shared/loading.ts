@@ -1,4 +1,6 @@
-/** Lightweight, bounded splash: no graphics dependency while Pixi downloads. */
+/** Lightweight, bounded splash: no graphics dependency while Pixi downloads.
+ * The product title lives here and nowhere else, so the tank opens uninterrupted.
+ */
 import { appConfig } from '../../config/app.config';
 import { strings } from '../../config/strings.en';
 import { element } from './dom';
@@ -16,13 +18,14 @@ export function createLoadingScreen(root: HTMLElement) {
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const overlay = element('div', 'loading-screen');
   overlay.setAttribute('aria-label', strings.loading);
-  const caption = element('div', 'loading-caption');
+  const content = element('div', 'loading-content');
+  const title = element('p', 'loading-title', strings.brand);
   const word = element('span', 'loading-word', strings.loading.slice(0, 1));
   word.setAttribute('aria-hidden', 'true');
   const accessible = element('span', 'sr-only', strings.loading);
   accessible.setAttribute('role', 'status');
-  caption.append(word, accessible);
-  overlay.append(caption);
+  content.append(title, word, accessible);
+  overlay.append(content);
   document.body.append(overlay);
   mountOimoWater(overlay, signal);
   root.inert = true;

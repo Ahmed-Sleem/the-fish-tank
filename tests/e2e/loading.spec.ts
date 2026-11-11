@@ -12,6 +12,9 @@ test('Oimo water, sequential loading letters, flat icon and correct identity', a
   await page.goto('./', { waitUntil: 'domcontentloaded' });
   const splash = page.locator('.loading-screen');
   await expect(splash).toBeVisible();
+  // The product title lives on the splash and nowhere else.
+  await expect(splash.locator('.loading-title')).toHaveText('the fish tank');
+  await expect(splash.locator('.loading-title')).toHaveCSS('text-transform', 'uppercase');
   await expect(page.locator('#app')).toHaveAttribute('inert', '');
   await expect(page.locator('.loading-drop, .loading-ripple')).toHaveCount(0);
   await expect(page.locator('.loading-water')).toHaveCount(1);
@@ -46,7 +49,11 @@ test('Oimo water, sequential loading letters, flat icon and correct identity', a
   release();
   await expect(splash).toHaveCount(0);
   await expect(page.locator('#app')).not.toHaveAttribute('inert');
-  await expect(page.locator('.wordmark')).toHaveText('the fish tank');
+  await expect(page.locator('.wordmark')).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('the fish tank');
+  const titleBox = await page.getByRole('heading', { level: 1 }).boundingBox();
+  expect(titleBox?.width ?? 0).toBeLessThanOrEqual(1);
+  expect(titleBox?.height ?? 0).toBeLessThanOrEqual(1);
   await expect(page).toHaveTitle(/^the fish tank —/);
   const icon = await page.locator('link[rel="icon"]').getAttribute('href');
   expect(icon).toContain('/the-fish-tank/');

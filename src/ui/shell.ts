@@ -1,13 +1,14 @@
-/** Direct aquarium interface. Future gameplay controls stay hidden until implemented. */
+/** Borderless aquarium interface. The tank fills the window; a single settings icon is the
+ * only chrome. Nothing unimplemented is shown, and no control appears that cannot work.
+ */
 import { createSettings } from './settings';
-import { button, dialog, stat, toolbar } from './shared/controls';
+import { button, dialog, sectionTitle, stat, actionRow } from './shared/controls';
 import { domainConfig } from '../config/domain.config';
 import { appConfig } from '../config/app.config';
 import { strings } from '../config/strings.en';
-import { buildLabel } from '../core/build';
 import { element, link } from './shared/dom';
 
-export function createShell(root: HTMLElement, revision: string, signal: AbortSignal) {
+export function createShell(root: HTMLElement, signal: AbortSignal) {
   const skip = link(strings.skip, '#aquarium', 'skip-link');
   const main = element('main', 'aquarium');
   main.id = 'aquarium';
@@ -16,81 +17,98 @@ export function createShell(root: HTMLElement, revision: string, signal: AbortSi
   const water = element('div', 'water');
   water.setAttribute('aria-hidden', 'true');
   const canvasHost = element('div', 'canvas-host');
-  water.append(canvasHost, element('div', 'water-light'), element('div', 'water-grain'));
-  const empty = element('p', 'aquarium-empty', strings.emptyTank);
-  main.append(water, empty);
+  water.append(
+    canvasHost,
+    element('div', 'water-light'),
+    element('div', 'water-surface'),
+    element('div', 'water-grain'),
+    element('div', 'water-vignette'),
+  );
+  main.append(water);
 
-  const status = element('p', 'renderer-status', strings.rendererStarting);
-  status.setAttribute('role', 'status');
-  status.setAttribute('aria-live', 'polite');
+  // The page keeps a heading for assistive technology; the visible title lives on the loading
+  // screen only, so the tank itself stays uninterrupted.
+  const heading = element('h1', 'sr-only', strings.brand);
+
   const graphics = stat(strings.runtimeLabel, strings.rendererStarting);
+  const settings = createSettings(signal);
+
+  const windowRow = element('div', 'ui-row-stack');
+  if (document.fullscreenEnabled) {
+    const fullscreen = button(
+      strings.fullscreen,
+      () => {
+        const change = document.fullscreenElement
+          ? document.exitFullscreen()
+          : root.requestFullscreen();
+        void change.catch(() => {
+          fullscreen.textContent = strings.fullscreenUnavailable;
+        });
+      },
+      signal,
+    );
+    document.addEventListener(
+      'fullscreenchange',
+      () => {
+        fullscreen.textContent = document.fullscreenElement
+          ? strings.exitFullscreen
+          : strings.fullscreen;
+      },
+      { signal },
+    );
+    windowRow.append(actionRow(strings.fullscreen, fullscreen));
+  }
+
+  const links = element('div', 'ui-links');
+  links.append(
+    link(
+      strings.credits,
+      `${appConfig.repository}/blob/${appConfig.branch}/docs/REUSE_LEDGER.md`,
+      'ui-link',
+    ),
+    link(strings.source, appConfig.repository, 'ui-link'),
+    link(
+      strings.plan,
+      `${appConfig.repository}/blob/${appConfig.branch}/IMPLEMENTATION_PLAN.md`,
+      'ui-link',
+    ),
+  );
+
   const details = dialog(
-    strings.buildDetails,
+    strings.settings,
     strings.close,
     [
-      element('p', '', strings.capabilities),
-      stat(strings.schemaLabel, `${strings.dataFormat} ${String(domainConfig.schemaVersion)}`).node,
+      // No build hash and no feature checklist in the interface: the owner asked for the tank
+      // and one dialog, not a developer dashboard.
       graphics.node,
-      element('p', 'build-id', `${strings.revisionPrefix} ${buildLabel(revision)}`),
-      element('p', '', strings.privacy),
-      link(
-        strings.credits,
-        `${appConfig.repository}/blob/${appConfig.branch}/docs/REUSE_LEDGER.md`,
-      ),
-      link(strings.source, appConfig.repository),
-      link(strings.plan, `${appConfig.repository}/blob/${appConfig.branch}/IMPLEMENTATION_PLAN.md`),
+      element('p', 'ui-note', strings.capabilities),
+      stat(strings.schemaLabel, `${strings.dataFormat} ${String(domainConfig.schemaVersion)}`).node,
+      sectionTitle(strings.linksSection),
+      links,
+      windowRow,
+      element('p', 'ui-note', strings.privacy),
+      settings.panel,
     ],
     signal,
   );
-  const about = button(
-    strings.buildDetails,
+
+  const trigger = settings.button;
+  trigger.addEventListener(
+    'click',
     () => {
-      details.open(about);
-    },
-    signal,
-  );
-  const fullscreen = button(
-    strings.fullscreen,
-    () => {
-      const change = document.fullscreenElement
-        ? document.exitFullscreen()
-        : root.requestFullscreen();
-      void change.catch(() => {
-        status.textContent = strings.fullscreenUnavailable;
-      });
-    },
-    signal,
-  );
-  document.addEventListener(
-    'fullscreenchange',
-    () => {
-      fullscreen.textContent = document.fullscreenElement
-        ? strings.exitFullscreen
-        : strings.fullscreen;
+      details.open(trigger);
     },
     { signal },
   );
-  // Some mobile browsers have no fullscreen API. Keep unavailable controls out of the HUD.
-  const settings = createSettings(signal);
-  const controls = document.fullscreenEnabled
-    ? [settings.button, fullscreen, about]
-    : [settings.button, about];
-  const header = element('header', 'game-hud');
-  header.append(
-    element('h1', 'wordmark', strings.brand),
-    toolbar(strings.interfaceTools, controls),
-  );
-  const runtime = element('section', 'tank-status');
-  runtime.id = 'build-status';
-  runtime.setAttribute('aria-label', strings.liveLabel);
-  runtime.append(status);
-  root.replaceChildren(skip, main, header, runtime, details.node, settings.node);
+
+  const hud = element('header', 'hud');
+  hud.append(trigger);
+
+  root.replaceChildren(skip, heading, main, hud, details.node);
   return {
     canvasHost,
     settings,
-    status,
     setStatus: (value: string) => {
-      status.textContent = value;
       graphics.update(value);
     },
   };

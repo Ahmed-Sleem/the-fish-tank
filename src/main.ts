@@ -1,6 +1,7 @@
 /** Mount the first verifiable app shell; failed graphics leave readable status and links. */
 import './ui/theme.css';
 import './ui/shell.css';
+import './ui/surface.css';
 import './ui/loading.css';
 import './ui/shared/controls.css';
 import { createLoadingScreen } from './ui/shared/loading';
@@ -13,16 +14,14 @@ const root = document.querySelector<HTMLElement>('#app');
 if (!root) throw new Error('Missing application root');
 const controller = new AbortController();
 const loading = createLoadingScreen(root);
-const { canvasHost, setStatus, settings } = createShell(
-  root,
-  __BUILD_REVISION__,
-  controller.signal,
-);
+// The tank is created behind the inert loader so the first ready frame already exists.
+const { canvasHost, setStatus, settings } = createShell(root, controller.signal);
 
 const events = createEvents<AppEvents>();
 events.on('rendererStatus', ({ state }) => {
   const labels = {
     ready: strings.rendererReady,
+    degraded: strings.rendererDegraded,
     failed: strings.rendererFailed,
     lost: strings.rendererLost,
   };
@@ -40,7 +39,10 @@ async function mountRenderer() {
   try {
     const { startRenderer } = await import('./render/bootstrap');
     if (await startRenderer(canvasHost, controller.signal, settings)) {
-      events.emit('rendererStatus', { state: 'ready' });
+      // The art can render while the water shaders fail; say so instead of claiming "Ready".
+      events.emit('rendererStatus', {
+        state: canvasHost.dataset.effects === 'unavailable' ? 'degraded' : 'ready',
+      });
       canvasHost.querySelector('canvas')?.addEventListener(
         'webglcontextlost',
         (event) => {

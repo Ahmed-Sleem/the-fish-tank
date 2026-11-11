@@ -1,133 +1,131 @@
-/* Full-window aquarium and floating HUD; no landing page or nonfunctional game tools. */
+/* Borderless full-window aquarium: no frame, no bar, no rules. Values come from theme.css. */
 * {
   box-sizing: border-box;
 }
+
 html {
   min-width: 0;
-  background: var(--color-dark);
+  background: var(--water-deep);
 }
+
 body {
   margin: 0;
-  color: var(--color-ink);
-  font: var(--body-size) var(--font-body);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--size-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
 }
+
 a {
   color: inherit;
 }
+
 p,
 h1,
-h2 {
+h2,
+h3 {
   margin: 0;
 }
+
 #app {
   min-height: 100svh;
   position: relative;
   isolation: isolate;
 }
+
 .aquarium {
   touch-action: pinch-zoom;
   position: relative;
   min-height: 100svh;
   outline: none;
+  overflow: hidden;
 }
+
 .water {
   position: absolute;
   inset: 0;
   z-index: var(--z-water);
-  background: var(--water-background);
+  background: var(--water-deep);
   pointer-events: none;
 }
+
 .canvas-host,
 .water-light,
-.water-grain {
+.water-grain,
+.water-vignette {
   position: absolute;
   inset: 0;
 }
+
 .canvas-host canvas {
   display: block;
   width: 100%;
   height: 100%;
+  image-rendering: pixelated;
 }
+
 .water-light {
-  background: var(--water-light);
+  background: var(--water-light-fallback);
+  mix-blend-mode: screen;
 }
+
 .water-grain {
-  background: var(--water-grain);
-  mask-image: var(--water-mask);
+  background: var(--water-grain-fallback);
+  mask-image: var(--water-mask-fallback);
+  opacity: 0.5;
 }
-.game-hud {
+
+/* Deepens the edges so the eye stays on the tank; no border, no frame. */
+.water-vignette {
+  background: var(--water-vignette-fallback);
+}
+
+/* One floating control, nothing else. Safe-area aware, never a bar with a rule. */
+.hud {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: var(--hud-pad);
+  top: var(--hud-pad);
+  right: var(--hud-pad);
+  z-index: var(--z-hud);
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-small);
-  pointer-events: none;
+  gap: var(--space-xs);
 }
-.game-hud > * {
-  pointer-events: auto;
-}
-.wordmark {
-  font-family: var(--font-display);
-  font-size: var(--wordmark-size);
-  font-weight: normal;
-  letter-spacing: var(--wordmark-tracking);
-}
-.aquarium-empty {
+
+/* Visually hidden but still announced: a clipped box, the standard technique. */
+.sr-only {
   position: absolute;
-  bottom: var(--empty-bottom);
-  left: var(--hud-pad);
-  right: var(--hud-pad);
-  text-align: center;
-  color: var(--color-muted);
-  font-size: var(--footer-copy-size);
-  line-height: var(--body-leading);
-  pointer-events: none;
+  width: var(--line-hair);
+  height: var(--line-hair);
+  padding: 0;
+  margin: calc(var(--line-hair) * -1);
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
-.tank-status {
-  position: absolute;
-  left: var(--hud-pad);
-  right: var(--hud-pad);
-  bottom: var(--hud-pad);
-  font-size: var(--footer-copy-size);
-  color: var(--color-muted);
-}
-.build-id {
-  font-family: var(--font-mono);
-  font-size: var(--footer-copy-size);
-  color: var(--color-muted);
-}
-.dialog-title {
-  font-family: var(--font-display);
-  font-size: var(--dialog-title-size);
-  font-weight: normal;
-}
-.text-link {
-  display: inline-block;
-  font-size: var(--link-size);
-  text-underline-offset: var(--space-tiny);
-}
-.text-link:hover {
-  color: var(--color-focus);
-}
-a:focus-visible,
+
+.ui-link:focus-visible,
 .aquarium:focus-visible {
-  outline: var(--focus-width) solid var(--color-focus);
+  outline: var(--focus-width) solid var(--action-primary);
   outline-offset: var(--focus-offset);
 }
+
 .skip-link {
   position: absolute;
-  top: var(--space-small);
+  top: var(--space-xs);
   left: var(--hud-pad);
-  transform: translateY(var(--skip-offset));
   z-index: var(--z-skip);
-  background: var(--color-dark);
-  padding: var(--space-small);
+  transform: translateY(-200%);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--size-small);
+  text-decoration: none;
+  transition: transform var(--motion-fast) var(--motion-ease);
 }
+
 .skip-link:focus {
   transform: none;
 }

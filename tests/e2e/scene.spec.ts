@@ -9,7 +9,7 @@ test('scene quality, motion, resize and context-loss lifecycle', async ({ page }
   await expect(page.locator('.loading-screen')).toHaveCount(0);
   const host = page.locator('.canvas-host');
   await expect(host).toHaveAttribute('data-quality', 'medium');
-  await page.getByRole('button', { name: strings.settings, exact: true }).click();
+  await page.getByRole('button', { name: strings.openSettings }).click();
   await page.getByLabel(strings.quality, { exact: true }).selectOption('low');
   await expect(host).toHaveAttribute('data-particles', '16');
   await expect(host).toHaveAttribute('data-resolution', '1');
@@ -55,7 +55,11 @@ test('scene quality, motion, resize and context-loss lifecycle', async ({ page }
   await expect(host).toHaveAttribute('data-resolution', '2');
   await page.locator('canvas').dispatchEvent('webglcontextlost');
   await expect(host).toHaveAttribute('data-running', 'false');
-  await expect(page.getByRole('status')).toHaveText(strings.rendererLost);
+  // The loss is surfaced inside the one dialog, never as a HUD readout over the tank.
+  await page.getByRole('button', { name: strings.openSettings }).click();
+  await expect(page.getByRole('dialog', { name: strings.settings })).toContainText(
+    strings.rendererLost,
+  );
   await page.waitForTimeout(200);
   expect(errors).toEqual([]);
 });
