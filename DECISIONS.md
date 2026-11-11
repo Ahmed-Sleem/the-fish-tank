@@ -91,3 +91,30 @@ Owner supplied two generated reference images (day and night) and asked for the 
 - **Centralisation.** Design values live only in `theme.css`; `scripts/verify-architecture.mjs` now also rejects CSS borders and one-pixel rules, so the "no frames" ruling is enforced rather than remembered.
 
 Renderer consequence: binding the scene texture into a Pixi v8 filter never worked (uniform typecasting rejects samplers, and a `Filter` resource binds black). The art is drawn opaque by the backdrop sprite; a translucent water-body filter sits over it; the water shader is an additive light pass with caustics, rays, a sun shaft and the ripple glow. A shader failure marks the host degraded and still shows the pixel tank, and the dialog then says the water effects are unavailable instead of claiming everything is ready.
+
+## DEC-023 — Ink is charged by drawn length only (2026-11-11)
+
+GAP-002 is answered by the owner: **ink cost is drawn length only.** This is the original intent and it takes precedence over the TECH_SPEC §8.1 draft, which is amended accordingly:
+
+- **No width multiplier.** The three pen widths are free. A thick stroke costs exactly what the same path would cost thin.
+- **No per-stroke fee.** Resting a stroke, lifting the pen and starting another adds nothing on its own. Colour is free as well.
+- **Length is normalized** by `min(canvasWidth, canvasHeight)`, so drawing is priced the same on a phone and on a wide monitor.
+- **The soft cap stays**, because it exists to stop one enormous drawing from being cheap, not to price widths.
+
+Consequences to honour in S05: live estimate and final commit must use the _same_ evaluator so the number cannot jump when a stroke is simplified; undo and clear refund the exact ink of the removed strokes, which is now simply their length; an exhausted wallet stops the pen rather than silently discarding work. The spec's `widthMultiplier` and `rateStroke` fields are removed rather than left dormant, so no later pass can quietly reintroduce the rejected rule.
+
+## DEC-024 — Background life is a required feature, not polish (2026-11-11)
+
+The owner asked during the S06 discussion for the tank's **background to animate** in its own right, and asked that this not be forgotten. It is recorded here as a product requirement so it cannot be dropped between sessions.
+
+Today the tank's art — bed, plants, far rocks — is painted **once** into a single `344x192` texture and never moves again. Only the water above it animates (caustics, god ray, surface band, particles, day/night), so the scene reads as a photograph behind moving water rather than a living tank.
+
+Required, in the owner's terms:
+
+- **Plants sway from their roots**, driven by the same current the particles already sample, so a cursor or fish stirring the water visibly bends them. They must stay anchored in the sand, never detach or slide.
+- **Bubbles** rise in thin streams and break at the surface.
+- **The far background moves at a different rate** than the foreground, for depth.
+
+Implementation consequence: the static art has to be split into layers — plants separated from bed and far scenery — instead of one baked texture, so each layer can be transformed independently at pixel scale. This is an architectural change to `src/render/pixel/`, not a decoration pass, and it must hold its frame budget at Quality Low, where the existing budget already ships.
+
+Order: after the drawing path produces a real fish (S07), so the animated background has something to react to, and before S08's steering work, which assumes a living scene.
