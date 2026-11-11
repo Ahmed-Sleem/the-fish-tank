@@ -45,3 +45,22 @@ export function architectureErrors(file, text) {
   }
   return errors;
 }
+
+/**
+ * The favicon is a shipped brand asset, so its colour is a design value like any other.
+ * It cannot read theme.css, so the only defence against the two drifting apart is a check:
+ * the single circle's fill must equal the --color-accent token in the one theme file.
+ * Returns an error string, or undefined when the asset and the token agree.
+ */
+export function faviconAccentError(faviconSvg, themeCss) {
+  const token = /--color-accent:\s*(#[0-9a-f]{6})\b/i.exec(themeCss)?.[1];
+  if (!token) return 'theme.css must define --color-accent as a six-digit hex colour';
+  const fills = [...faviconSvg.matchAll(/fill="(#[0-9a-f]{6})"/gi)].map((match) =>
+    match[1].toLowerCase(),
+  );
+  if (fills.length !== 1)
+    return `favicon.svg must fill exactly one shape, found ${String(fills.length)}`;
+  return fills[0] === token.toLowerCase()
+    ? undefined
+    : `favicon.svg fill ${fills[0] ?? 'none'} must equal --color-accent ${token}`;
+}

@@ -71,3 +71,9 @@ Implemented native Pixi half-float ping-pong ripples and refraction, seeded shar
 - Added GAP-021 (no automated accessibility/contrast/responsive-matrix checks) and GAP-022 (single-theme departure not yet documented).
 - Validation: `npm run verify` green — 86 unit, 22 browser, 11 architecture, 4 documentation tests, format, lint, strict types, audit zero, build; controlled failures observed for the new pinned hashes and required documents, then restored.
 - Next: owner decision on GAP-002 ink pricing, then S05. GAP-005 60 fps recorded-target remains open.
+
+## 2026-11-11 session 5 (continued) — brand colour centralised and guarded
+
+- `--color-accent` had a second definition as the literal fill in `public/favicon.svg`; nothing kept them equal. Added `faviconAccentError` and wired it into `npm run verify:architecture`, with four fixtures.
+- Controlled proof: favicon fill changed to `#396aac` failed verification (exit 1) naming both colours; restored file passed (exit 0).
+- Note: an initial fixture asserted the _matching_ colour as a drift case and correctly failed, which is how the fixture was caught.

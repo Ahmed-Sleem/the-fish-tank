@@ -148,3 +148,24 @@ Implemented native Pixi half-float ping-pong ripples and refraction, seeded shar
 - **Self-check.** Is the study complete? Yes — every tracked file was read and every gate run,
   not inferred. Is the reconciliation wired in? Yes — the two new pinned hashes and three new
   required documents fail the build if removed (observed). Nothing gameplay-related was claimed.
+
+## GAP-025 — brand colour defined once and guarded (2026-11-11)
+
+- **Root cause.** `--color-accent: #396aab` in `theme.css` was duplicated as the literal `fill`
+  in `public/favicon.svg`. A static SVG cannot read the theme, and nothing compared the two —
+  only a CSS comment asserted they matched ("a comment is not a check", rules §0.2/§0.3).
+- **Fix.** `faviconAccentError(faviconSvg, themeCss)` in `scripts/architecture-rules.mjs` parses
+  the token and the favicon's fills: exactly one fill must exist and equal the token,
+  case-insensitively. Wired into `scripts/verify-architecture.mjs`, so it runs in `npm run verify`
+  and in CI. Four fixtures in `tests/architecture/rules.test.mjs`.
+- **Files.** `scripts/architecture-rules.mjs`, `scripts/verify-architecture.mjs`,
+  `tests/architecture/rules.test.mjs`, docs/audit/log/changelog.
+- **Controlled evidence.** Favicon fill mutated `#396aab` → `#396aac`: verifier printed
+  `public/favicon.svg: favicon.svg fill #396aac must equal --color-accent #396aab` and exited 1.
+  Restored: `PASS` exit 0. Architecture fixtures 15 pass / 0 fail.
+- **A mistake worth recording.** The first drift fixture used `#396aab` — the _matching_ colour —
+  so it failed. The check was right and the fixture was wrong; the fixture was changed to a truly
+  different colour rather than the check being weakened.
+- **Self-check.** Fixed everywhere? Yes — one definition, one guard, all entry points through
+  `npm run verify`. Wired? Yes, verified through the real command, not the unit test alone.
+  Does the test validate behaviour? Yes, observed failing for the intended reason.

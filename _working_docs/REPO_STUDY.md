@@ -211,11 +211,14 @@ missing; one was a link list.
 
 ## 6. Standards actually violated today (found by reading, not guessed)
 
-1. **Dead tokens.** `--color-accent`, `--water-body` and `--water-foam` are read at runtime
-   by `getComputedStyle` from the canvas hosts, so the `var()` grep reports zero uses — that
-   is *not* a violation. But `--color-accent` has no consumer at all (the favicon is a static
-   SVG) and one token is defined but never rendered. Cosmetic, must be resolved before the
-   theme is called final.
+1. **Favicon colour duplicated the brand token.** `--water-body` and `--water-foam` are read
+   at runtime via `getComputedStyle` from the canvas hosts, so a `var()` grep reports zero uses
+   and that is *not* a violation. But `--color-accent: #396aab` had a second definition: the
+   literal fill in `public/favicon.svg`, which cannot read `theme.css`, with nothing keeping
+   the two equal. **Closed:** `scripts/architecture-rules.mjs` now parses both files
+   (`faviconAccentError`, wired into `verify-architecture`), so a drifted brand colour fails
+   `npm run verify`. Proven by changing the fill to `#396aac` (exit 1) and restoring (exit 0).
+   Lesson worth keeping: a comment saying "the favicon matches the token" is not a check.
 2. **Stale status text in the documents** — corrected in this study (see §4). This is exactly
    what rule §12 ("documentation must match reality") exists to prevent.
 3. **S03/S04 verification documents were not in the required-documents list**, so deleting
@@ -225,6 +228,10 @@ missing; one was a link list.
    user-visible update. Corrected.
 5. **No accessibility/contrast/responsive automated check.** The GUI rules make these
    mandatory and require tooling enforcement. Recorded as GAP-021, not silently accepted.
+6. **No light theme, and no recorded reason.** The GUI standard requires deliberately designed
+   light *and* dark themes. The product is dark-blue only by owner identity decision, which is
+   legitimate — but the departure was never written into `DECISIONS.md`, so a future session
+   could "fix" it or a reviewer could call it an oversight. Recorded as GAP-022.
 
 ## 7. How to work in this repository
 
