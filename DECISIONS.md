@@ -118,3 +118,17 @@ Required, in the owner's terms:
 Implementation consequence: the static art has to be split into layers — plants separated from bed and far scenery — instead of one baked texture, so each layer can be transformed independently at pixel scale. This is an architectural change to `src/render/pixel/`, not a decoration pass, and it must hold its frame budget at Quality Low, where the existing budget already ships.
 
 Order: after the drawing path produces a real fish (S07), so the animated background has something to react to, and before S08's steering work, which assumes a living scene.
+
+## DEC-025 — Where the loader's water belongs in the tank (2026-11-11)
+
+The owner likes the pool on the loading screen and wants it in the tank, but does not know where. That indecision is answered here rather than being carried forward.
+
+The loader water is **not** a different effect to be dropped somewhere new. It is the *same* physics the tank's water already uses: the tank runs a curl-current flow field plus pointer impulses (`src/sim/water/flow.ts`, `input.ts`) and a GPU ripple field, and the loader runs the Oimo APIC solver that DEC-019 adapted for exactly this purpose. The loader shows it as a bed of point sprites because during loading there is **no tank yet** — it has to be the whole picture. In the tank there is a picture, so the same motion has to appear as *displacement in it*, not as grains in front of it.
+
+So the answer to "where": **inside the tank's existing lighting and refraction, driven by one shared flow.** Three places, in order of value:
+
+1. **The surface band and the water body** move with the same flow the particles already sample, so a cursor stir bends the waterline and the light along with the plants.
+2. **A calm pool of grains, at the bottom of the tank**, where the loader's dotted look is actually appropriate: sand, silt and plankton near the floor. Not a curtain over the fish.
+3. **The far background parallax**, which is DEC-024 and needs the static art split into layers first.
+
+A second canvas repeating the loader shader over the tank is explicitly rejected: it doubles the water simulation, contradicts the single-source rule that already governs `moodAt`, and would show two fluids that disagree whenever the pointer moves. The loader and the tank must sample one field.
