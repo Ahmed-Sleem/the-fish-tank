@@ -62,3 +62,12 @@ Implemented seeded pooled particles, ordered layers/surface, bounded 30Hz loop a
 ## S04 water implementation and loader adjustment
 
 Implemented native Pixi half-float ping-pong ripples and refraction, seeded shared curl current, owner-source credited caustics/depth/rays, coalesced cursor/touch impulses and cleanup/quality/motion handling. Loader minimum now five seconds, bottom pool receives a bounded initial push. No Three dependency or placeholder fish. See `docs/S04_VERIFICATION.md` for exact scope, regression proof and honest software-renderer timings. Hardware <1.5ms GPU/60fps targets remain open GAP-005 (software RAF does NOT meet them); S05 pricing still blocked GAP-002. Full local verify passed: 86 unit, 22 browser, 11 architecture, 4 documentation tests; format/lint/typecheck/build/hash checks and audit zero. Publishing on arena/4cbba201-the-fish-tank for review; no auto-merge authorization assumed.
+
+## 2026-11-11 session 5 — Full repository study and rules reconciliation
+
+- Studied the whole repository and the four owner attachments; wrote `_working_docs/REPO_STUDY.md` as the durable orientation document (product, architecture, session map, genuinely open gates, next move).
+- Reconciled the attachments: `GENERAL_GUI_AGENT_RULES.md` was missing from the repository and is now stored verbatim with a pinned hash; the owner's five design references are preserved verbatim and linked to the existing licence verdicts.
+- Corrected status claims that reality had overtaken: GAP-007 (first deployment) closed against observed Actions runs and the live site; S02–S04 statuses, the phase-gate note, developer setup, roadmap, audit and player README updated.
+- Added GAP-021 (no automated accessibility/contrast/responsive-matrix checks) and GAP-022 (single-theme departure not yet documented).
+- Validation: `npm run verify` green — 86 unit, 22 browser, 11 architecture, 4 documentation tests, format, lint, strict types, audit zero, build; controlled failures observed for the new pinned hashes and required documents, then restored.
+- Next: owner decision on GAP-002 ink pricing, then S05. GAP-005 60 fps recorded-target remains open.

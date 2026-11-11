@@ -1,6 +1,6 @@
 # Contributing and project conventions
 
-Read the [working rules](_working_docs/AGENT_RULES.md), [chunking process](_working_docs/CHUNKING_MECHANISM.md), current audit/log/roadmap, [idea](GAME_IDEA.md), [technical specification](TECH_SPEC.md) and [implementation plan](IMPLEMENTATION_PLAN.md) before implementation. Original input documents are preserved; record amendments in DECISIONS.md.
+Read the [repository study](_working_docs/REPO_STUDY.md) for current state, then the [working rules](_working_docs/AGENT_RULES.md), [GUI production standard](_working_docs/GENERAL_GUI_AGENT_RULES.md), [chunking process](_working_docs/CHUNKING_MECHANISM.md), current audit/log/roadmap, [idea](GAME_IDEA.md), [technical specification](TECH_SPEC.md) and [implementation plan](IMPLEMENTATION_PLAN.md) before implementation. Original input documents are preserved; record amendments in DECISIONS.md.
 
 ## README is the player's guide — keep it current
 

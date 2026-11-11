@@ -1,6 +1,6 @@
 # Developer setup
 
-The current product is the S01 foundation shell, not a playable game. Player instructions are in the [README](../README.md). Update that guide with every user-visible change; see [contributing](../CONTRIBUTING.md).
+The current product is the S01–S04 foundation — toolchain, contracts, tank scene and interactive water — not a playable game. Player instructions are in the [README](../README.md). Update that guide with every user-visible change; see [contributing](../CONTRIBUTING.md).
 
 ## Requirements and commands
 
@@ -29,5 +29,6 @@ Normal CI installs Playwright Chromium with OS dependencies. This sandbox's netw
 ## References and evidence
 
 - [Technical specification](../TECH_SPEC.md), [plan](../IMPLEMENTATION_PLAN.md), [decisions](../DECISIONS.md) and [third-party notices](../THIRD_PARTY_NOTICES.md).
-- [S01 validation](S01_VERIFICATION.md), [audit](../_working_docs/AUDIT_AND_TODO.md), [implementation log](../_working_docs/IMPLEMENTATION_LOG.md), [next step](../_working_docs/NEXT_SESSIONS_ROADMAP.md).
+- [Repository study](../_working_docs/REPO_STUDY.md) — start here for orientation: where the project stands, what is next and what is genuinely open.
+- [S01 validation](S01_VERIFICATION.md), [S02](S02_VERIFICATION.md), [S03](S03_VERIFICATION.md), [S04](S04_VERIFICATION.md) validations, [audit](../_working_docs/AUDIT_AND_TODO.md), [implementation log](../_working_docs/IMPLEMENTATION_LOG.md), [next step](../_working_docs/NEXT_SESSIONS_ROADMAP.md).
 - [Deployment operations](DEPLOYMENT.md) — workflows are now installed; no more template uploads are required.
