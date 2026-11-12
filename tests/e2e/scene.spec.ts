@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForTank } from './support/ready';
 import { strings } from '../../src/config/strings.en';
 test('scene quality, motion, resize and context-loss lifecycle', async ({ page }) => {
   const errors: string[] = [];
@@ -6,7 +7,7 @@ test('scene quality, motion, resize and context-loss lifecycle', async ({ page }
     errors.push(error.message);
   });
   await page.goto('./');
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   const host = page.locator('.canvas-host');
   await expect(host).toHaveAttribute('data-quality', 'medium');
   await page.getByRole('button', { name: strings.openSettings }).click();
@@ -80,7 +81,7 @@ test.describe('the day/night cycle', () => {
     // well into the first fade, so demanding "day" first would fail for the machine, not the code.
     test.setTimeout(150000);
     await page.goto('./');
-    await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 30000 });
+    await waitForTank(page);
     // Reduced motion deliberately freezes the tank at night with no cycle at all, so the
     // transition is only meaningful where motion is allowed.
     test.skip(

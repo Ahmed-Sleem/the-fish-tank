@@ -1,5 +1,6 @@
 /** No mocked service can turn this shell into a claim of playable gameplay. */
 import { expect, test } from '@playwright/test';
+import { waitForTank } from './support/ready';
 import { strings } from '../../src/config/strings.en';
 
 test('the project subpath renders, reloads and never calls external services', async ({ page }) => {
@@ -16,7 +17,7 @@ test('the project subpath renders, reloads and never calls external services', a
     if (response.status() >= 400) failures.push(`${String(response.status())} ${response.url()}`);
   });
   await page.goto('./');
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   // The title belongs to the splash, not the tank: the page keeps only an accessible heading.
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings.brand);
   // The title is announced, not drawn: it must not occupy visible area in the tank.
@@ -38,9 +39,9 @@ test('the project subpath renders, reloads and never calls external services', a
     true,
   );
   await page.reload();
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   await expect(page.locator('canvas')).toHaveCount(1);
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: strings.skip })).toBeFocused();
   await page.keyboard.press('Enter');
@@ -58,7 +59,7 @@ test('graphics failure leaves accessible status and working navigation', async (
     HTMLCanvasElement.prototype.getContext = () => null;
   });
   await page.goto('./');
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   await page.getByRole('button', { name: strings.openSettings }).click();
   const dialog = page.getByRole('dialog', { name: strings.settings });
   await expect(dialog).toContainText(strings.rendererFailed);
@@ -66,7 +67,7 @@ test('graphics failure leaves accessible status and working navigation', async (
     'href',
     /IMPLEMENTATION_PLAN\.md$/,
   );
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   expect(failures).toEqual([]);
 });
 
@@ -74,7 +75,7 @@ test('lost graphics context is reported in the settings dialog, not as a silent 
   page,
 }) => {
   await page.goto('./');
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   await page.locator('canvas').dispatchEvent('webglcontextlost');
   await page.getByRole('button', { name: strings.openSettings }).click();
   await expect(page.getByRole('dialog', { name: strings.settings })).toContainText(
@@ -86,7 +87,7 @@ test('the tank is borderless: no frames, rules or chrome, only water and two ico
   page,
 }) => {
   await page.goto('./');
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   const offenders = await page.evaluate(() => {
     const bad: string[] = [];
     for (const node of document.querySelectorAll<HTMLElement>('#app *')) {

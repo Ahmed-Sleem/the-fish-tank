@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForTank } from './support/ready';
 import { hasWebgl2 } from './support/capabilities';
 
 test('Oimo water, sequential loading letters, flat icon and correct identity', async ({
@@ -95,6 +96,6 @@ test('loading remains readable when water graphics fail and respects motion chan
   await expect(page.locator('.loading-word')).toHaveText('loading');
   await expect(page.locator('.loading-water')).toHaveCount(0);
   release();
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   await expect(page.locator('#app')).not.toHaveAttribute('inert');
 });
