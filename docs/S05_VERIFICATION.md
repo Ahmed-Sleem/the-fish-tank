@@ -31,6 +31,20 @@ Integration: the shell now has two icons — **draw a fish** and **settings** �
 1. `affordableLength` solved the closed form and ignored rounding, so a 25-coin budget produced a drawing priced at 31.
 2. Refining on raw doubles still overshot: the last representable step below the boundary summed to exactly `5.5`, which rounds up a whole coin over budget. The search now runs on a thousandths grid, so the value checked is the value returned.
 
+## The night defect (found by the owner, not by a test)
+
+The owner left the tab open and never saw the dark tank. Three independent faults, each enough on its own:
+
+1. The mood was written to `.canvas-host`, but the stylesheets read `:root[data-mood]`, so the CSS palette never switched.
+2. The palette was applied only when the mood _changed_, so the opening state was never applied at all.
+3. The cycle advanced on accumulated **simulated** seconds, which stop while the tab is hidden, while the tank pauses behind a dialog, and whenever frames are dropped. It now follows real time.
+
+A browser without float render targets was also stuck in permanent daylight, because only the shader drove the cycle; the degraded path now runs it too. The regression test asserts the observered transition to night, and skips under reduced motion, which deliberately holds the tank at night with no cycle.
+
+## Where the loader's water belongs (DEC-025)
+
+The owner likes the loader's pool and wants it in the tank. The loader water is not a separate effect: it is the same physics the tank already runs, shown as point sprites only because during loading there is no tank to show. In the tank the same motion belongs inside the existing lighting, refraction and surface band, driven by the one flow the particles already sample. A second canvas repeating the loader shader is rejected — two fluids would disagree the moment the pointer moved.
+
 ## Deliberately not done
 
 - **Nothing swims yet.** `onDone` spends the ink and closes the dialog; the strokes are handed to a callback that currently has no renderer to receive them. Cutout, birth and steering are S07–S09.
