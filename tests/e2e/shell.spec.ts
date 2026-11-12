@@ -4,6 +4,10 @@ import { waitForTank } from './support/ready';
 import { strings } from '../../src/config/strings.en';
 
 test('the project subpath renders, reloads and never calls external services', async ({ page }) => {
+  // This spec loads and then reloads the full WebGL page, so it does twice the work of its
+  // neighbours. The default 30s ceiling is not enough for that on a shared runner, and the
+  // failure it produces (ERR_ABORTED mid-reload) reads like a broken page rather than a slow one.
+  test.setTimeout(120000);
   const failures: string[] = [];
   const external: string[] = [];
   page.on('pageerror', (error) => {
