@@ -11,6 +11,30 @@ import { startSession } from './session';
 // Revisit the canvas accessibility policy when interactive entities arrive.
 extensions.remove(AccessibilitySystem);
 
+/**
+ * Give initialization a hard ceiling.
+ *
+ * GPU drivers do occasionally never resolve renderer creation. Waiting patiently there is not
+ * resilience, it is a stuck loading screen with no exit. A tank without water is the better
+ * failure, and it is one the player can see and act on. The timer is cleared on success so it
+ * cannot fire during a long session.
+ */
+async function raceStartup<T>(work: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      work,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error('Renderer startup timed out'));
+        }, appConfig.loading.startupTimeoutMs);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function startRenderer(
   host: HTMLElement,
   signal: AbortSignal,
@@ -34,10 +58,15 @@ export async function startRenderer(
   return startSession(
     {
       initialize: async () => {
-        await app.init({
-          ...appConfig.renderer,
-          resolution: Math.min(window.devicePixelRatio, appConfig.renderer.maxResolution),
-        });
+        // Fail fast rather than hang: a driver that never completes initialization would
+        // otherwise hold the loading screen up forever, leaving no way into the tank. main.ts
+        // catches the rejection and reports the failure instead of keeping the splash.
+        await raceStartup(
+          app.init({
+            ...appConfig.renderer,
+            resolution: Math.min(window.devicePixelRatio, appConfig.renderer.maxResolution),
+          }),
+        );
         app.canvas.setAttribute('aria-hidden', 'true');
         host.append(app.canvas);
         scene = mountScene(app, host, settings.get());
