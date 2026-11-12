@@ -10,6 +10,9 @@ export default defineConfig({
   reporter: process.env.CI ? [['list'], ['./tests/e2e/support/ci-reporter.ts']] : 'list',
   use: {
     baseURL: 'http://127.0.0.1:4173/the-fish-tank/',
+    // `load` waits for every asset, and a fresh WebGL page on a shared CI core is a real second
+    // or three slower than a laptop. The default 30s is a tight ceiling for an honest wait.
+    navigationTimeout: 60000,
     launchOptions: {
       ...(process.env.CHROMIUM_EXECUTABLE_PATH
         ? { executablePath: process.env.CHROMIUM_EXECUTABLE_PATH }
