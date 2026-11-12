@@ -5,35 +5,12 @@ import { appConfig } from '../config/app.config';
 import { mountScene } from './scene';
 import type { Settings } from '../ui/settings';
 import { startSession } from './session';
+import { withStartupCeiling } from './startup';
 
 // This empty canvas is decorative. All meaningful content is accessible HTML.
 // Do not let Pixi add an off-screen mobile activation button for an empty stage.
 // Revisit the canvas accessibility policy when interactive entities arrive.
 extensions.remove(AccessibilitySystem);
-
-/**
- * Give initialization a hard ceiling.
- *
- * GPU drivers do occasionally never resolve renderer creation. Waiting patiently there is not
- * resilience, it is a stuck loading screen with no exit. A tank without water is the better
- * failure, and it is one the player can see and act on. The timer is cleared on success so it
- * cannot fire during a long session.
- */
-async function raceStartup<T>(work: Promise<T>): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  try {
-    return await Promise.race([
-      work,
-      new Promise<never>((_, reject) => {
-        timer = setTimeout(() => {
-          reject(new Error('Renderer startup timed out'));
-        }, appConfig.loading.startupTimeoutMs);
-      }),
-    ]);
-  } finally {
-    clearTimeout(timer);
-  }
-}
 
 export async function startRenderer(
   host: HTMLElement,
@@ -61,11 +38,12 @@ export async function startRenderer(
         // Fail fast rather than hang: a driver that never completes initialization would
         // otherwise hold the loading screen up forever, leaving no way into the tank. main.ts
         // catches the rejection and reports the failure instead of keeping the splash.
-        await raceStartup(
+        await withStartupCeiling(
           app.init({
             ...appConfig.renderer,
             resolution: Math.min(window.devicePixelRatio, appConfig.renderer.maxResolution),
           }),
+          appConfig.loading.startupTimeoutMs,
         );
         app.canvas.setAttribute('aria-hidden', 'true');
         host.append(app.canvas);

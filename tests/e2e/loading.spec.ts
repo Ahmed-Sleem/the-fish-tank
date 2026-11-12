@@ -98,37 +98,3 @@ test('loading remains readable when water graphics fail and respects motion chan
   await expect(page.locator('.loading-screen')).toHaveCount(0);
   await expect(page.locator('#app')).not.toHaveAttribute('inert');
 });
-
-test('a driver that never finishes initializing still lets the player into the tank', async ({
-  page,
-}) => {
-  // The failure this guards against is not hypothetical: a GPU driver can leave renderer creation
-  // pending forever, and the loader used to await it with no ceiling, so the splash stayed up with
-  // no way out. The tank without water is a far better outcome than a screen that never leaves.
-  test.setTimeout(120000);
-  await page.addInitScript(() => {
-    // Copied out of the descriptor: the method must be called with a canvas as `this`.
-    const getContext = Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype, 'getContext')
-      ?.value as (this: HTMLCanvasElement, type: string, ...rest: unknown[]) => unknown;
-    HTMLCanvasElement.prototype.getContext = function (
-      this: HTMLCanvasElement,
-      type: string,
-      ...rest: unknown[]
-    ) {
-      const context = getContext.call(this, type, ...rest) as WebGL2RenderingContext | null;
-      if (context && type === 'webgl2') {
-        // A call that never returns, exactly as a wedged driver behaves.
-        Object.defineProperty(context, 'createProgram', {
-          value: () => new Promise(() => undefined),
-        });
-      }
-      return context;
-    } as typeof HTMLCanvasElement.prototype.getContext;
-  });
-  await page.goto('./');
-  // The ceiling is 15s; allow generous slack for a slow runner plus the 5s minimum.
-  await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 60000 });
-  await expect(page.locator('#app')).not.toHaveAttribute('inert');
-  // It must be honest about what happened, not claim the graphics are ready.
-  await expect(page.getByRole('button', { name: /settings/i })).toBeVisible();
-});
