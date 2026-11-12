@@ -91,3 +91,44 @@ Owner supplied two generated reference images (day and night) and asked for the 
 - **Centralisation.** Design values live only in `theme.css`; `scripts/verify-architecture.mjs` now also rejects CSS borders and one-pixel rules, so the "no frames" ruling is enforced rather than remembered.
 
 Renderer consequence: binding the scene texture into a Pixi v8 filter never worked (uniform typecasting rejects samplers, and a `Filter` resource binds black). The art is drawn opaque by the backdrop sprite; a translucent water-body filter sits over it; the water shader is an additive light pass with caustics, rays, a sun shaft and the ripple glow. A shader failure marks the host degraded and still shows the pixel tank, and the dialog then says the water effects are unavailable instead of claiming everything is ready.
+
+## DEC-023 — Ink is charged by drawn length only (2026-11-11)
+
+GAP-002 is answered by the owner: **ink cost is drawn length only.** This is the original intent and it takes precedence over the TECH_SPEC §8.1 draft, which is amended accordingly:
+
+- **No width multiplier.** The three pen widths are free. A thick stroke costs exactly what the same path would cost thin.
+- **No per-stroke fee.** Resting a stroke, lifting the pen and starting another adds nothing on its own. Colour is free as well.
+- **Length is normalized** by `min(canvasWidth, canvasHeight)`, so drawing is priced the same on a phone and on a wide monitor.
+- **The soft cap stays**, because it exists to stop one enormous drawing from being cheap, not to price widths.
+
+Consequences to honour in S05: live estimate and final commit must use the _same_ evaluator so the number cannot jump when a stroke is simplified; undo and clear refund the exact ink of the removed strokes, which is now simply their length; an exhausted wallet stops the pen rather than silently discarding work. The spec's `widthMultiplier` and `rateStroke` fields are removed rather than left dormant, so no later pass can quietly reintroduce the rejected rule.
+
+## DEC-024 — Background life is a required feature, not polish (2026-11-11)
+
+The owner asked during the S06 discussion for the tank's **background to animate** in its own right, and asked that this not be forgotten. It is recorded here as a product requirement so it cannot be dropped between sessions.
+
+Today the tank's art — bed, plants, far rocks — is painted **once** into a single `344x192` texture and never moves again. Only the water above it animates (caustics, god ray, surface band, particles, day/night), so the scene reads as a photograph behind moving water rather than a living tank.
+
+Required, in the owner's terms:
+
+- **Plants sway from their roots**, driven by the same current the particles already sample, so a cursor or fish stirring the water visibly bends them. They must stay anchored in the sand, never detach or slide.
+- **Bubbles** rise in thin streams and break at the surface.
+- **The far background moves at a different rate** than the foreground, for depth.
+
+Implementation consequence: the static art has to be split into layers — plants separated from bed and far scenery — instead of one baked texture, so each layer can be transformed independently at pixel scale. This is an architectural change to `src/render/pixel/`, not a decoration pass, and it must hold its frame budget at Quality Low, where the existing budget already ships.
+
+Order: after the drawing path produces a real fish (S07), so the animated background has something to react to, and before S08's steering work, which assumes a living scene.
+
+## DEC-025 — Where the loader's water belongs in the tank (2026-11-11)
+
+The owner likes the pool on the loading screen and wants it in the tank, but does not know where. That indecision is answered here rather than being carried forward.
+
+The loader water is **not** a different effect to be dropped somewhere new. It is the _same_ physics the tank's water already uses: the tank runs a curl-current flow field plus pointer impulses (`src/sim/water/flow.ts`, `input.ts`) and a GPU ripple field, and the loader runs the Oimo APIC solver that DEC-019 adapted for exactly this purpose. The loader shows it as a bed of point sprites because during loading there is **no tank yet** — it has to be the whole picture. In the tank there is a picture, so the same motion has to appear as _displacement in it_, not as grains in front of it.
+
+So the answer to "where": **inside the tank's existing lighting and refraction, driven by one shared flow.** Three places, in order of value:
+
+1. **The surface band and the water body** move with the same flow the particles already sample, so a cursor stir bends the waterline and the light along with the plants.
+2. **A calm pool of grains, at the bottom of the tank**, where the loader's dotted look is actually appropriate: sand, silt and plankton near the floor. Not a curtain over the fish.
+3. **The far background parallax**, which is DEC-024 and needs the static art split into layers first.
+
+A second canvas repeating the loader shader over the tank is explicitly rejected: it doubles the water simulation, contradicts the single-source rule that already governs `moodAt`, and would show two fluids that disagree whenever the pointer moves. The loader and the tank must sample one field.

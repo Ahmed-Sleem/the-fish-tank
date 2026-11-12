@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { waitForTank } from './support/ready';
 import { strings } from '../../src/config/strings.en';
 test('the single settings icon opens one dialog that holds every control and restores focus', async ({
   page,
 }) => {
   await page.goto('./');
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   // The dialog is the only place settings live; while it is shut its controls are hidden.
   await expect(page.getByLabel(strings.quality, { exact: true })).not.toBeVisible();
   const open = page.getByRole('button', { name: strings.openSettings });
@@ -45,7 +46,7 @@ test('fullscreen control works or stays hidden when browser API is unavailable',
   page,
 }) => {
   await page.goto('./');
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   const enabled = await page.evaluate(() => document.fullscreenEnabled);
   await page.getByRole('button', { name: strings.openSettings }).click();
   const dialog = page.getByRole('dialog', { name: strings.settings });

@@ -217,3 +217,24 @@
   --loading-word-height: 1em;
   --loading-text-shadow: 0 2px 18px #000000cc, 0 0 4px #000000aa;
 }
+
+/* ---- Drawing surface: white paper, because the cutout step expects it ----
+ * The board is the one intentionally light area in the product. It is the paper the player draws
+ * on, not chrome, and it must stay pure white so the near-white removal has nothing to guess at.
+ * Every value below is a token; no other stylesheet may write a colour or size.
+ */
+:root {
+  --draw-paper: #ffffff;
+  --draw-ink: #14384d;
+  --draw-board-radius: var(--radius-lg);
+  --draw-board-shadow: var(--shadow-soft);
+  --draw-tool-size: 2.25rem;
+  --draw-swatch-size: 1.5rem;
+  --draw-tool-gap: var(--space-xs);
+  --draw-gauge-track: color-mix(in srgb, var(--text-primary) 18%, transparent);
+  --draw-gauge-fill: var(--color-accent);
+  /* The paper never grows past this, so it stays inside a phone viewport with the tools visible. */
+  --draw-board-max-height: min(58vh, 30rem);
+  /* A one-line status keeps its height when empty, so the footer never jumps. */
+  --draw-notice-height: 1em;
+}

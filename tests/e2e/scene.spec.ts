@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForTank } from './support/ready';
 import { strings } from '../../src/config/strings.en';
 test('scene quality, motion, resize and context-loss lifecycle', async ({ page }) => {
   const errors: string[] = [];
@@ -6,7 +7,7 @@ test('scene quality, motion, resize and context-loss lifecycle', async ({ page }
     errors.push(error.message);
   });
   await page.goto('./');
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   const host = page.locator('.canvas-host');
   await expect(host).toHaveAttribute('data-quality', 'medium');
   await page.getByRole('button', { name: strings.openSettings }).click();
@@ -62,4 +63,34 @@ test('scene quality, motion, resize and context-loss lifecycle', async ({ page }
   );
   await page.waitForTimeout(200);
   expect(errors).toEqual([]);
+});
+
+test.describe('the day/night cycle', () => {
+  // Serial, because this test watches real time for over a minute. Run beside the pixel and
+  // pointer specs it competes for CPU, and a starved page misses its first paint — which then
+  // looks like an unrelated spec's failure. The tank's own specs must not be slowed down to
+  // prove the clock works.
+  test.describe.configure({ mode: 'serial' });
+
+  test('reaches night on its own, without interaction', async ({ page }) => {
+    // The owner's report: leave the tab open and night never comes. The cycle used to advance on
+    // *simulated* seconds, which stop while the tab is hidden, while the tank pauses behind a
+    // dialog, and whenever frames are dropped. It now follows real time.
+    //
+    // This asserts the transition rather than a starting phase: a slow runner can free the loader
+    // well into the first fade, so demanding "day" first would fail for the machine, not the code.
+    test.setTimeout(150000);
+    await page.goto('./');
+    await waitForTank(page);
+    // Reduced motion deliberately freezes the tank at night with no cycle at all, so the
+    // transition is only meaningful where motion is allowed.
+    test.skip(
+      await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches),
+      'reduced motion holds the tank at night instead of cycling',
+    );
+    const root = page.locator('html');
+    await expect(root).toHaveAttribute('data-mood', /day|dusk|night|dawn/);
+    // Within one full cycle plus a fade the mood must become night, whatever it started as.
+    await expect(root).toHaveAttribute('data-mood', 'night', { timeout: 100000 });
+  });
 });

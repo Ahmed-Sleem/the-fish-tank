@@ -14,6 +14,11 @@ const paths = {
     'M16 21h3a2 2 0 0 0 2-2v-3',
     'M8 21H5a2 2 0 0 1-2-2v-3',
   ],
+  // A brush: the one action the tank offers besides settings.
+  brush: [
+    'M4 20c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4h-1.5',
+    'M9.5 15.5 19 6a2.1 2.1 0 0 0-3-3L6.5 12.5',
+  ],
   collapse: [
     'M3 8h3a2 2 0 0 0 2-2V3',
     'M21 8h-3a2 2 0 0 1-2-2V3',

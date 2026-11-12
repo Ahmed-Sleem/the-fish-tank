@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForTank } from './support/ready';
 import type { Page } from '@playwright/test';
 import { hasWebgl2 } from './support/capabilities';
 
@@ -29,7 +30,7 @@ async function controlled(page: Page) {
     });
   });
   await page.goto('./');
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
 }
 async function sample(page: Page, input: boolean, type = 'pointerdown', frames = 4) {
   return page.evaluate(
@@ -118,7 +119,7 @@ test('post-loader pointer controls respect dialogs, motion, cancellation and qua
   test.skip(!(await hasWebgl2(browser)), 'browser has no WebGL2 float targets');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('./');
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   const host = page.locator('.canvas-host');
   await page.mouse.move(150, 220);
   await page.mouse.down();
@@ -160,7 +161,7 @@ test('unsupported float targets leave truthful graphics status and usable contro
     });
   });
   await page.goto('./');
-  await expect(page.locator('.loading-screen')).toHaveCount(0);
+  await waitForTank(page);
   // Water effects fail, the pixel tank still renders: a readable scene, never a blank window.
   await expect(page.locator('.canvas-host')).toHaveAttribute('data-effects', 'unavailable');
   await expect(page.locator('.canvas-host canvas')).toHaveCount(1);

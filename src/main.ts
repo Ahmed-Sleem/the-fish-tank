@@ -2,6 +2,7 @@
 import './ui/theme.css';
 import './ui/shell.css';
 import './ui/surface.css';
+import './ui/drawing.css';
 import './ui/loading.css';
 import './ui/shared/controls.css';
 import { createLoadingScreen } from './ui/shared/loading';

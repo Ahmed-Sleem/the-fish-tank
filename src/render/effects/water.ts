@@ -133,6 +133,27 @@ export function createWaterEffects(
 
   let reducedMotion = false;
   let lastMood = '';
+  /**
+   * Wall-clock origin for the cycle.
+   *
+   * The old code accumulated only simulated seconds, which meant the cycle could not advance while
+   * the tab was hidden, while the tank was paused behind a dialog, or while frames were being
+   * dropped. Leaving the page open and never seeing night is exactly what that produces. The cycle
+   * is scenery, not simulation: it follows real time, so it always arrives.
+   */
+  const cycleOrigin = Date.now() / 1000;
+
+  /**
+   * Apply a mood everywhere it matters.
+   *
+   * `:root[data-mood=...]` is what the stylesheets read, so writing it to the canvas host left the
+   * CSS palette permanently unset. This also runs for the *first* mood: the old code only reacted
+   * to a change, so the opening day state was never applied at all.
+   */
+  const publishMood = (mood: string) => {
+    host.dataset.mood = mood;
+    document.documentElement.dataset.mood = mood;
+  };
 
   /** Re-read the live tokens and push them to the shader. Called on mood change and reconfigure. */
   const applyTokens = () => {
@@ -155,11 +176,15 @@ export function createWaterEffects(
       if (disposed) return;
       time += seconds;
       if (!reducedMotion) {
-        const { mood, daylight } = moodAt(time);
+        const { mood, daylight } = moodAt(Date.now() / 1000 - cycleOrigin);
         if (mood !== lastMood) {
           lastMood = mood;
-          applyTokens();
-          host.dataset.mood = mood;
+          publishMood(mood);
+          // The token swap above is a style recalculation; read it back only once it has landed,
+          // otherwise the shader keeps the previous palette for a frame and the two can disagree.
+          requestAnimationFrame(() => {
+            if (!disposed) applyTokens();
+          });
         }
         visualUniforms.uniforms.uStyle[3] = daylight;
       }
@@ -207,7 +232,7 @@ export function createWaterEffects(
       if (settings.reducedMotion) {
         clear();
         // Reduced motion holds the calm night palette rather than freezing mid-fade.
-        host.dataset.mood = 'night';
+        publishMood('night');
         lastMood = '';
       } else {
         lastMood = '';

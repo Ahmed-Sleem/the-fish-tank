@@ -11,7 +11,7 @@ import {
   Rectangle,
 } from 'pixi.js';
 import type { Application } from 'pixi.js';
-import { sceneConfig } from '../config/scene.config';
+import { moodAt, sceneConfig } from '../config/scene.config';
 import type { ScenePreferences } from '../config/scene.config';
 import { createParticles } from './particles';
 import { createFixedLoop } from '../core/loop';
@@ -82,6 +82,21 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
     host.dataset.effects = 'unavailable';
     particleLayer.filters = [];
   }
+
+  /**
+   * Publish the mood even without water effects.
+   *
+   * The shader is what normally reaches dusk in its own uniforms, but a browser without float
+   * render targets still has a CSS palette — the surface band, the vignette and the interface all
+   * read these tokens. Letting the degraded path sit in permanent daylight would mean the owner's
+   * night never arrives on exactly the machines that need the cheap version.
+   */
+  const publishMood = (mood: string) => {
+    host.dataset.mood = mood;
+    document.documentElement.dataset.mood = mood;
+    tint();
+  };
+  const fallbackOrigin = Date.now() / 1000;
   const flow = createFlow(),
     input = createWaterInput();
   let impulses = 0;
@@ -148,10 +163,14 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
     bodyUniforms.uniforms.uDeep = rgb('--water-deep');
   };
   const loop = createFixedLoop((seconds) => {
-    const mood = host.dataset.mood ?? '';
-    if (mood !== lastMood) {
-      lastMood = mood;
-      tint();
+    // Without effects nothing else drives the cycle, so the scene owns it here. Real time, not
+    // simulated time: the cycle must arrive even if frames are dropped or the tab was hidden.
+    if (!effects) {
+      const mood = moodAt(Date.now() / 1000 - fallbackOrigin).mood;
+      if (mood !== lastMood) {
+        lastMood = mood;
+        publishMood(mood);
+      }
     }
     const impulse = input.take();
     if (impulse) {
@@ -214,6 +233,14 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
     // Do not run two GPU water scenes during startup. First static tank draw is ready;
     // the loader owns animation until it releases the inert application.
     if (host.closest('[inert]')) {
+      previous = 0;
+      frame = requestAnimationFrame(animate);
+      return;
+    }
+    // A modal dialog covers the tank completely, so simulating water behind it burns the GPU
+    // for pixels nobody can see — on a weak machine that starves the dialog the player is
+    // actually looking at. Hold the tank still until the dialog closes.
+    if (document.querySelector('dialog[open]')) {
       previous = 0;
       frame = requestAnimationFrame(animate);
       return;
