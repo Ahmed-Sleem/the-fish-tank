@@ -81,7 +81,6 @@ test('night is a different place, not a dimmer tank', async ({ page }) => {
       return {
         mood: document.documentElement.dataset.mood ?? '',
         grade: gradeStyle?.backgroundImage ?? '',
-        blend: gradeStyle?.mixBlendMode ?? '',
         water: style.getPropertyValue('--water-top').trim(),
         sand: style.getPropertyValue('--art-sand-mid').trim(),
         plant: style.getPropertyValue('--art-plant-scale').trim(),
@@ -96,13 +95,17 @@ test('night is a different place, not a dimmer tank', async ({ page }) => {
     .not.toBe(before.mood);
   const after = await readEnvironment();
 
-  // The whole environment turns over: grade, blend, water and the scenery's own colours.
+  // The whole environment turns over: the full-scene grade, the water, and the scenery's own
+  // colours. The grade deliberately has no blend mode — a full-screen compositing layer above the
+  // tank turned out to be a real cost on a software renderer — so it changes paint, not blending.
   expect(after.grade).not.toBe(before.grade);
-  expect(after.blend).not.toBe(before.blend);
   expect(after.water).not.toBe(before.water);
   expect(after.sand).not.toBe(before.sand);
   expect(after.plant).not.toBe(before.plant);
   // And the grade is a real wash over the scene, not an invisible layer.
   const opacity = await grade.evaluate((node) => getComputedStyle(node).opacity);
-  expect(Number(opacity)).toBeGreaterThan(0.5);
+  // A wash you can see, but not a fog: the tank has to stay legible under it. The band is wide on
+  // purpose — the exact value is a design choice, "present and not opaque" is the requirement.
+  expect(Number(opacity)).toBeGreaterThanOrEqual(0.4);
+  expect(Number(opacity)).toBeLessThan(0.85);
 });

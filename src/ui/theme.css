@@ -214,8 +214,7 @@
     color-mix(in srgb, var(--night-water-deep) 72%, transparent) 100%
   );
   --env-grade: var(--env-grade-day);
-  --env-grade-blend: soft-light;
-  --env-grade-opacity: 0.85;
+  --env-grade-opacity: 0.5;
   --env-vignette: radial-gradient(
     ellipse 86% 78% at 50% 42%,
     transparent 34%,
@@ -230,8 +229,7 @@
 :root[data-mood-base='day'][data-mood='dawn'],
 :root[data-mood-base='night'][data-mood='dusk'] {
   --env-grade: var(--env-grade-night);
-  --env-grade-blend: multiply;
-  --env-grade-opacity: 0.9;
+  --env-grade-opacity: 0.62;
   /* Night keeps less of the frame legible at the edges, which is what makes it feel deep. */
   --env-dust-opacity: 0.85;
 }

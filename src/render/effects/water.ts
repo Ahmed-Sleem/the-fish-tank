@@ -134,6 +134,8 @@ export function createWaterEffects(
   let reducedMotion = false;
   let moodPreference: MoodPreference = 'auto';
   let lastMood = '';
+  /** Last grade opacity written to the host, so the style write happens only on a change. */
+  let lastGradeOpacity = -1;
   /**
    * Wall-clock origin for the cycle.
    *
@@ -200,8 +202,16 @@ export function createWaterEffects(
          * moment the mood attribute flips. Driving its opacity from the same `daylight` value the
          * water shader uses keeps the dissolve continuous: the grade thins as the light goes, and
          * the full night wash only arrives when night does.
+         *
+         * Quantised and written only on a change. A style write on the canvas host invalidates
+         * style for the whole subtree, and doing that every frame is a real cost on a software
+         * renderer — it showed up as timeouts on CI, where the tank is actually rendered.
          */
-        host.style.setProperty('--env-grade-live-opacity', String(0.55 + daylight * 0.4));
+        const grade = Math.round((0.4 + daylight * 0.32) * 20) / 20;
+        if (grade !== lastGradeOpacity) {
+          lastGradeOpacity = grade;
+          host.style.setProperty('--env-grade-live-opacity', String(grade));
+        }
       }
       waveUniforms.uniforms.uImpulse = [
         impulse?.x ?? 0,

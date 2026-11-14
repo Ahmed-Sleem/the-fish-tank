@@ -176,7 +176,16 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
    * stays noon-coloured no matter what the stylesheet says. Repainting on mood change is what
    * makes the whole environment turn over instead of only the water on top of it.
    */
+  let paintedMood = '';
   const repaintArt = () => {
+    /*
+     * Repainting redraws every layer at the reference grid. That is cheap enough to do on a mood
+     * change and pointless to do twice, so a guard keyed on the palette's own mood makes it
+     * impossible for a stray call to turn into a per-frame redraw.
+     */
+    const mood = host.dataset.mood ?? '';
+    if (mood === paintedMood) return;
+    paintedMood = mood;
     const palette = paletteFromTheme(host);
     createBackdropLayers({
       width: pixelConfig.width,

@@ -30,6 +30,5 @@
   background: var(--env-grade);
   /* Falls back to the token when nothing is animating (reduced motion, first paint). */
   opacity: var(--env-grade-live-opacity, var(--env-grade-opacity));
-  mix-blend-mode: var(--env-grade-blend);
   pointer-events: none;
 }
