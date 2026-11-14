@@ -162,6 +162,8 @@ test('the panel stays organised: captioned tools, one leading figure, actions in
 test('ink is drawn in blocks the same size as the tank art, not as smooth lines', async ({
   page,
 }) => {
+  // Reads back a full-board pixel buffer after a real drag; slow on a software renderer.
+  test.setTimeout(90000);
   const dialog = await openDrawing(page);
   const board = page.locator('.draw-board');
   await stroke(page, 0.2, 0.8);

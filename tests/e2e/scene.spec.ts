@@ -2,6 +2,9 @@ import { expect, test } from '@playwright/test';
 import { waitForTank } from './support/ready';
 import { strings } from '../../src/config/strings.en';
 test('scene quality, motion, resize and context-loss lifecycle', async ({ page }) => {
+  // A long chain of settings changes, each reconfiguring a real WebGL context. Every step waits on
+  // the tank, so the work is bounded; 30s is simply the wrong ceiling for a software renderer.
+  test.setTimeout(90000);
   const errors: string[] = [];
   page.on('pageerror', (error) => {
     errors.push(error.message);
