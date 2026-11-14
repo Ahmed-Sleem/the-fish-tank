@@ -80,18 +80,27 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
    * art pixel therefore does not move at all, which is the correct reading for a stiff plant.
    */
   const plantSprites = art.plants.map((plant) => {
-    const textures = plant.frames.map((frame) => {
-      const texture = Texture.from(frame);
-      texture.source.scaleMode = 'nearest';
-      return texture;
-    });
-    const sprite = new Sprite(textures[0] ?? Texture.EMPTY);
+    // One texture per plant. Its poses are frames along the strip, so walking them costs a
+    // rectangle change rather than a texture swap.
+    const texture = Texture.from(plant.strip);
+    texture.source.scaleMode = 'nearest';
+    const poseTextures = Array.from(
+      { length: pixelConfig.plantPoses },
+      (_, pose) =>
+        new Texture({
+          source: texture.source,
+          frame: new Rectangle(pose * plant.frameW, 0, plant.frameW, plant.frameH),
+        }),
+    );
+    // The resting pose is the middle one, so a plant starts neutral.
+    const resting = Math.floor((pixelConfig.plantPoses - 1) / 2);
+    const sprite = new Sprite(poseTextures[resting] ?? texture);
     sprite.label = `pixel-plant-${plant.kind}-${String(plant.index)}`;
-    // Anchor at the root, so swapping poses never shifts the plant: every frame is painted with
-    // the root at the same point in its canvas.
+    // Anchor at the root, so a pose change never shifts the plant: every frame is painted with
+    // the root at the same point in its column.
     sprite.anchor.set(0.5, 1);
     background.addChild(sprite);
-    return { sprite, plant, textures, pose: -1 };
+    return { sprite, plant, textures: poseTextures, pose: resting };
   });
   host.dataset.plants = String(plantSprites.length);
   host.dataset.artGrid = `${String(pixelConfig.width)}x${String(pixelConfig.height)}`;
@@ -220,16 +229,11 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
       seed: pixelConfig.seed,
       // Draw into the canvases the sprites already use, so only the pixels change.
       // Every pose canvas, flattened: the painter reuses them in the same order it created them.
-      into: {
-        bed: art.bed,
-        far: art.far,
-        plants: art.plants.flatMap((plant) => [...plant.frames]),
-      },
+      into: { bed: art.bed, far: art.far, plants: art.plants.map((plant) => plant.strip) },
     });
     for (const layer of artLayers) layer.texture.source.update();
-    for (const { textures } of plantSprites) {
-      for (const texture of textures) texture.source.update();
-    }
+    // Every pose shares one source per plant, so one update refreshes the whole strip.
+    for (const { sprite } of plantSprites) sprite.texture.source.update();
   };
   const tint = () => {
     repaintArt();
@@ -362,15 +366,16 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
      */
     scaleX = width / pixelConfig.width;
     scaleY = height / pixelConfig.height;
-    for (const { sprite, plant, textures } of plantSprites) {
-      const frame = textures[0];
-      if (!frame) continue;
-      // Drawn at the art grid's own resolution and scaled by the same factor as the picture, so
-      // one art pixel stays one art pixel everywhere. Poses share a canvas size by construction.
-      sprite.width = frame.width * scaleX;
-      sprite.height = frame.height * scaleY;
+    for (const { sprite, plant } of plantSprites) {
+      /*
+       * A sprite sized from its texture would be the width of the whole strip. The pose width is
+       * what belongs on screen, scaled by the same factor as the picture so one art pixel stays
+       * one art pixel everywhere.
+       */
+      sprite.width = plant.frameW * scaleX;
+      sprite.height = plant.frameH * scaleY;
       sprite.x = plant.anchor.x * scaleX;
-      // The anchor is at the canvas's bottom edge, which is one pixel below the root.
+      // The anchor is at the strip's bottom edge, which is one pixel below the root.
       sprite.y = plant.anchor.y * scaleY + scaleY;
     }
     body.width = width;

@@ -71,10 +71,17 @@ export interface PlantAnchor {
  */
 export interface PlantSprite {
   /**
-   * One canvas per bend pose, left to right. The renderer shows one at a time — drawing a plant
-   * at a fresh angle every frame would put its pixels between grid cells and blur the art.
+   * Every bend pose in one horizontal strip: pose 0 leftmost, the resting pose in the middle.
+   *
+   * One canvas per plant, so the GPU pays one texture rather than one per pose. The sprite walks
+   * the strip's frames instead of swapping textures, which also means a pose change is a change
+   * of rectangle and nothing more.
    */
-  readonly frames: readonly HTMLCanvasElement[];
+  readonly strip: HTMLCanvasElement;
+  /** Width of one pose inside the strip. */
+  readonly frameW: number;
+  /** Height of the whole strip, which is also the height of one pose. */
+  readonly frameH: number;
   readonly anchor: PlantAnchor;
   /** Plant type, so a repaint can redraw it in the new mood's colours. */
   readonly kind: 'fan' | 'stem';
@@ -238,15 +245,23 @@ export function createBackdropLayers({
   const poses = pixelConfig.plantPoses;
   const poseBends = Array.from({ length: poses }, (_, pose) => bendForPose(pose, poses));
 
-  /** A canvas for one plant pose, reusing an existing one across repaints when possible. */
-  const poseSurface = (slot: number, widthPx: number, heightPx: number) => {
+  /**
+   * A plant's poses, laid out as one horizontal strip: pose 0, pose 1, ... side by side.
+   *
+   * One canvas per plant, not one per pose. A canvas that reaches the GPU costs a texture, and
+   * seventeen plants times fifteen poses would be 255 textures for scenery — enough to make the
+   * renderer, not the animation, the expensive part (which showed up as CI timeouts before the
+   * pose count was cut back to this shape). The strip becomes one texture whose frames the sprite
+   * walks through, so a pose change is a rectangle change and nothing else.
+   */
+  const poseStrip = (slot: number, frameW: number, frameH: number) => {
     const canvas = into?.plants?.[slot] ?? document.createElement('canvas');
-    canvas.width = widthPx;
-    canvas.height = heightPx;
+    canvas.width = frameW * poses;
+    canvas.height = frameH;
     const context = canvas.getContext('2d');
     if (!context) throw new Error('2D context unavailable for a plant');
-    context.clearRect(0, 0, widthPx, heightPx);
-    return { canvas, ctx: context };
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    return { canvas, ctx: context, frameW, frameH };
   };
 
   /** Draw one frond rooted at the origin of `context`, tangent bent by `bend` at the tip. */
@@ -298,21 +313,19 @@ export function createBackdropLayers({
     const by = Math.round(floor(bx));
     // Padded for the widest lean: a pose must never be clipped by its own canvas.
     const reach = Math.ceil(length + widthAt + pixelConfig.plantMaxBend * length) + 2;
-    const frames: HTMLCanvasElement[] = [];
+    const strip = poseStrip(slot, reach * 2, reach * 2 + 2);
     for (let pose = 0; pose < poses; pose++) {
-      const frame = poseSurface(slot + pose, reach * 2, reach * 2 + 2);
-      // The root sits at the bottom-centre of the frame, matching the sprite's anchor.
-      const ox = reach;
-      const oy = reach * 2;
-      frame.ctx.save();
-      frame.ctx.translate(ox, oy);
+      // Each pose is painted in its own column of the strip; the root sits at that column's
+      // bottom-centre, which is where the sprite's anchor will be.
+      strip.ctx.save();
+      strip.ctx.translate(pose * strip.frameW + reach, reach * 2);
       for (let i = 0; i < count; i++) {
         const f = count > 1 ? i / (count - 1) : 0.5;
         // `phase` is the fan's own seed: neighbouring fans differ in height and lean.
         const scaled = length * (0.7 + noise(i, bx, x * 10) * 0.4);
         const lean = x * 10 * 0.12;
         frondLocal(
-          frame.ctx,
+          strip.ctx,
           -Math.PI / 2 + (f - 0.5) * spread + lean,
           scaled,
           widthAt,
@@ -320,12 +333,13 @@ export function createBackdropLayers({
           poseBends[pose] ?? 0,
         );
       }
-      frame.ctx.restore();
-      frames.push(frame.canvas);
+      strip.ctx.restore();
     }
-    slot += poses;
+    slot += 1;
     plantSprites.push({
-      frames,
+      strip: strip.canvas,
+      frameW: strip.frameW,
+      frameH: strip.frameH,
       kind: 'fan',
       index,
       anchor: { x: bx, y: by, height: Math.round(length), give: 1 },
@@ -339,16 +353,15 @@ export function createBackdropLayers({
     const bx = Math.round(width * x);
     const by = Math.round(floor(bx));
     const reach = Math.ceil(heightPx + 16 + pixelConfig.plantMaxBend * heightPx) + 2;
-    const frames: HTMLCanvasElement[] = [];
+    const strip = poseStrip(slot, reach * 2, reach * 2 + 2);
     const pal = palette.plantStem;
     for (let pose = 0; pose < poses; pose++) {
-      const frame = poseSurface(slot + pose, reach * 2, reach * 2 + 2);
-      const ox = reach;
+      const ox = pose * strip.frameW + reach;
       const oy = reach * 2;
       const bend = poseBends[pose] ?? 0;
       const ink = (sx: number, sy: number, colour: string) => {
-        frame.ctx.fillStyle = colour;
-        frame.ctx.fillRect(Math.round(ox + sx), Math.round(oy + sy), 1, 1);
+        strip.ctx.fillStyle = colour;
+        strip.ctx.fillRect(Math.round(ox + sx), Math.round(oy + sy), 1, 1);
       };
       for (let k = 0; k < heightPx; k++) {
         const f = k / heightPx;
@@ -371,11 +384,12 @@ export function createBackdropLayers({
           }
         }
       }
-      frames.push(frame.canvas);
     }
-    slot += poses;
+    slot += 1;
     plantSprites.push({
-      frames,
+      strip: strip.canvas,
+      frameW: strip.frameW,
+      frameH: strip.frameH,
       kind: 'stem',
       index,
       anchor: { x: bx, y: by, height: Math.round(heightPx), give: 0.8 },
