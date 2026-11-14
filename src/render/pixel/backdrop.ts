@@ -8,6 +8,7 @@
  * creatures — nothing here simulates ecology or gameplay.
  */
 import { pixelConfig } from '../../config/pixel.config';
+import { bendForPose } from './sway';
 
 export interface PixelPalette {
   sandLight: string;
@@ -42,7 +43,7 @@ export interface BackdropOptions {
    * The sprites are built from these canvases once, so repainting in place is what lets the
    * scenery change colour with the day without rebuilding the scene graph.
    */
-  into?: { bed: HTMLCanvasElement; far: HTMLCanvasElement; plants: HTMLCanvasElement };
+  into?: { bed: HTMLCanvasElement; far: HTMLCanvasElement; plants?: readonly HTMLCanvasElement[] };
 }
 
 /**
@@ -61,14 +62,35 @@ export interface PlantAnchor {
   readonly give: number;
 }
 
+/**
+ * One moving plant.
+ *
+ * Each plant is its own small canvas rather than a slice of one shared picture. That is the only
+ * way it can bend about *its own* root: a sprite can be rotated or moved as a whole, and either
+ * of those through a shared pivot lifts a plant off the sand.
+ */
+export interface PlantSprite {
+  /**
+   * One canvas per bend pose, left to right. The renderer shows one at a time — drawing a plant
+   * at a fresh angle every frame would put its pixels between grid cells and blur the art.
+   */
+  readonly frames: readonly HTMLCanvasElement[];
+  readonly anchor: PlantAnchor;
+  /** Plant type, so a repaint can redraw it in the new mood's colours. */
+  readonly kind: 'fan' | 'stem';
+  /** Index into `pixelConfig.fans` or `pixelConfig.stems`. */
+  readonly index: number;
+}
+
 export interface BackdropLayers {
   /** Sand, pebbles and the buried mass: never moves. */
   readonly bed: HTMLCanvasElement;
   /** Rocks and moss: drifts a fraction of a pixel with the current. */
   readonly far: HTMLCanvasElement;
-  /** Fronds and stems: the part that actually sways. */
-  readonly plants: HTMLCanvasElement;
-  readonly anchors: { readonly far: PlantAnchor[]; readonly plants: PlantAnchor[] };
+  /** Fronds and stems, each with its own root. */
+  readonly plants: readonly PlantSprite[];
+  /** Roots of the far layer's moss clumps, for the far drift. */
+  readonly farAnchors: readonly PlantAnchor[];
 }
 
 /** Where a set of authored props meets the sand, for the sway pass to rotate about. */
@@ -110,8 +132,9 @@ export function createBackdropLayers({
   // Created up front rather than looked up by name, so a layer can never be "not made yet".
   const bed = surface(into?.bed);
   const far = surface(into?.far);
-  const foliage = surface(into?.plants);
-  const anchors: { far: PlantAnchor[]; plants: PlantAnchor[] } = { far: [], plants: [] };
+  // Only the far layer still has anchors: the plants carry their own, because each one bends
+  // about its own root rather than about a shared pivot.
+  const anchors: { far: PlantAnchor[] } = { far: [] };
   // `ctx` is the active painting surface: the art helpers below all write through it.
   let ctx = bed.ctx;
   const put = (x: number, y: number, colour: string, w = 1, h = 1) => {
@@ -201,76 +224,163 @@ export function createBackdropLayers({
   };
 
   // --- Plant fronds and stems ---------------------------------------------
-  const frond = (
-    bx: number,
-    by: number,
+  //
+  // Every plant is painted into its own small canvases — one per pose — in a local frame whose
+  // origin is the point the plant is rooted at. Pixels stay on the art grid because the canvas is
+  // the grid: the plant bends by being *drawn* differently, not by being rotated or translated by
+  // a fraction of a pixel. That is how pixel animation has always worked, and it is the only way
+  // to get crisp motion at this scale.
+  //
+  // Painting nine poses per plant is cheap: each is a few hundred `fillRect` calls on a small
+  // canvas, once, and the frame loop then does nothing but point the sprite at a different
+  // texture.
+  const plantSprites: PlantSprite[] = [];
+  const poses = pixelConfig.plantPoses;
+  const poseBends = Array.from({ length: poses }, (_, pose) => bendForPose(pose, poses));
+
+  /** A canvas for one plant pose, reusing an existing one across repaints when possible. */
+  const poseSurface = (slot: number, widthPx: number, heightPx: number) => {
+    const canvas = into?.plants?.[slot] ?? document.createElement('canvas');
+    canvas.width = widthPx;
+    canvas.height = heightPx;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('2D context unavailable for a plant');
+    context.clearRect(0, 0, widthPx, heightPx);
+    return { canvas, ctx: context };
+  };
+
+  /** Draw one frond rooted at the origin of `context`, tangent bent by `bend` at the tip. */
+  const frondLocal = (
+    context: CanvasRenderingContext2D,
     angle: number,
     length: number,
     widthAt: number,
+    curve: number,
     bend: number,
-    sway: number,
   ) => {
     const pal = palette.plant;
-    let px = bx;
-    let py = by;
+    const ink = (x: number, y: number, colour: string) => {
+      context.fillStyle = colour;
+      context.fillRect(Math.round(x), Math.round(y), 1, 1);
+    };
+    let px = 0;
+    let py = 0;
     for (let u = 0; u < length; u += 0.7) {
       const f = u / length;
-      const a = angle + bend * f * f + sway * f;
+      /*
+       * `f * f` is zero at the base and largest at the tip, so the stem pivots at the sand rather
+       * than sliding across it. `bend` scales that whole curve, which is how one pose becomes
+       * another; `curve` is the frond's own resting shape and stays put.
+       */
+      /*
+       * `bend * f * f` again: zero at the root, most at the tip. The fan's own `curve` stays, so a
+       * frond keeps its resting shape and the pose adds lean on top of it rather than replacing it.
+       */
+      const a = angle + curve * f * f + bend * f * f;
       px += Math.cos(a) * 0.7;
       py += Math.sin(a) * 0.7;
       const w = widthAt * Math.pow(Math.sin(Math.PI * Math.pow(f, 0.75)), 0.7);
       for (let v = -w; v <= w; v += 0.7) {
         let colour = Math.abs(v) < 0.55 ? (pal[0] ?? '') : v > 0 ? (pal[2] ?? '') : (pal[1] ?? '');
         if (Math.abs(v) > w - 0.8) colour = pal[3] ?? colour;
-        put(px - Math.sin(a) * v, py + Math.cos(a) * v, colour);
+        ink(px - Math.sin(a) * v, py + Math.cos(a) * v, colour);
       }
     }
+    return { x: px, y: py };
   };
 
-  const fan = (
-    bx: number,
-    by: number,
-    count: number,
-    spread: number,
-    length: number,
-    widthAt: number,
-    phase: number,
-    bendSpan: number,
-  ) => {
-    for (let i = 0; i < count; i++) {
-      const f = count > 1 ? i / (count - 1) : 0.5;
-      // `phase` is the fan's own seed: neighbouring fans differ in height and lean.
-      const scaled = length * (0.7 + noise(i, bx, phase) * 0.4);
-      const sway = phase * 0.12; // radians: a small, stable lean per fan
-      frond(
-        bx,
-        by,
-        -Math.PI / 2 + (f - 0.5) * spread + sway,
-        scaled,
-        widthAt,
-        (f - 0.5) * bendSpan,
-        0,
-      );
+  let slot = 0;
+  for (let index = 0; index < pixelConfig.fans.length; index++) {
+    const fanDef = pixelConfig.fans[index];
+    if (!fanDef) continue;
+    const [x, count, spread, length, widthAt] = fanDef;
+    const bx = Math.round(width * x);
+    const by = Math.round(floor(bx));
+    // Padded for the widest lean: a pose must never be clipped by its own canvas.
+    const reach = Math.ceil(length + widthAt + pixelConfig.plantMaxBend * length) + 2;
+    const frames: HTMLCanvasElement[] = [];
+    for (let pose = 0; pose < poses; pose++) {
+      const frame = poseSurface(slot + pose, reach * 2, reach * 2 + 2);
+      // The root sits at the bottom-centre of the frame, matching the sprite's anchor.
+      const ox = reach;
+      const oy = reach * 2;
+      frame.ctx.save();
+      frame.ctx.translate(ox, oy);
+      for (let i = 0; i < count; i++) {
+        const f = count > 1 ? i / (count - 1) : 0.5;
+        // `phase` is the fan's own seed: neighbouring fans differ in height and lean.
+        const scaled = length * (0.7 + noise(i, bx, x * 10) * 0.4);
+        const lean = x * 10 * 0.12;
+        frondLocal(
+          frame.ctx,
+          -Math.PI / 2 + (f - 0.5) * spread + lean,
+          scaled,
+          widthAt,
+          (f - 0.5) * spread * 0.35,
+          poseBends[pose] ?? 0,
+        );
+      }
+      frame.ctx.restore();
+      frames.push(frame.canvas);
     }
-  };
+    slot += poses;
+    plantSprites.push({
+      frames,
+      kind: 'fan',
+      index,
+      anchor: { x: bx, y: by, height: Math.round(length), give: 1 },
+    });
+  }
 
-  const stem = (x: number, y: number, heightPx: number, phase: number) => {
+  for (let index = 0; index < pixelConfig.stems.length; index++) {
+    const stemDef = pixelConfig.stems[index];
+    if (!stemDef) continue;
+    const [x, heightPx, phase] = stemDef;
+    const bx = Math.round(width * x);
+    const by = Math.round(floor(bx));
+    const reach = Math.ceil(heightPx + 16 + pixelConfig.plantMaxBend * heightPx) + 2;
+    const frames: HTMLCanvasElement[] = [];
     const pal = palette.plantStem;
-    for (let k = 0; k < heightPx; k++) {
-      const f = k / heightPx;
-      const px = x + Math.sin(phase + k * 0.05) * f * f * heightPx * 0.1;
-      const py = y - k;
-      put(px, py, pal[0] ?? '');
-      if (k % 4 === 2) {
-        const leafLength = (1 - f * 0.55) * 9 + ((k & 4) !== 0 ? 1 : 0);
-        for (let j = 1; j < leafLength; j++) {
-          const colour = j > leafLength * 0.6 ? (pal[2] ?? '') : (pal[1] ?? '');
-          put(px + j, py - j * 0.45, colour);
-          put(px - j, py - j * 0.45, colour);
+    for (let pose = 0; pose < poses; pose++) {
+      const frame = poseSurface(slot + pose, reach * 2, reach * 2 + 2);
+      const ox = reach;
+      const oy = reach * 2;
+      const bend = poseBends[pose] ?? 0;
+      const ink = (sx: number, sy: number, colour: string) => {
+        frame.ctx.fillStyle = colour;
+        frame.ctx.fillRect(Math.round(ox + sx), Math.round(oy + sy), 1, 1);
+      };
+      for (let k = 0; k < heightPx; k++) {
+        const f = k / heightPx;
+        // The stem's own resting curve, plus the pose's lean which grows toward the tip.
+        const px = Math.sin(phase + k * 0.05) * f * f * heightPx * 0.1 + bend * f * f * heightPx;
+        const py = -k;
+        ink(px, py, pal[0] ?? '');
+        if (k % 4 === 2) {
+          const leafLength = (1 - f * 0.55) * 9 + ((k & 4) !== 0 ? 1 : 0);
+          /*
+           * The leaves belong to the plant, so they lean with it. They also stagger: each pair
+           * lags the stalk slightly (`f` is lower than the stalk's own bend), which is what makes
+           * a stem look flexible instead of like a bent wire with pins stuck in it.
+           */
+          const leafBend = bend * f * f * heightPx * 0.75;
+          for (let j = 1; j < leafLength; j++) {
+            const colour = j > leafLength * 0.6 ? (pal[2] ?? '') : (pal[1] ?? '');
+            ink(px + j + leafBend, py - j * 0.45, colour);
+            ink(px - j + leafBend, py - j * 0.45, colour);
+          }
         }
       }
+      frames.push(frame.canvas);
     }
-  };
+    slot += poses;
+    plantSprites.push({
+      frames,
+      kind: 'stem',
+      index,
+      anchor: { x: bx, y: by, height: Math.round(heightPx), give: 0.8 },
+    });
+  }
 
   // --- Pebbles (bed layer: they belong to the sand, not to the foliage) ----
   for (let i = 0; i < pixelConfig.pebbles; i++) {
@@ -291,22 +401,7 @@ export function createBackdropLayers({
     clump(Math.round(width * cx), Math.round(height * cy), rx, ry, s);
   anchors.far = anchorsFor(pixelConfig.clumps, width, height, floor, 0.25);
 
-  // --- Plant layer: fronds and stems, which carry the real motion --------
-  ctx = foliage.ctx;
-  for (const [x, count, spread, length, widthAt] of pixelConfig.fans) {
-    const bx = Math.round(width * x);
-    fan(bx, Math.round(floor(bx)) - 1, count, spread, length, widthAt, x * 10, spread * 0.35);
-  }
-  for (const [x, heightPx, phase] of pixelConfig.stems) {
-    const bx = Math.round(width * x);
-    stem(bx, Math.round(floor(bx)) - 1, heightPx, phase);
-  }
-  anchors.plants = [
-    ...anchorsFor(pixelConfig.fans, width, height, floor, 1),
-    ...anchorsFor(pixelConfig.stems, width, height, floor, 0.8),
-  ];
-
-  return { bed: bed.canvas, far: far.canvas, plants: foliage.canvas, anchors };
+  return { bed: bed.canvas, far: far.canvas, plants: plantSprites, farAnchors: anchors.far };
 }
 
 /** Reads the art palette from the live theme tokens, so there is one source of colour. */
