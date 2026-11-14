@@ -10,6 +10,7 @@
  * photographic background is how halos get made.
  */
 import { element } from './shared/dom';
+import { pixelConfig } from '../config/pixel.config';
 import { button } from './shared/controls';
 import { strings } from '../config/strings.en';
 import { penOptions } from '../config/ink.config';
@@ -41,6 +42,14 @@ export interface DrawingOptions {
   /** Called with the committed strokes once the player is done and the ink is spent. */
   readonly onDone: (strokes: readonly DrawnStroke[], cost: number) => void;
   readonly signal: AbortSignal;
+  /**
+   * The tank, used to measure one art pixel on screen.
+   *
+   * The drawing is rendered on the same grain as the scenery: the sheet asks the tank how large
+   * its pixels currently are instead of guessing. A hardcoded grain would silently drift out of
+   * step with the art the moment the tank resizes.
+   */
+  readonly tank?: HTMLElement | null;
 }
 
 const refusalText: Record<InkRefusal, string> = {
@@ -50,7 +59,7 @@ const refusalText: Record<InkRefusal, string> = {
 };
 
 export function createDrawing(options: DrawingOptions): DrawingSurface {
-  const { purse, onDone, signal } = options;
+  const { purse, onDone, signal, tank } = options;
 
   const node = element('div', 'draw-surface');
   const board = element('canvas', 'draw-board');
@@ -58,13 +67,11 @@ export function createDrawing(options: DrawingOptions): DrawingSurface {
   board.setAttribute('role', 'img');
 
   const hint = element('p', 'draw-hint', strings.drawHint);
-  const costOut = element('strong', 'draw-cost-value');
-  const costRow = element('p', 'draw-cost');
-  costRow.append(element('span', 'draw-cost-label', `${strings.drawCostLabel}: `), costOut);
+  const costOut = element('strong', 'draw-figure-value');
+  costOut.textContent = '0';
 
-  const inkRow = element('p', 'draw-ink');
-  const inkValue = element('span', 'draw-ink-value');
-  inkRow.append(element('span', 'draw-ink-label', `${strings.drawInkLabel}: `), inkValue);
+  const inkValue = element('strong', 'draw-figure-value');
+  inkValue.textContent = String(purse.available());
 
   const notice = element('p', 'draw-notice');
   notice.setAttribute('role', 'status');
@@ -148,21 +155,53 @@ export function createDrawing(options: DrawingOptions): DrawingSurface {
   doneButton.classList.add('draw-done');
   doneButton.disabled = true;
 
-  const controls = element('div', 'draw-controls');
-  const widthGroup = element('div', 'draw-group');
-  widthGroup.setAttribute('role', 'group');
-  widthGroup.setAttribute('aria-label', strings.drawToolPen);
-  widthGroup.append(...widths.map(({ swatch }) => swatch));
-  const colourGroup = element('div', 'draw-group');
-  colourGroup.setAttribute('role', 'group');
-  colourGroup.setAttribute('aria-label', strings.drawToolColour);
-  colourGroup.append(...colours.map(({ swatch }) => swatch));
-  const actionGroup = element('div', 'draw-group');
-  actionGroup.append(undoButton, clearButton);
-  controls.append(widthGroup, colourGroup, actionGroup);
+  /** A captioned cluster. A caption is cheaper to read than a legend of unlabelled dots. */
+  const cluster = (caption: string, label: string, items: HTMLElement[]) => {
+    const wrap = element('div', 'draw-cluster');
+    const title = element('span', 'draw-cluster-title', caption);
+    const group = element('div', 'draw-group');
+    group.setAttribute('role', 'group');
+    group.setAttribute('aria-label', label);
+    group.append(...items);
+    wrap.append(title, group);
+    return wrap;
+  };
 
+  const controls = element('div', 'draw-controls');
+  controls.append(
+    cluster(
+      strings.drawToolPen,
+      strings.drawToolPen,
+      widths.map(({ swatch }) => swatch),
+    ),
+    cluster(
+      strings.drawToolColour,
+      strings.drawToolColour,
+      colours.map(({ swatch }) => swatch),
+    ),
+  );
+
+  // Undo and clear act on the drawing, so they sit with the sheet rather than with the pens.
+  const actionGroup = element('div', 'draw-actions');
+  actionGroup.append(undoButton, clearButton);
+
+  // Numbers the player acts on are paired and given room, instead of being a sentence in a corner.
+  const figure = (label: string, value: HTMLElement, tone: string) => {
+    const wrap = element('div', `draw-figure draw-figure--${tone}`);
+    wrap.append(element('span', 'draw-figure-label', label), value);
+    return wrap;
+  };
+  const figures = element('div', 'draw-figures');
+  figures.append(
+    figure(strings.drawCostLabel, costOut, 'cost'),
+    figure(strings.drawInkLabel, inkValue, 'ink'),
+  );
+
+  // Two deliberate rows: what it costs, then what you can do about it. Mixing them in one flow
+  // made Done wrap alone onto its own line as the dialog narrowed.
+  actionGroup.append(doneButton);
   const footer = element('div', 'draw-footer');
-  footer.append(costRow, inkRow, notice, doneButton);
+  footer.append(notice, figures, actionGroup);
 
   const body = element('div', 'draw-body');
   body.append(board);
@@ -182,6 +221,10 @@ export function createDrawing(options: DrawingOptions): DrawingSurface {
   let drawing = false;
   let held = 0;
   let cssWidth = 0;
+  /** One art pixel in CSS pixels; kept from `measure()` so `trace` does not re-measure per frame. */
+  let grainCss = 1;
+  /** One art pixel in device pixels, snapped to whole pixels so blocks stay square on screen. */
+  let block = 1;
   let cssHeight = 0;
   let queued = 0;
 
@@ -191,10 +234,33 @@ export function createDrawing(options: DrawingOptions): DrawingSurface {
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
   }
 
+  /**
+   * Size of one art pixel on screen, in CSS pixels.
+   *
+   * Measured from the tank rather than configured, because the scenery and the drawing have to
+   * agree at every window size: the tank is the reference grid scaled to fit, so one of its pixels
+   * is however wide the tank currently is divided by `pixelConfig.width`. If the tank cannot be
+   * measured yet (it is display:none while the dialog measures), fall back to a sensible grain
+   * rather than to a smooth line.
+   */
+  function grainSize(): number {
+    const tankRect = tank?.getBoundingClientRect();
+    if (tankRect && tankRect.width > 0) return tankRect.width / pixelConfig.width;
+    // No measurable tank: pick a grain that still reads as pixel art on any screen.
+    return Math.max(2, 640 / pixelConfig.width);
+  }
+
   function measure() {
     const rect = board.getBoundingClientRect();
     cssWidth = rect.width;
     cssHeight = rect.height;
+    const grain = grainSize();
+    /*
+     * Two canvases' worth of work in one: the device scale keeps the paper crisp, and the art
+     * grain divides it into visible blocks. Drawing at `grain × ratio` device pixels per art
+     * pixel means a stroke is made of the same square blocks as the scenery — a 2px pen is two
+     * blocks wide here just as it is two blocks wide in the tank.
+     */
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
     const nextWidth = Math.max(1, Math.round(cssWidth * ratio));
     const nextHeight = Math.max(1, Math.round(cssHeight * ratio));
@@ -202,22 +268,54 @@ export function createDrawing(options: DrawingOptions): DrawingSurface {
       board.width = nextWidth;
       board.height = nextHeight;
     }
+    grainCss = Math.max(grain, 0.5);
+    // Snap so art-pixel edges land on whole device pixels; otherwise blocks shimmer.
+    block = Math.max(1, Math.round(grainCss * ratio));
+    // Blocks are stamped as exact rectangles; smoothing would blur their edges back into vectors.
+    if (context) context.imageSmoothingEnabled = false;
   }
 
-  /** One place draws a stroke, so the live preview and the committed ink cannot diverge. */
+  /**
+   * One place draws a stroke, so the live preview and the committed ink cannot diverge.
+   *
+   * Strokes arrive as a smooth path in CSS pixels and leave as blocks. The walk happens in
+   * art-pixel space and each step paints a whole block-aligned square, which is what makes the
+   * line read as pixel art: stepping one art pixel at a time is also what keeps a fast diagonal
+   * solid, since no two neighbouring stamps can be more than a block apart. Pen width is rounded
+   * up to whole blocks — a pen narrower than the grain would be invisible — so the three pens stay
+   * distinguishable at every window size instead of collapsing into one.
+   */
   function trace(ctx: CanvasRenderingContext2D, stroke: DrawnStroke, scale: number) {
     const [first, ...rest] = stroke.points;
     if (!first) return;
-    ctx.strokeStyle = stroke.colour;
-    ctx.lineWidth = stroke.width * scale;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    ctx.moveTo(first.x * scale, first.y * scale);
-    for (const point of rest) ctx.lineTo(point.x * scale, point.y * scale);
-    // A dot is a valid mark: a single tap must leave ink rather than nothing.
-    if (rest.length === 0) ctx.lineTo(first.x * scale + 0.01, first.y * scale);
-    ctx.stroke();
+    const size = Math.max(1, block);
+    const penBlocks = Math.max(1, Math.ceil(stroke.width / grainCss));
+    // Centre the pen on the path: an odd pen has a middle block, an even one sits half a block out.
+    const inset = Math.floor((penBlocks - 1) / 2) * size;
+    const toArt = (value: number) => (value * scale) / size;
+    ctx.fillStyle = stroke.colour;
+    const stamp = (artX: number, artY: number) => {
+      ctx.fillRect(
+        Math.round(artX) * size - inset,
+        Math.round(artY) * size - inset,
+        size * penBlocks,
+        size * penBlocks,
+      );
+    };
+    let fromX = toArt(first.x);
+    let fromY = toArt(first.y);
+    stamp(fromX, fromY);
+    for (const point of rest) {
+      const toX = toArt(point.x);
+      const toY = toArt(point.y);
+      // A dot is a valid mark: a single tap must leave ink rather than nothing.
+      const steps = Math.max(1, Math.ceil(Math.max(Math.abs(toX - fromX), Math.abs(toY - fromY))));
+      for (let i = 1; i <= steps; i += 1) {
+        stamp(fromX + ((toX - fromX) * i) / steps, fromY + ((toY - fromY) * i) / steps);
+      }
+      fromX = toX;
+      fromY = toY;
+    }
   }
 
   function render() {

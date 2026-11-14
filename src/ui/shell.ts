@@ -2,7 +2,7 @@
  * only chrome. Nothing unimplemented is shown, and no control appears that cannot work.
  */
 import { createSettings } from './settings';
-import { button, dialog, iconButton, sectionTitle, stat, actionRow } from './shared/controls';
+import { button, dialog, iconButton, icon, sectionTitle, stat, actionRow } from './shared/controls';
 import { createDrawing } from './drawing';
 import { createPurse } from '../draw/purse';
 import { inkConfig } from '../config/ink.config';
@@ -22,6 +22,8 @@ export function createShell(root: HTMLElement, signal: AbortSignal) {
   const canvasHost = element('div', 'canvas-host');
   water.append(
     canvasHost,
+    // The mood grade covers the composed tank, so sand, plants and water turn over together.
+    element('div', 'water-grade'),
     element('div', 'water-light'),
     element('div', 'water-surface'),
     element('div', 'water-grain'),
@@ -116,6 +118,7 @@ export function createShell(root: HTMLElement, signal: AbortSignal) {
       drawing = createDrawing({
         purse,
         signal,
+        tank: canvasHost,
         onDone: () => {
           // The strokes are priced and paid for, but nothing swims yet: closing on a drawing that
           // vanishes would be a lie about what just happened.
@@ -137,8 +140,41 @@ export function createShell(root: HTMLElement, signal: AbortSignal) {
     { signal },
   );
 
+  // One tap to change the light. It shows the destination rather than the current state — a
+  // moon means "go to night" — and its label says the same thing, so neither is a guess.
+  const moodButton = iconButton(
+    'moon',
+    strings.moodToNight,
+    () => {
+      toggleMood();
+    },
+    signal,
+  );
+  const syncMoodButton = () => {
+    const night = document.documentElement.dataset.mood === 'night';
+    const next = night ? 'day' : 'night';
+    moodButton.replaceChildren(icon(night ? 'sun' : 'moon'));
+    moodButton.setAttribute('aria-label', night ? strings.moodToDay : strings.moodToNight);
+    moodButton.title = night ? strings.moodToDay : strings.moodToNight;
+    moodButton.dataset.next = next;
+  };
+  function toggleMood() {
+    const night = document.documentElement.dataset.mood === 'night';
+    settings.setMood(night ? 'day' : 'night');
+    syncMoodButton();
+  }
+  syncMoodButton();
+  const moodObserver = new MutationObserver(syncMoodButton);
+  moodObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-mood'],
+  });
+  signal.addEventListener('abort', () => {
+    moodObserver.disconnect();
+  });
+
   const hud = element('header', 'hud');
-  hud.append(drawTrigger, trigger);
+  hud.append(moodButton, drawTrigger, trigger);
 
   root.replaceChildren(skip, heading, main, hud, details.node);
   return {

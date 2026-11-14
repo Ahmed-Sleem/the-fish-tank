@@ -51,11 +51,33 @@ test('mood-dependent tokens are defined in the base block and in every mood bloc
     '--surface-colour',
     '--water-glow',
   ];
-  const blocks = [...theme.matchAll(/:root[^{]*\{([^}]*)\}/g)].map((match) => match[1] ?? '');
+  /*
+   * A rule may list several selectors, which is how the fade states (dusk, dawn) share a palette
+   * with the settled mood they belong to. Each selector is counted separately, so a token that is
+   * declared for day and for day's fade registers twice — as it should.
+   */
+  const rules = [...theme.matchAll(/([^{}]+)\{([^}]*)\}/g)].map((match) => ({
+    selectors: (match[1] ?? '').split(',').filter((part) => part.includes(':root')),
+    body: match[2] ?? '',
+  }));
+  const blocks = rules.flatMap((rule) =>
+    rule.selectors.map((selector) => ({ selector, body: rule.body })),
+  );
   expect(blocks.length).toBeGreaterThan(3);
   for (const token of moodTokens) {
-    const declared = blocks.filter((block) => new RegExp(`^\\s*${token}\\s*:`, 'm').test(block));
-    // Base block plus day plus night (the reduced-motion block repeats the night values).
+    const declared = blocks.filter((block) =>
+      new RegExp(`^\\s*${token}\\s*:`, 'm').test(block.body),
+    );
+    const inDay = declared.some((block) => block.selector.includes("'day'"));
+    const inNight = declared.some((block) => block.selector.includes("'night'"));
+    // Both settled moods must paint it, or the tank renders that token unset for half the cycle.
+    expect(inDay && inNight, token).toBe(true);
+    /*
+     * Base block plus the day block plus the night block. The reduced-motion block deliberately
+     * declares no colours: `resolveMood` freezes the cycle at night, so the night palette arrives
+     * through `data-mood` like any other night. Repeating it in CSS would override a player who
+     * asks for day while their system asks for stillness.
+     */
     expect(declared.length, token).toBeGreaterThanOrEqual(3);
   }
 });

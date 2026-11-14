@@ -20,3 +20,16 @@
   pointer-events: none;
   mix-blend-mode: screen;
 }
+
+/* The mood grade: one wash over the whole scene, not a tint on the water alone.
+   Pointer-transparent and non-interactive, so it can never intercept a stir. */
+.water-grade {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-grade);
+  background: var(--env-grade);
+  /* Falls back to the token when nothing is animating (reduced motion, first paint). */
+  opacity: var(--env-grade-live-opacity, var(--env-grade-opacity));
+  mix-blend-mode: var(--env-grade-blend);
+  pointer-events: none;
+}

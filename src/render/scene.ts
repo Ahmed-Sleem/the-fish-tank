@@ -11,7 +11,7 @@ import {
   Rectangle,
 } from 'pixi.js';
 import type { Application } from 'pixi.js';
-import { moodAt, sceneConfig } from '../config/scene.config';
+import { resolveMood, sceneConfig } from '../config/scene.config';
 import type { ScenePreferences } from '../config/scene.config';
 import { createParticles } from './particles';
 import { createFixedLoop } from '../core/loop';
@@ -19,7 +19,8 @@ import { createFlow } from '../sim/water/flow';
 import { createWaterInput } from '../sim/water/input';
 import { createWaterEffects } from './effects/water';
 import { waterBodyFragment } from './effects/shaders';
-import { createBackdropCanvas, paletteFromTheme } from './pixel/backdrop';
+import { createBackdropLayers, paletteFromTheme } from './pixel/backdrop';
+import { applySway, swayFor } from './pixel/sway';
 import { pixelConfig } from '../config/pixel.config';
 export function mountScene(app: Application, host: HTMLElement, preferences: ScenePreferences) {
   // Mood colours are read through the computed style so the day/night cycle needs no redraw
@@ -43,18 +44,32 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
   if (!background || !particleLayer) throw new Error('Missing tank layers');
   // Pixel-art scenery sits under the water filter, so the shader's refraction and caustics fall
   // across the sand and plants exactly as in the owner's reference.
-  const backdropSource = createBackdropCanvas({
+  // The art is painted in three layers instead of one flat canvas. Nothing here is animated yet;
+  // splitting it is what makes motion possible at all, because a single baked image can only be
+  // moved as a whole — and moving the sand is not animation, it is a sliding photograph.
+  const art = createBackdropLayers({
     width: pixelConfig.width,
     height: pixelConfig.height,
     palette: paletteFromTheme(host),
     seed: pixelConfig.seed,
   });
-  const backdropTexture = Texture.from(backdropSource);
-  backdropTexture.source.scaleMode = 'nearest';
-  const backdrop = new Sprite(backdropTexture);
-  backdrop.label = 'pixel-backdrop';
-  background.addChild(backdrop);
+  const artSprite = (source: HTMLCanvasElement, label: string) => {
+    const texture = Texture.from(source);
+    texture.source.scaleMode = 'nearest';
+    const sprite = new Sprite(texture);
+    sprite.label = label;
+    // The art grid is authored bottom-centre so a layer can lean about its own root without the
+    // sprite's box dragging the picture sideways.
+    sprite.anchor.set(0.5, 1);
+    background.addChild(sprite);
+    return sprite;
+  };
+  const bed = artSprite(art.bed, 'pixel-bed');
+  const far = artSprite(art.far, 'pixel-far');
+  const plants = artSprite(art.plants, 'pixel-plants');
+  const artLayers = [bed, far, plants];
   host.dataset.artGrid = `${String(pixelConfig.width)}x${String(pixelConfig.height)}`;
+  host.dataset.sway = 'on';
 
   // A translucent water body sits between the art and the light pass: it is what makes the
   // scene read as *under water* instead of a picture behind glass. Colour comes from tokens.
@@ -91,9 +106,18 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
    * read these tokens. Letting the degraded path sit in permanent daylight would mean the owner's
    * night never arrives on exactly the machines that need the cheap version.
    */
-  const publishMood = (mood: string) => {
+  /** Sets the attributes the stylesheets read. Repainting Pixi colours is a separate concern. */
+  const setMoodAttributes = (mood: string) => {
     host.dataset.mood = mood;
     document.documentElement.dataset.mood = mood;
+  };
+  // Establish a light immediately. A tank that shows no mood until something moves is a tank
+  // whose palette is the un-themed fallback, and under reduced motion nothing would ever set it.
+  // Only the attribute is set here: the sprite pool and `settings` do not exist yet, and the
+  // first loop pass tints anyway.
+  setMoodAttributes(resolveMood(0, preferences.mood, preferences.reducedMotion).mood);
+  const publishMood = (mood: string) => {
+    setMoodAttributes(mood);
     tint();
   };
   const fallbackOrigin = Date.now() / 1000;
@@ -145,7 +169,27 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
   });
   let lastMood = '';
   /** One place repaints mood-dependent Pixi colours; called only when the mood token changes. */
+  /**
+   * Repaint the scenery in the current mood's colours.
+   *
+   * The art is baked into canvases, so a CSS token change cannot reach it: sand drawn at noon
+   * stays noon-coloured no matter what the stylesheet says. Repainting on mood change is what
+   * makes the whole environment turn over instead of only the water on top of it.
+   */
+  const repaintArt = () => {
+    const palette = paletteFromTheme(host);
+    createBackdropLayers({
+      width: pixelConfig.width,
+      height: pixelConfig.height,
+      palette,
+      seed: pixelConfig.seed,
+      // Draw into the canvases the sprites already use, so only the pixels change.
+      into: { bed: art.bed, far: art.far, plants: art.plants },
+    });
+    for (const layer of artLayers) layer.texture.source.update();
+  };
   const tint = () => {
+    repaintArt();
     const surface = color('--surface-colour');
     const deep = color('--water-deep');
     sprites.forEach((dot, i) => {
@@ -162,11 +206,18 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
     bodyUniforms.uniforms.uTop = rgb('--water-top');
     bodyUniforms.uniforms.uDeep = rgb('--water-deep');
   };
+  const farLayer = { anchors: art.anchors.far, gain: pixelConfig.swayGainFar };
+  const plantsLayer = { anchors: art.anchors.plants, gain: pixelConfig.swayGainPlants };
+  let swayTime = 0;
   const loop = createFixedLoop((seconds) => {
     // Without effects nothing else drives the cycle, so the scene owns it here. Real time, not
     // simulated time: the cycle must arrive even if frames are dropped or the tab was hidden.
     if (!effects) {
-      const mood = moodAt(Date.now() / 1000 - fallbackOrigin).mood;
+      const mood = resolveMood(
+        Date.now() / 1000 - fallbackOrigin,
+        settings.mood,
+        settings.reducedMotion,
+      ).mood;
       if (mood !== lastMood) {
         lastMood = mood;
         publishMood(mood);
@@ -179,6 +230,14 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
     }
     flow.update(seconds);
     pool.update(seconds, (x, y) => flow.sample(x, y));
+    if (!settings.reducedMotion) {
+      // Seconds here is the fixed step, so the tide is a function of simulated time and stays
+      // identical under different frame rates — the same contract the particles keep.
+      swayTime += seconds;
+      const sample = (x: number, y: number) => flow.sample(x, y);
+      applySway(far, swayFor(farLayer, swayTime, sample), far.width / 2);
+      applySway(plants, swayFor(plantsLayer, swayTime, sample), plants.width / 2);
+    }
     effects?.step(impulse, seconds);
   });
   let settings = preferences,
@@ -206,8 +265,13 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
       sceneConfig.presets[settings.quality].resolution,
     );
     app.renderer.resize(width, height);
-    backdrop.width = width;
-    backdrop.height = height;
+    for (const layer of artLayers) {
+      layer.width = width;
+      layer.height = height;
+      // Anchored bottom-centre, so the box spans the full viewport around the root line.
+      layer.x = width / 2;
+      layer.y = height;
+    }
     body.width = width;
     body.height = height;
     body.filterArea = new Rectangle(0, 0, width, height);
@@ -274,6 +338,11 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
   return {
     configure(next: ScenePreferences) {
       settings = next;
+      // Publish before anything else: with reduced motion there is no animation loop to notice a
+      // changed preference, so choosing day would change nothing at all.
+      publishMood(
+        resolveMood(Date.now() / 1000 - fallbackOrigin, next.mood, next.reducedMotion).mood,
+      );
       effects?.configure(settings);
       resize();
       restart();
@@ -289,8 +358,10 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
       inputTarget.removeEventListener('pointerleave', cancel);
       inputTarget.removeEventListener('pointercancel', cancel);
       body.destroy();
-      backdrop.destroy();
-      backdropTexture.destroy(true);
+      for (const layer of artLayers) {
+        layer.texture.destroy(true);
+        layer.destroy();
+      }
       effects?.dispose();
       document.removeEventListener('visibilitychange', restart);
       window.removeEventListener('resize', resize);

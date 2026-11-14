@@ -55,6 +55,15 @@ export const strings = {
   drawLeft: 'ink left',
   drawNoSurface: 'The drawing surface is not ready yet.',
 
+  // Day and night. The icon's accessible name says what pressing it does, not what is showing,
+  // so a screen-reader user is never left guessing which way the switch goes.
+  moodLabel: 'Lighting',
+  moodAuto: 'Follow the day',
+  moodDay: 'Always day',
+  moodNight: 'Always night',
+  moodToNight: 'Switch to night',
+  moodToDay: 'Switch to day',
+
   linksSection: 'More',
   credits: 'Open-source credits',
   source: 'Source code',

@@ -1,14 +1,12 @@
-/* The drawing surface. Only tokens from theme.css appear here: no raw colours, sizes or times. */
+/* The drawing panel. Only tokens from theme.css appear here: no raw colours, sizes or times.
+ *
+ * Layout is deliberate rather than stacked: the sheet is the only bright thing on screen, the
+ * tools are two captioned clusters, and the two numbers a player acts on sit in the footer as
+ * paired figures instead of trailing text. The eye should go sheet -> pen -> price -> Done.
+ */
 .draw-panel {
   display: grid;
   gap: var(--space-md);
-}
-
-.draw-title {
-  margin: 0;
-  font-size: var(--size-title);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
 }
 
 .draw-hint {
@@ -18,16 +16,17 @@
 }
 
 .draw-body {
-  /* The paper must keep a usable aspect on a phone without ever leaving the viewport. */
+  /* Inset paper inside a recess: the sheet reads as a physical page, not a white hole. */
   position: relative;
   display: grid;
   aspect-ratio: 4 / 3;
   max-height: var(--draw-board-max-height);
   width: 100%;
+  padding: var(--draw-paper-inset);
   border-radius: var(--draw-board-radius);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
-  background: var(--draw-paper);
-  box-shadow: var(--draw-board-shadow);
 }
 
 .draw-board {
@@ -36,22 +35,40 @@
   height: 100%;
   touch-action: none;
   cursor: crosshair;
+  border-radius: var(--draw-paper-radius);
+  background: var(--draw-paper);
+  box-shadow: var(--draw-sheet-shadow-inset);
 }
 
+/* ---- Toolbar: captioned clusters, one per kind of choice ---- */
 .draw-controls {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-sm);
+  align-items: flex-start;
+  gap: var(--space-xs);
+}
+
+.draw-cluster {
+  display: grid;
+  gap: var(--draw-cluster-gap);
+}
+
+.draw-cluster-title {
+  padding-inline: var(--space-2xs);
+  color: var(--text-muted);
+  font-size: var(--draw-cluster-title-size);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 .draw-group {
   display: flex;
   align-items: center;
-  gap: var(--draw-tool-gap);
-  padding: var(--space-2xs) var(--space-xs);
-  border-radius: var(--radius-pill);
-  background: var(--surface-raised);
+  gap: var(--draw-cluster-gap);
+  padding: var(--draw-cluster-padding);
+  border-radius: var(--draw-cluster-radius);
+  background: var(--draw-cluster-surface);
 }
 
 .draw-width,
@@ -73,54 +90,42 @@
   background: var(--text-primary);
 }
 
-.draw-swatch {
-  position: relative;
-}
-
 .draw-swatch::after {
   content: '';
   width: var(--draw-swatch-size);
   height: var(--draw-swatch-size);
   border-radius: var(--radius-pill);
   background: var(--draw-swatch);
+  /* The white swatch needs an edge of its own or it vanishes against the cluster. */
+  box-shadow: var(--draw-swatch-edge);
 }
 
 /* Selection is a ring, not a tick: it must be legible at every pen width and every colour.
- * The inner halo keeps the ring visible on top of a dark swatch, where a single thin line
- * against the raised surface all but disappears. */
+ * The outer halo keeps it visible on top of a dark swatch. */
 .draw-width[aria-pressed='true'],
 .draw-swatch[aria-pressed='true'] {
   box-shadow:
     0 0 0 var(--focus-width) var(--action-primary),
-    0 0 0 var(--focus-offset) var(--surface-raised);
+    0 0 0 var(--focus-offset) var(--draw-cluster-surface);
 }
 
+.draw-width:hover,
+.draw-swatch:hover {
+  background: var(--surface-hover);
+}
+
+/* ---- Footer: notice, the two figures, then the actions ---- */
 .draw-footer {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  /* One column, two rows: the notice, the figures, then the actions. Nothing wraps by accident. */
+  grid-template-columns: 1fr;
   align-items: center;
-  gap: var(--space-sm);
-  justify-content: flex-end;
-}
-
-.draw-cost,
-.draw-ink {
-  margin: 0;
-  font-size: var(--size-small);
-  color: var(--text-muted);
-}
-
-.draw-cost-value,
-.draw-ink-value {
-  color: var(--text-primary);
-  font-weight: var(--weight-strong);
-  font-variant-numeric: tabular-nums;
+  gap: var(--draw-footer-gap);
 }
 
 .draw-notice {
   margin: 0;
   min-height: var(--draw-notice-height);
-  flex: 1 1 100%;
   font-size: var(--size-small);
   color: var(--status-warn);
 }
@@ -129,6 +134,61 @@
   display: none;
 }
 
-.draw-done {
+.draw-figures {
+  display: flex;
+  gap: var(--space-lg);
+  min-width: 0;
+}
+
+.draw-figure {
+  display: grid;
+  gap: var(--draw-cluster-gap);
+  min-width: var(--draw-figure-min-width);
+}
+
+.draw-figure-label {
+  color: var(--text-muted);
+  font-size: var(--draw-figure-label-size);
   font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.draw-figure-value {
+  font-size: var(--draw-figure-value-size);
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* One figure leads. Two numbers the same size is two answers to "what does this cost?". */
+.draw-figure--ink .draw-figure-value {
+  font-size: var(--draw-figure-ink-size);
+  font-weight: var(--weight-strong);
+}
+
+.draw-figure--cost .draw-figure-value {
+  color: var(--draw-figure-cost);
+}
+
+.draw-figure--ink .draw-figure-value {
+  color: var(--draw-figure-ink);
+}
+
+.draw-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--draw-action-gap);
+}
+
+/* Done is the commitment, so it gets the weight and the room; undo and clear are corrections. */
+.draw-actions .draw-done {
+  margin-inline-start: var(--draw-action-gap);
+  padding-inline: var(--space-xl);
+}
+
+.draw-done {
+  font-weight: var(--weight-bold);
+  padding-inline: var(--space-lg);
 }

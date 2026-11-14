@@ -74,12 +74,18 @@ h3 {
 .water-grain {
   background: var(--water-grain-fallback);
   mask-image: var(--water-mask-fallback);
-  opacity: 0.5;
 }
 
-/* Deepens the edges so the eye stays on the tank; no border, no frame. */
+/* Deepens the edges so the eye stays on the tank; no border, no frame.
+   The vignette is mood-aware: night pulls the corners in further than day does. */
 .water-vignette {
-  background: var(--water-vignette-fallback);
+  background: var(--env-vignette);
+  opacity: var(--env-vignette-opacity);
+}
+
+/* Suspended particles thicken at night, which reads as depth rather than as brightness. */
+.water-grain {
+  opacity: var(--env-dust-opacity);
 }
 
 /* One floating control, nothing else. Safe-area aware, never a bar with a rule. */
