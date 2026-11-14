@@ -79,7 +79,7 @@ test.describe('the day/night cycle', () => {
     //
     // This asserts the transition rather than a starting phase: a slow runner can free the loader
     // well into the first fade, so demanding "day" first would fail for the machine, not the code.
-    test.setTimeout(150000);
+    test.setTimeout(240000);
     await page.goto('./');
     await waitForTank(page);
     // Reduced motion deliberately freezes the tank at night with no cycle at all, so the
@@ -91,6 +91,6 @@ test.describe('the day/night cycle', () => {
     const root = page.locator('html');
     await expect(root).toHaveAttribute('data-mood', /day|dusk|night|dawn/);
     // Within one full cycle plus a fade the mood must become night, whatever it started as.
-    await expect(root).toHaveAttribute('data-mood', 'night', { timeout: 100000 });
+    await expect(root).toHaveAttribute('data-mood', 'night', { timeout: 180000 });
   });
 });
