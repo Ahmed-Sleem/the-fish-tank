@@ -39,6 +39,20 @@ export const pixelConfig = {
     [0.95, 4, 1.0, 34, 7],
     [0.47, 4, 1.4, 18, 6],
   ],
+  /**
+   * Scenery motion, in art-grid units per second.
+   *
+   * Tuned so a 90px stem moves a couple of pixels over several seconds: at this resolution that
+   * is a gentle sway, and anything faster reads as wind or as a bug.
+   */
+  swaySpeed: 0.55,
+  swayIdle: 0.55,
+  swayFlow: 1.6,
+  /** Largest flow contribution to a lean, so a violent stroke cannot uproot the scenery. */
+  swayMaxPush: 1.2,
+  /** Gain per layer, so depth is a difference in motion and not only in colour. */
+  swayGainFar: 0.28,
+  swayGainPlants: 1,
   /** [xFraction, height, phase] */
   stems: [
     [0.27, 44, 0],

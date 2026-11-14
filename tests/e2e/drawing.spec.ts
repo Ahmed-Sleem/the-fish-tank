@@ -51,8 +51,8 @@ test('a stroke is priced by length, shown honestly, and undone for a full refund
   page,
 }) => {
   const dialog = await openDrawing(page);
-  const ink = dialog.locator('.draw-ink-value');
-  const cost = dialog.locator('.draw-cost-value');
+  const ink = dialog.locator('.draw-figure--ink .draw-figure-value');
+  const cost = dialog.locator('.draw-figure--cost .draw-figure-value');
   const startInk = Number(await ink.textContent());
 
   await stroke(page, 0.2, 0.8);
@@ -70,7 +70,7 @@ test('a stroke is priced by length, shown honestly, and undone for a full refund
 
 test('a longer stroke costs more than a short one, and width changes nothing', async ({ page }) => {
   const dialog = await openDrawing(page);
-  const cost = dialog.locator('.draw-cost-value');
+  const cost = dialog.locator('.draw-figure--cost .draw-figure-value');
 
   await stroke(page, 0.3, 0.4);
   const short = Number(await cost.textContent());
@@ -93,7 +93,7 @@ test('clearing returns every coin, and the dialog forgets the drawing when reope
   page,
 }) => {
   const dialog = await openDrawing(page);
-  const ink = dialog.locator('.draw-ink-value');
+  const ink = dialog.locator('.draw-figure--ink .draw-figure-value');
   const startInk = Number(await ink.textContent());
 
   await stroke(page, 0.2, 0.8);
@@ -115,7 +115,7 @@ test('the drawing dialog is keyboard reachable and closes back to its icon', asy
 test('committing a drawing spends exactly the price that was shown', async ({ page }) => {
   const dialog = await openDrawing(page);
   await stroke(page, 0.2, 0.8);
-  const shown = Number(await dialog.locator('.draw-cost-value').textContent());
+  const shown = Number(await dialog.locator('.draw-figure--cost .draw-figure-value').textContent());
   expect(shown).toBeGreaterThan(0);
 
   await dialog.getByRole('button', { name: strings.drawDone }).click();
@@ -123,7 +123,109 @@ test('committing a drawing spends exactly the price that was shown', async ({ pa
 
   // Reopening starts a fresh sheet, and the wallet has genuinely fallen by the shown price.
   const reopened = await openDrawing(page);
-  const remaining = Number(await reopened.locator('.draw-ink-value').textContent());
+  const remaining = Number(
+    await reopened.locator('.draw-figure--ink .draw-figure-value').textContent(),
+  );
   expect(remaining).toBeLessThan(100);
   expect(100 - remaining).toBe(shown);
+});
+
+test('the panel stays organised: captioned tools, one leading figure, actions in reach', async ({
+  page,
+}) => {
+  test.setTimeout(90000);
+  const dialog = await openDrawing(page);
+
+  // Each kind of choice says what it is, rather than being a row of unexplained dots.
+  await expect(dialog.locator('.draw-cluster-title')).toHaveCount(2);
+  await expect(dialog.locator('.draw-cluster-title').first()).toHaveText(/pen/i);
+
+  // The price is the one number that leads; the balance is context beside it, not a rival.
+  await stroke(page, 0.2, 0.8);
+  const cost = dialog.locator('.draw-figure--cost .draw-figure-value');
+  const ink = dialog.locator('.draw-figure--ink .draw-figure-value');
+  const costSize = Number.parseFloat(await cost.evaluate((el) => getComputedStyle(el).fontSize));
+  const inkSize = Number.parseFloat(await ink.evaluate((el) => getComputedStyle(el).fontSize));
+  expect(costSize).toBeGreaterThan(inkSize);
+
+  // Every control is inside the dialog, which is what stops Done drifting out of reach.
+  const dialogBox = await dialog.boundingBox();
+  for (const name of [strings.drawUndo, strings.drawClear, strings.drawDone]) {
+    const box = await dialog.getByRole('button', { name }).boundingBox();
+    expect(box).not.toBeNull();
+    if (!box || !dialogBox) continue;
+    expect(box.x + box.width).toBeLessThanOrEqual(dialogBox.x + dialogBox.width + 1);
+    expect(box.y + box.height).toBeLessThanOrEqual(dialogBox.y + dialogBox.height + 1);
+  }
+});
+
+test('ink is drawn in blocks the same size as the tank art, not as smooth lines', async ({
+  page,
+}) => {
+  const dialog = await openDrawing(page);
+  const board = page.locator('.draw-board');
+  await stroke(page, 0.2, 0.8);
+
+  /*
+   * A pixel line is only pixel art if its edge is a staircase of the tank's own blocks. Read the
+   * pixels back and measure the run length of the leading edge: a smooth (antialiased) stroke
+   * changes column every row, whereas a blocky one holds the same edge across several rows, and
+   * the block size must match the tank's art scale rather than the display's device ratio.
+   */
+  const sample = await board.evaluate((node) => {
+    const canvas = node as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('no 2d context');
+    const { width, height } = canvas;
+    const data = ctx.getImageData(0, 0, width, height).data;
+    const solid = (x: number, y: number) => (data[(y * width + x) * 4 + 3] ?? 0) > 200;
+    // For each row, the leftmost solid pixel; the run of identical values is one block tall.
+    const runs: number[] = [];
+    let previous = -1;
+    let run = 0;
+    for (let y = 0; y < height; y += 1) {
+      let edge = -1;
+      for (let x = 0; x < width; x += 1) {
+        if (solid(x, y)) {
+          edge = x;
+          break;
+        }
+      }
+      if (edge === -1) {
+        if (run > 0) runs.push(run);
+        run = 0;
+        previous = -1;
+        continue;
+      }
+      if (edge === previous) run += 1;
+      else {
+        if (run > 0) runs.push(run);
+        run = 1;
+        previous = edge;
+      }
+    }
+    if (run > 0) runs.push(run);
+    const fresh = runs.filter((value) => value > 1).sort((a, b) => a - b);
+    const tank = document.querySelector('.canvas-host');
+    const tankWidth = tank ? tank.getBoundingClientRect().width : 0;
+    return {
+      canvasWidth: width,
+      cssWidth: canvas.getBoundingClientRect().width,
+      longestRun: runs.length > 0 ? Math.max(...runs) : 0,
+      medianSquareRun: fresh.length > 0 ? fresh[Math.floor(fresh.length / 2)] : 0,
+      tankWidth,
+    };
+  });
+
+  // Blocks are real: an antialiased vector stroke would almost never hold an edge for >1 row.
+  expect(sample.longestRun).toBeGreaterThan(2);
+  expect(sample.medianSquareRun).toBeGreaterThan(1);
+  /*
+   * And their size is the tank's grain, not the screen's. One art pixel is the tank width over
+   * 344 (the reference grid), so on this board the same measurement should land within a device
+   * pixel or two of that — proving the drawing and the scenery share one grain.
+   */
+  const devicePerArtPixel = (sample.canvasWidth / sample.cssWidth) * (sample.tankWidth / 344);
+  expect(Math.abs((sample.medianSquareRun ?? 0) - devicePerArtPixel)).toBeLessThanOrEqual(2.5);
+  await expect(dialog.getByRole('button', { name: strings.drawDone })).toBeEnabled();
 });

@@ -14,6 +14,19 @@ const paths = {
     'M16 21h3a2 2 0 0 0 2-2v-3',
     'M8 21H5a2 2 0 0 1-2-2v-3',
   ],
+  // Sun and moon: the same control shown two ways, because the light is the thing being changed.
+  sun: [
+    'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z',
+    'M12 2v2',
+    'M12 20v2',
+    'M4.9 4.9l1.4 1.4',
+    'M17.7 17.7l1.4 1.4',
+    'M2 12h2',
+    'M20 12h2',
+    'M4.9 19.1l1.4-1.4',
+    'M17.7 6.3l1.4-1.4',
+  ],
+  moon: ['M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z'],
   // A brush: the one action the tank offers besides settings.
   brush: [
     'M4 20c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4h-1.5',

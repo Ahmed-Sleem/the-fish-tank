@@ -33,12 +33,15 @@ test('the project subpath renders, reloads and never calls external services', a
   await expect(page.locator('canvas')).toHaveCount(1);
   await expect(page.getByRole('main', { name: strings.aquarium })).toBeVisible();
   await expect(page.locator('.intro, .hero-title, .chapter, .footer')).toHaveCount(0);
-  // Two controls, one destination each: draw a fish, and settings. The owner's "one settings
-  // icon" ruling is about settings not being scattered, so this asserts that no third control
-  // has appeared and that each icon opens exactly one dialog.
-  await expect(page.locator('.hud button')).toHaveCount(2);
+  // Three controls, one destination each: the light, drawing, and settings. The owner's "one
+  // settings icon" ruling is about settings not being scattered, so this asserts the exact set
+  // and that no fourth control has appeared.
+  await expect(page.locator('.hud button')).toHaveCount(3);
   await expect(page.getByRole('button', { name: strings.openSettings })).toBeVisible();
   await expect(page.getByRole('button', { name: strings.drawOpen })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: new RegExp(`${strings.moodToNight}|${strings.moodToDay}`) }),
+  ).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
@@ -87,7 +90,7 @@ test('lost graphics context is reported in the settings dialog, not as a silent 
   );
 });
 
-test('the tank is borderless: no frames, rules or chrome, only water and two icons', async ({
+test('the tank is borderless: no frames, rules or chrome, only water and three icons', async ({
   page,
 }) => {
   await page.goto('./');

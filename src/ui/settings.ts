@@ -12,8 +12,13 @@ export function createSettings(signal: AbortSignal) {
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const events = createEvents<{ change: ScenePreferences }>();
   let quality: ScenePreferences['quality'] = sceneConfig.defaultQuality,
-    userMotion = false;
-  const get = (): ScenePreferences => ({ quality, reducedMotion: userMotion || media.matches });
+    userMotion = false,
+    mood: ScenePreferences['mood'] = 'auto';
+  const get = (): ScenePreferences => ({
+    quality,
+    reducedMotion: userMotion || media.matches,
+    mood,
+  });
   const notify = () => {
     events.emit('change', get());
   };
@@ -47,8 +52,30 @@ export function createSettings(signal: AbortSignal) {
   media.addEventListener('change', syncMotion, { signal });
   syncMotion();
 
+  // Pinning the light is the one preference a player reaches for constantly, so it is offered
+  // both here and as a single tap in the tank itself.
+  const moodSelect = selectField(
+    strings.moodLabel,
+    [
+      { value: 'auto', label: strings.moodAuto },
+      { value: 'day', label: strings.moodDay },
+      { value: 'night', label: strings.moodNight },
+    ],
+    mood,
+    (value) => {
+      mood = value;
+      notify();
+    },
+    signal,
+  );
+  const setMood = (next: ScenePreferences['mood']) => {
+    mood = next;
+    moodSelect.input.value = next;
+    notify();
+  };
+
   const panel = element('div', 'ui-panel');
-  panel.append(select.node, motion.node);
+  panel.append(select.node, motion.node, moodSelect.node);
 
   const open = iconButton(
     'settings',
@@ -70,6 +97,7 @@ export function createSettings(signal: AbortSignal) {
     button: open,
     panel,
     get,
+    setMood,
     subscribe: (callback: (value: ScenePreferences) => void) => events.on('change', callback),
   };
 }

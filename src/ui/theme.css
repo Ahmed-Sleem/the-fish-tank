@@ -21,6 +21,8 @@
 
   --size-wordmark: clamp(1.05rem, 2.6vw, 1.5rem);
   --size-title: clamp(1.35rem, 3.4vw, 1.9rem);
+  /* One display size, used where a single number is the point of the surface. */
+  --size-display: clamp(1.75rem, 4.2vw, 2.4rem);
   --size-body: 0.9375rem;
   --size-small: 0.8125rem;
   --size-tiny: 0.6875rem;
@@ -67,24 +69,37 @@
   --night-ray: #4fb9cf;
   --night-surface: #8fe6f2;
 
-  /* ---- Art colours (plants, rock, sand) shared by both moods ---- */
-  /* Art ramps are comma-separated token lists read as one value, so a palette is edited once. */
-  --art-plant-scale: #1d5626, #2f8a38, #6fbf4a, #a8e06a;
-  --art-stem-scale: #245a2c, #388a3a, #5ab048;
-  --art-moss-scale: #10301a, #1b4f26, #2c7a30, #48a03a, #80c850;
-  --art-rock-mid: #4a4a44;
-  --art-rock-light: #8a8578;
-  --art-rock-dark: #2a2a26;
-  --art-sand-light: #e3d3b2;
-  --art-sand-mid: #c0ab86;
-  --art-sand-dark: #8f7d61;
-  --art-sand-shadow: #4e4738;
-  --art-pebble-scale: #3a5a7a, #6a5a4a, #7a7a80, #9a6a3a, #4a4a5a, #5a7a8a;
-  --art-fish-body: #2fb0bc;
-  --art-fish-shadow: #1f86a0;
-  --art-fish-fin: #e8923c;
-  --art-fish-outline: #124a5c;
-  --art-fish-glint: #ffd498;
+  /* ---- Art colours (plants, rock, sand) ----
+   * Each art ramp exists twice: a sunlit set and a moonlit set. Both moods share the *shapes*
+   * and differ in every colour, which is what makes the turn of the day read as a different
+   * place rather than as a lamp being switched on somewhere off screen.
+   * Ramps are comma-separated token lists read as one value, so a palette is edited once.
+   */
+  --day-art-plant-scale: #1d5626, #2f8a38, #6fbf4a, #a8e06a;
+  --day-art-stem-scale: #245a2c, #388a3a, #5ab048;
+  --day-art-moss-scale: #10301a, #1b4f26, #2c7a30, #48a03a, #80c850;
+  --day-art-rock-mid: #4a4a44;
+  --day-art-rock-light: #8a8578;
+  --day-art-rock-dark: #2a2a26;
+  --day-art-sand-light: #e3d3b2;
+  --day-art-sand-mid: #c0ab86;
+  --day-art-sand-dark: #8f7d61;
+  --day-art-sand-shadow: #4e4738;
+  --day-art-pebble-scale: #3a5a7a, #6a5a4a, #7a7a80, #9a6a3a, #4a4a5a, #5a7a8a;
+
+  /* Moonlight: everything cools and darkens, and the plants go from leaf green to kelp teal.
+     The sand keeps a little warmth under the lamp so the bed does not read as concrete. */
+  --night-art-plant-scale: #0d2b2e, #17504a, #2a7f6b, #4fae93;
+  --night-art-stem-scale: #102f33, #1a4f4c, #2c7d6f;
+  --night-art-moss-scale: #08181c, #0e2b2e, #154a44, #22705f, #38977d;
+  --night-art-rock-mid: #24292e;
+  --night-art-rock-light: #47525a;
+  --night-art-rock-dark: #14181c;
+  --night-art-sand-light: #6f7a76;
+  --night-art-sand-mid: #545f5e;
+  --night-art-sand-dark: #3a4346;
+  --night-art-sand-shadow: #212a2f;
+  --night-art-pebble-scale: #23323f, #3a3630, #41474d, #52443a, #2a2b33, #31454c;
 
   /* ---- Active mood (driven by the day/night cycle) ---- */
   --water-top: var(--night-water-top);
@@ -137,6 +152,7 @@
   --dialog-width: 30rem;
 
   /* ---- Layers ---- */
+  --z-grade: 1;
   --z-water: -1;
   --z-hud: 2;
   --z-skip: 3;
@@ -144,8 +160,92 @@
   --z-loading-content: 1;
 }
 
-/* Day/night: only the mood tokens swap; every consumer reads them unchanged. */
-:root[data-mood='day'] {
+/* Day/night: the whole environment swaps, art included; every consumer reads the same names. */
+:root,
+:root[data-mood='day'],
+:root[data-mood-base='day'][data-mood='dusk'],
+:root[data-mood-base='night'][data-mood='dawn'] {
+  --art-plant-scale: var(--day-art-plant-scale);
+  --art-stem-scale: var(--day-art-stem-scale);
+  --art-moss-scale: var(--day-art-moss-scale);
+  --art-rock-mid: var(--day-art-rock-mid);
+  --art-rock-light: var(--day-art-rock-light);
+  --art-rock-dark: var(--day-art-rock-dark);
+  --art-sand-light: var(--day-art-sand-light);
+  --art-sand-mid: var(--day-art-sand-mid);
+  --art-sand-dark: var(--day-art-sand-dark);
+  --art-sand-shadow: var(--day-art-sand-shadow);
+  --art-pebble-scale: var(--day-art-pebble-scale);
+}
+
+:root[data-mood='night'],
+:root[data-mood-base='day'][data-mood='dawn'],
+:root[data-mood-base='night'][data-mood='dusk'] {
+  --art-plant-scale: var(--night-art-plant-scale);
+  --art-stem-scale: var(--night-art-stem-scale);
+  --art-moss-scale: var(--night-art-moss-scale);
+  --art-rock-mid: var(--night-art-rock-mid);
+  --art-rock-light: var(--night-art-rock-light);
+  --art-rock-dark: var(--night-art-rock-dark);
+  --art-sand-light: var(--night-art-sand-light);
+  --art-sand-mid: var(--night-art-sand-mid);
+  --art-sand-dark: var(--night-art-sand-dark);
+  --art-sand-shadow: var(--night-art-sand-shadow);
+  --art-pebble-scale: var(--night-art-pebble-scale);
+}
+
+/* ---- Full environment grade ----
+ * Water colour alone is not a different time of day. Each mood also washes the entire scene with
+ * its own light — a warm sun grade by day, a cold blue one at night — plus a different vignette
+ * and visibility. `mix-blend-mode` does the work in one pass over the composed tank, so the sand,
+ * plants, particles and fish all sit in the same light instead of each being tinted separately.
+ */
+:root {
+  --env-grade-day: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--day-ray) 30%, transparent) 0%,
+    color-mix(in srgb, var(--day-water-glow) 14%, transparent) 46%,
+    color-mix(in srgb, var(--day-water-deep) 26%, transparent) 100%
+  );
+  --env-grade-night: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--night-surface) 16%, transparent) 0%,
+    color-mix(in srgb, var(--night-water-mid) 40%, transparent) 52%,
+    color-mix(in srgb, var(--night-water-deep) 72%, transparent) 100%
+  );
+  --env-grade: var(--env-grade-day);
+  --env-grade-opacity: 0.5;
+  --env-vignette: radial-gradient(
+    ellipse 86% 78% at 50% 42%,
+    transparent 34%,
+    color-mix(in srgb, var(--night-water-deep) 34%, transparent) 74%,
+    color-mix(in srgb, var(--night-water-deep) 62%, transparent) 100%
+  );
+  --env-vignette-opacity: var(--vignette);
+  --env-dust-opacity: 0.5;
+}
+
+:root[data-mood='night'],
+:root[data-mood-base='day'][data-mood='dawn'],
+:root[data-mood-base='night'][data-mood='dusk'] {
+  --env-grade: var(--env-grade-night);
+  --env-grade-opacity: 0.62;
+  /* Night keeps less of the frame legible at the edges, which is what makes it feel deep. */
+  --env-dust-opacity: 0.85;
+}
+
+/* The fish keep their own colours in both moods: they are the player's work, not scenery. */
+:root {
+  --art-fish-body: #2fb0bc;
+  --art-fish-shadow: #1f86a0;
+  --art-fish-fin: #e8923c;
+  --art-fish-outline: #124a5c;
+  --art-fish-glint: #ffd498;
+}
+
+:root[data-mood='day'],
+:root[data-mood-base='day'][data-mood='dusk'],
+:root[data-mood-base='night'][data-mood='dawn'] {
   --water-top: var(--day-water-top);
   --water-mid: var(--day-water-mid);
   --water-deep: var(--day-water-deep);
@@ -165,20 +265,12 @@
     --motion-base: 1ms;
     --motion-slow: 1ms;
   }
-  :root[data-mood='day'],
-  :root[data-mood='dusk'],
-  :root[data-mood='dawn'] {
-    --water-top: var(--night-water-top);
-    --water-mid: var(--night-water-mid);
-    --water-deep: var(--night-water-deep);
-    --light-colour: var(--night-light);
-    --ray-colour: var(--night-ray);
-    --surface-colour: var(--night-surface);
-    --water-glow: var(--night-water-glow);
-    --ray-strength: 0.18;
-    --caustic-strength: 0.55;
-    --vignette: 0.42;
-  }
+  /*
+   * The colours are *not* overridden here. `resolveMood` already freezes the automatic cycle at
+   * night under reduced motion, so the frozen palette arrives through `data-mood='night'` like any
+   * other night. Pinning those tokens to night here as well would ignore a player who presses the
+   * moon and asks for day: the attribute would say day and the tank would stay dark.
+   */
 }
 
 /* ---- CSS-only ambience under the canvas (no extra render pass) ---- */
@@ -234,7 +326,29 @@
   --draw-gauge-track: color-mix(in srgb, var(--text-primary) 18%, transparent);
   --draw-gauge-fill: var(--color-accent);
   /* The paper never grows past this, so it stays inside a phone viewport with the tools visible. */
-  --draw-board-max-height: min(58vh, 30rem);
+  --draw-board-max-height: min(56vh, 28rem);
   /* A one-line status keeps its height when empty, so the footer never jumps. */
-  --draw-notice-height: 1em;
+  --draw-notice-height: 1.25rem;
+
+  /* ---- Drawing panel: one measured layout, not a pile of rows ---- */
+  --draw-paper-inset: var(--space-2xs);
+  --draw-paper-radius: calc(var(--draw-board-radius) - var(--draw-paper-inset));
+  --draw-cluster-gap: var(--space-2xs);
+  --draw-cluster-padding: var(--space-xs) var(--space-sm);
+  --draw-cluster-radius: var(--radius-pill);
+  --draw-cluster-surface: color-mix(in srgb, var(--text-primary) 7%, transparent);
+  --draw-cluster-title-size: var(--size-tiny);
+  --draw-figure-min-width: 4.75rem;
+  --draw-figure-value-size: var(--size-display);
+  --draw-figure-ink-size: var(--size-body);
+  --draw-figure-label-size: var(--size-tiny);
+  --draw-figure-cost: var(--text-primary);
+  --draw-figure-ink: var(--action-primary);
+  --draw-action-gap: var(--space-xs);
+  --draw-footer-gap: var(--space-sm);
+  --draw-sheet-shadow-inset: var(--draw-sheet-edge), var(--draw-sheet-shade);
+  /* A hairline this faint only separates white paper from a raised surface; it draws no frame. */
+  --draw-sheet-edge: inset 0 0 0 var(--line-hair) #00000014;
+  --draw-sheet-shade: inset 0 2px 10px #0000000f;
+  --draw-swatch-edge: inset 0 0 0 var(--line-hair) #00000038;
 }

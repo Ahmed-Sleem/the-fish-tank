@@ -45,13 +45,45 @@ export type Quality = keyof typeof sceneConfig.presets;
 export interface ScenePreferences {
   quality: Quality;
   reducedMotion: boolean;
+  /**
+   * `auto` follows the 45/15/45/15 cycle. `day` and `night` pin the tank for as long as the
+   * player wants to look at it — the cycle is lovely scenery, but nobody should have to wait
+   * ninety seconds for the light they prefer.
+   */
+  mood: MoodPreference;
 }
+
+export type MoodPreference = 'auto' | 'day' | 'night';
 
 export type Mood = 'day' | 'dusk' | 'night' | 'dawn';
 
 /** Single definition of the cycle maths: the renderer and the theme attribute both use it,
  * so the water and the CSS tokens can never disagree about what time it is.
  */
+/**
+ * The mood the tank should show, honouring an explicit pin.
+ *
+ * A pinned mood reports full daylight or full night rather than a fade, because the player asked
+ * for a look, not for a moment on a curve. Reduced motion keeps its own contract: the tank holds
+ * still at night unless the player has pinned day.
+ */
+export function resolveMood(
+  elapsedSeconds: number,
+  preference: MoodPreference,
+  reducedMotion: boolean,
+): { mood: Mood; daylight: number } {
+  if (preference === 'day') return { mood: 'day', daylight: 1 };
+  if (preference === 'night') return { mood: 'night', daylight: 0 };
+  if (reducedMotion) return { mood: 'night', daylight: 0 };
+  return moodAt(elapsedSeconds);
+}
+
+/** Whether the fade is heading toward night (dusk) or back toward day (dawn). */
+export function isFadingToNight(mood: Mood): boolean {
+  // Dusk is day heading into night, so it colours from the day palette; dawn colours from night.
+  return mood === 'dusk';
+}
+
 export function moodAt(elapsedSeconds: number): { mood: Mood; daylight: number } {
   const { daySeconds, fadeSeconds, nightSeconds } = sceneConfig.cycle;
   const total = daySeconds + fadeSeconds + nightSeconds + fadeSeconds;

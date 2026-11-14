@@ -36,21 +36,84 @@ export interface BackdropOptions {
   height: number;
   palette: PixelPalette;
   seed?: number;
+  /**
+   * Paint into these canvases instead of creating new ones.
+   *
+   * The sprites are built from these canvases once, so repainting in place is what lets the
+   * scenery change colour with the day without rebuilding the scene graph.
+   */
+  into?: { bed: HTMLCanvasElement; far: HTMLCanvasElement; plants: HTMLCanvasElement };
 }
 
-export function createBackdropCanvas({
+/**
+ * A place a plant grows from, in art-grid pixels.
+ *
+ * The anchor matters more than it looks: a frond that sways about its middle visibly detaches
+ * from the sand. Everything that moves is rooted here, and the bend is applied as a rotation about
+ * this point with the strength growing toward the tip.
+ */
+export interface PlantAnchor {
+  readonly x: number;
+  readonly y: number;
+  /** Tip height above the root in grid pixels; height drives how far the tip travels. */
+  readonly height: number;
+  /** Stiffness 0..1: a tall frond moves more than a squat clump. */
+  readonly give: number;
+}
+
+export interface BackdropLayers {
+  /** Sand, pebbles and the buried mass: never moves. */
+  readonly bed: HTMLCanvasElement;
+  /** Rocks and moss: drifts a fraction of a pixel with the current. */
+  readonly far: HTMLCanvasElement;
+  /** Fronds and stems: the part that actually sways. */
+  readonly plants: HTMLCanvasElement;
+  readonly anchors: { readonly far: PlantAnchor[]; readonly plants: PlantAnchor[] };
+}
+
+/** Where a set of authored props meets the sand, for the sway pass to rotate about. */
+function anchorsFor(
+  props: readonly (readonly number[])[],
+  width: number,
+  height: number,
+  floor: (x: number) => number,
+  give: number,
+): PlantAnchor[] {
+  return props.map((prop) => {
+    const x = Math.round(width * (prop[0] ?? 0));
+    // The authored `y` is the crown; the root is the sand line, and that is what must not move.
+    const heightPx = Math.max(6, Math.min(height, floor(x) - height * (prop[1] ?? 0.8)));
+    return { x, y: Math.round(floor(x)), height: Math.round(heightPx), give };
+  });
+}
+
+export function createBackdropLayers({
   width,
   height,
   palette,
-}: BackdropOptions): HTMLCanvasElement {
+  into,
+}: BackdropOptions): BackdropLayers {
   const seed = pixelConfig.seed;
   /** Per-call noise, offset by the configured seed so the tank is reproducible but not plain. */
   const noise = (x: number, y: number, salt = 0) => hash(x, y, salt + seed);
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('2D context unavailable for the pixel backdrop');
+  type Surface = { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D };
+  const surface = (existing?: HTMLCanvasElement): Surface => {
+    const canvas = existing ?? document.createElement('canvas');
+    if (canvas.width !== width) canvas.width = width;
+    if (canvas.height !== height) canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('2D context unavailable for the pixel backdrop');
+    // A repaint starts from nothing: the previous mood's pixels must not show through.
+    context.clearRect(0, 0, width, height);
+    return { canvas, ctx: context };
+  };
+  // Created up front rather than looked up by name, so a layer can never be "not made yet".
+  const bed = surface(into?.bed);
+  const far = surface(into?.far);
+  const foliage = surface(into?.plants);
+  const anchors: { far: PlantAnchor[]; plants: PlantAnchor[] } = { far: [], plants: [] };
+  // `ctx` is the active painting surface: the art helpers below all write through it.
+  let ctx = bed.ctx;
   const put = (x: number, y: number, colour: string, w = 1, h = 1) => {
     ctx.fillStyle = colour;
     ctx.fillRect(Math.round(x), Math.round(y), w, h);
@@ -58,6 +121,8 @@ export function createBackdropCanvas({
 
   const groundY = (x: number) =>
     height * (pixelConfig.groundBase + Math.sin(x / 38) * 0.016 + Math.sin(x / 11) * 0.004);
+  /** The sand line: the root every anchored prop is measured from. */
+  const floor = (x: number) => groundY(x);
 
   // --- Sand bed -------------------------------------------------------------
   // Lit crown, a soft lit slope, then the buried mass darkens with depth. The reference's bed
@@ -207,24 +272,7 @@ export function createBackdropCanvas({
     }
   };
 
-  // --- Compose -------------------------------------------------------------
-  for (const [cx, cy, rx, ry, s] of pixelConfig.rocks)
-    rock(Math.round(width * cx), Math.round(height * cy), rx, ry, s);
-  for (const [cx, cy, rx, ry, s] of pixelConfig.clumps)
-    clump(Math.round(width * cx), Math.round(height * cy), rx, ry, s);
-
-  const floor = (x: number) => groundY(x);
-
-  for (const [x, count, spread, length, widthAt] of pixelConfig.fans) {
-    const bx = Math.round(width * x);
-    fan(bx, Math.round(floor(bx)) - 1, count, spread, length, widthAt, x * 10, spread * 0.35);
-  }
-  for (const [x, heightPx, phase] of pixelConfig.stems) {
-    const bx = Math.round(width * x);
-    stem(bx, Math.round(floor(bx)) - 1, heightPx, phase);
-  }
-
-  // --- Pebbles -------------------------------------------------------------
+  // --- Pebbles (bed layer: they belong to the sand, not to the foliage) ----
   for (let i = 0; i < pixelConfig.pebbles; i++) {
     const x = Math.floor(8 + hash(i, 1) * (width - 16));
     const y = Math.floor(floor(x) + 3 + hash(i, 2) * 16);
@@ -235,7 +283,30 @@ export function createBackdropCanvas({
     put(x, y + 1, palette.sandShadow, w, 1);
   }
 
-  return canvas;
+  // --- Far layer: rocks and low moss, which move only a hair --------------
+  ctx = far.ctx;
+  for (const [cx, cy, rx, ry, s] of pixelConfig.rocks)
+    rock(Math.round(width * cx), Math.round(height * cy), rx, ry, s);
+  for (const [cx, cy, rx, ry, s] of pixelConfig.clumps)
+    clump(Math.round(width * cx), Math.round(height * cy), rx, ry, s);
+  anchors.far = anchorsFor(pixelConfig.clumps, width, height, floor, 0.25);
+
+  // --- Plant layer: fronds and stems, which carry the real motion --------
+  ctx = foliage.ctx;
+  for (const [x, count, spread, length, widthAt] of pixelConfig.fans) {
+    const bx = Math.round(width * x);
+    fan(bx, Math.round(floor(bx)) - 1, count, spread, length, widthAt, x * 10, spread * 0.35);
+  }
+  for (const [x, heightPx, phase] of pixelConfig.stems) {
+    const bx = Math.round(width * x);
+    stem(bx, Math.round(floor(bx)) - 1, heightPx, phase);
+  }
+  anchors.plants = [
+    ...anchorsFor(pixelConfig.fans, width, height, floor, 1),
+    ...anchorsFor(pixelConfig.stems, width, height, floor, 0.8),
+  ];
+
+  return { bed: bed.canvas, far: far.canvas, plants: foliage.canvas, anchors };
 }
 
 /** Reads the art palette from the live theme tokens, so there is one source of colour. */

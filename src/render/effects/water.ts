@@ -14,8 +14,8 @@ import {
 } from 'pixi.js';
 import type { Application, Container, WebGLRenderer } from 'pixi.js';
 import { effectsConfig as cfg } from '../../config/effects.config';
-import type { Quality, ScenePreferences } from '../../config/scene.config';
-import { moodAt } from '../../config/scene.config';
+import type { Mood, MoodPreference, Quality, ScenePreferences } from '../../config/scene.config';
+import { isFadingToNight, resolveMood } from '../../config/scene.config';
 import type { Impulse } from '../../sim/water/input';
 import { waveFragment, tankFragment, refractFragment } from './shaders';
 
@@ -132,7 +132,10 @@ export function createWaterEffects(
   clear();
 
   let reducedMotion = false;
+  let moodPreference: MoodPreference = 'auto';
   let lastMood = '';
+  /** Last grade opacity written to the host, so the style write happens only on a change. */
+  let lastGradeOpacity = -1;
   /**
    * Wall-clock origin for the cycle.
    *
@@ -150,9 +153,12 @@ export function createWaterEffects(
    * CSS palette permanently unset. This also runs for the *first* mood: the old code only reacted
    * to a change, so the opening day state was never applied at all.
    */
-  const publishMood = (mood: string) => {
+  const publishMood = (mood: Mood) => {
     host.dataset.mood = mood;
     document.documentElement.dataset.mood = mood;
+    // A fade has no block of its own: it borrows the side it is travelling toward, so the whole
+    // environment — grade, art, water — is mid-transition rather than momentarily unpainted.
+    document.documentElement.dataset.moodBase = isFadingToNight(mood) ? 'day' : 'night';
   };
 
   /** Re-read the live tokens and push them to the shader. Called on mood change and reconfigure. */
@@ -176,7 +182,11 @@ export function createWaterEffects(
       if (disposed) return;
       time += seconds;
       if (!reducedMotion) {
-        const { mood, daylight } = moodAt(Date.now() / 1000 - cycleOrigin);
+        const { mood, daylight } = resolveMood(
+          Date.now() / 1000 - cycleOrigin,
+          moodPreference,
+          reducedMotion,
+        );
         if (mood !== lastMood) {
           lastMood = mood;
           publishMood(mood);
@@ -187,6 +197,21 @@ export function createWaterEffects(
           });
         }
         visualUniforms.uniforms.uStyle[3] = daylight;
+        /*
+         * The CSS grade cannot interpolate between two gradients, so it would snap at the exact
+         * moment the mood attribute flips. Driving its opacity from the same `daylight` value the
+         * water shader uses keeps the dissolve continuous: the grade thins as the light goes, and
+         * the full night wash only arrives when night does.
+         *
+         * Quantised and written only on a change. A style write on the canvas host invalidates
+         * style for the whole subtree, and doing that every frame is a real cost on a software
+         * renderer — it showed up as timeouts on CI, where the tank is actually rendered.
+         */
+        const grade = Math.round((0.4 + daylight * 0.32) * 20) / 20;
+        if (grade !== lastGradeOpacity) {
+          lastGradeOpacity = grade;
+          host.style.setProperty('--env-grade-live-opacity', String(grade));
+        }
       }
       waveUniforms.uniforms.uImpulse = [
         impulse?.x ?? 0,
@@ -204,6 +229,7 @@ export function createWaterEffects(
     configure(settings: ScenePreferences) {
       quality = settings.quality;
       reducedMotion = settings.reducedMotion;
+      moodPreference = settings.mood;
       const preset = cfg.presets[quality];
       visual.resolution = preset.resolution;
       refract.resolution = preset.resolution;
@@ -229,15 +255,17 @@ export function createWaterEffects(
         settings.reducedMotion ? 0 : cfg.displacement,
       ];
       refractUniforms.uniforms.uStrength = settings.reducedMotion ? 0 : cfg.displacement * 40;
-      if (settings.reducedMotion) {
-        clear();
-        // Reduced motion holds the calm night palette rather than freezing mid-fade.
-        publishMood('night');
-        lastMood = '';
-      } else {
-        lastMood = '';
-        applyTokens();
-      }
+      // Resolve the mood immediately on every reconfigure. Waiting for the next simulation step
+      // makes a tapped toggle feel broken, and holding the previous palette through a fade makes
+      // a pinned choice look like it did not take.
+      lastMood = '';
+      const resolved = resolveMood(Date.now() / 1000 - cycleOrigin, moodPreference, reducedMotion);
+      publishMood(resolved.mood);
+      if (settings.reducedMotion) clear();
+      // The token swap is a style recalculation, so read the palette back after it has landed.
+      requestAnimationFrame(() => {
+        if (!disposed) applyTokens();
+      });
       host.dataset.rippleGrid = String(size);
     },
     resize(width: number, height: number) {

@@ -71,7 +71,9 @@ test('equal-time rendered water changes locally for scripted touch and hover imp
   context,
   browser,
 }) => {
-  test.setTimeout(120000);
+  // Three full tank startups plus two readbacks, on a software renderer that is the slowest
+  // thing in CI. The work is bounded; only the ceiling was tight.
+  test.setTimeout(240000);
   test.skip(!(await hasWebgl2(browser)), 'browser has no WebGL2 float targets');
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));

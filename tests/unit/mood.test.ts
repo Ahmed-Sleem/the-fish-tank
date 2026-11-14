@@ -8,7 +8,7 @@
  * follows real time, because a broken clock is invisible until someone waits long enough.
  */
 import { describe, expect, it } from 'vitest';
-import { moodAt, sceneConfig } from '../../src/config/scene.config';
+import { isFadingToNight, moodAt, resolveMood, sceneConfig } from '../../src/config/scene.config';
 
 const { daySeconds, fadeSeconds, nightSeconds } = sceneConfig.cycle;
 const total = daySeconds + fadeSeconds + nightSeconds + fadeSeconds;
@@ -51,4 +51,50 @@ describe('moodAt', () => {
     expect(moodAt(-1).mood).toBe('dawn');
     expect(Number.isFinite(moodAt(Number.MAX_SAFE_INTEGER).daylight)).toBe(true);
   });
+});
+
+describe('resolveMood: the player can choose the light', () => {
+  it('follows the cycle when nothing is pinned', () => {
+    // Ten seconds in is squarely day; thirty seconds later it is not.
+    expect(resolveMood(10, 'auto', false)).toEqual(moodAt(10));
+    expect(resolveMood(75, 'auto', false)).toEqual(moodAt(75));
+  });
+
+  it('pins day at full daylight even in the middle of the night', () => {
+    const night = daySeconds + fadeSeconds + 5;
+    expect(moodAt(night).mood).toBe('night');
+    expect(resolveMood(night, 'day', false)).toEqual({ mood: 'day', daylight: 1 });
+  });
+
+  it('pins night even in the middle of the day', () => {
+    expect(resolveMood(5, 'night', false)).toEqual({ mood: 'night', daylight: 0 });
+  });
+
+  it('keeps a pin indefinitely, because the player asked for a look not a moment', () => {
+    // Ten full cycles later the choice must still hold.
+    const far = total * 10 + 7;
+    expect(resolveMood(far, 'day', false).mood).toBe('day');
+    expect(resolveMood(far, 'night', false).mood).toBe('night');
+  });
+
+  it('still freezes at night under reduced motion when nothing is pinned', () => {
+    expect(resolveMood(10, 'auto', true)).toEqual({ mood: 'night', daylight: 0 });
+  });
+
+  it('lets an explicit pin override reduced motion, since the player asked for day', () => {
+    expect(resolveMood(10, 'day', true)).toEqual({ mood: 'day', daylight: 1 });
+  });
+});
+
+it('a fade borrows the side it is travelling toward', () => {
+  /*
+   * Dusk and dawn are transitions with no block of their own. Without this mapping the stylesheet
+   * has no palette during a fade and the tank would flash through an unpainted state twice a
+   * cycle — the most visible moment to get wrong, since it is exactly when the light changes.
+   */
+  expect(isFadingToNight('dusk')).toBe(true);
+  expect(isFadingToNight('dawn')).toBe(false);
+  // Settled moods are not fades at all.
+  expect(isFadingToNight('day')).toBe(false);
+  expect(isFadingToNight('night')).toBe(false);
 });
