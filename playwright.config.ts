@@ -5,19 +5,23 @@ export default defineConfig({
   testDir: './tests/e2e',
   expect: { timeout: 10000 },
   /*
-   * One spec file at a time, in one worker.
+   * Two projects, two workers, one test at a time each.
    *
-   * Every spec here boots a real WebGL tank, and CI renders it in software. Running the desktop
-   * and mobile projects in parallel put four tanks on a two-core runner at once, which starved
-   * pages badly enough to blow 30s ceilings on tests whose assertions were fine. The suite takes
-   * longer this way and tells the truth; the alternative was a flaky pipeline that had to be
-   * re-run until the machine happened to keep up.
+   * Every spec boots a real WebGL tank and CI renders it in software, so *height* of concurrency
+   * is what starved the pages: four tanks at once on a two-core runner blew ceilings on tests
+   * whose assertions were fine. One worker per project keeps at most two tanks alive and still
+   * uses both cores.
+   *
+   * `fullyParallel: false` matters more than the worker count: it runs each file's tests in
+   * sequence inside its project, so the two heavy specs stop competing with their own siblings.
+   * Serialising the entire suite — one worker for both projects — fixed the flakiness but pushed
+   * the job past its 15-minute ceiling, which is a different way of being unusable.
    */
   fullyParallel: false,
-  ...(process.env.CI ? { workers: 1 } : {}),
+  ...(process.env.CI ? { workers: 2 } : {}),
   forbidOnly: Boolean(process.env.CI),
-  // No retries: a test that needs a second attempt is telling us something. Serialising the
-  // suite is the fix; masking a failure is not.
+  // No retries: a test that needs a second attempt is telling us something. Keeping concurrency
+  // low is the fix; masking a failure is not.
   retries: 0,
   reporter: process.env.CI ? [['list'], ['./tests/e2e/support/ci-reporter.ts']] : 'list',
   use: {
