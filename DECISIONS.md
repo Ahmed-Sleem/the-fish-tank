@@ -132,3 +132,44 @@ So the answer to "where": **inside the tank's existing lighting and refraction, 
 3. **The far background parallax**, which is DEC-024 and needs the static art split into layers first.
 
 A second canvas repeating the loader shader over the tank is explicitly rejected: it doubles the water simulation, contradicts the single-source rule that already governs `moodAt`, and would show two fluids that disagree whenever the pointer moves. The loader and the tank must sample one field.
+
+## DEC-026 — The drawing is pixel-grain, at the tank's own grain (2026-11-11)
+
+The owner: _"the draw must be pixel draw the same grain size as the rest of the gui."_
+
+The drawing sheet was a smooth vector canvas — `ctx.stroke()` with round caps and joins at device resolution — sitting next to a tank drawn on a `344x192` reference grid with nearest-neighbour sampling. Two different rendering languages in one picture.
+
+The grain is **measured from the tank**, not configured. One art pixel is `tankWidth / 344` CSS pixels, read at draw time, so the sheet and the scenery share a grain at every window size and cannot drift apart on resize. A hardcoded grain would have been wrong the first time the window changed.
+
+Strokes are walked in **art-pixel space** and each step stamps a block-aligned square. That is what keeps a fast diagonal solid — stamping only at the sampled points leaves the line full of holes — and it is why pen widths are rounded **up** to whole blocks: a pen narrower than the grain would render as nothing, and the three pens would silently collapse into one width. Stroke coordinates themselves stay in CSS pixels, because the ink price is computed from them; rescaling the input would quietly change what a stroke costs, which DEC-023 forbids.
+
+Consequence for later work: anything that draws into this sheet (fish previews, thumbnails of saved tanks) inherits the same grain or it will look pasted on.
+
+## DEC-027 — Day and night are two places, not two brightnesses (2026-11-11)
+
+The owner: _"the diff between day and night must be great like the complete color overlay and them and so on the complete env not only small light."_
+
+The tank had one palette and changed how much of it you saw. Night was the same sand, the same plants and the same rock with less light on them — the scenery is **baked into canvases**, so no stylesheet could ever reach it. That is the structural reason the change felt small, and it had to be fixed in the renderer, not in the theme.
+
+Three things now change together:
+
+1. **The scenery is repainted** in the mood's own colours on every mood change, in place, into the canvases the sprites already use.
+2. **A full-scene grade** washes the composed tank — sand, plants, particles and water in one pass — with a different paint and a different opacity per mood.
+3. **The air itself differs**: the vignette closes in and the suspended dust thickens at night.
+
+The grade's opacity is driven by the same `daylight` value the water shader uses, so the dissolve through dusk and dawn is continuous rather than snapping when the attribute flips. The two fade moods have no palette block of their own, so each **borrows the side it is travelling toward** (`data-mood-base`); without that the tank went unpainted for 15 seconds twice per cycle.
+
+Two constraints that shaped the implementation, both learned from a failed deploy rather than from the sandbox:
+
+- **No `mix-blend-mode` on the grade.** A full-screen compositing layer above the tank is cheap when the tank draws nothing and expensive when it does. It timed out CI, where the tank is really rendered, and passed locally where it is blank. The grade is a plain overlay.
+- **No style writes per frame.** The same failure: writing a CSS variable on the canvas host every frame invalidates style for the whole subtree. The value is quantised and written only on a change.
+
+Corollary, recorded because it was a real bug: under reduced motion the stylesheet used to pin night colours for _every_ mood, which meant pressing the moon to ask for day changed the attribute and nothing else. `resolveMood` already freezes the cycle at night; the CSS override only managed to overrule the player. Frozen is a state, not a palette.
+
+## DEC-028 — The e2e suite runs one tank at a time on CI (2026-11-11)
+
+Merging DEC-026/027 failed its own deploy: Verify passed, then the same suite ran again for Pages and two specs exceeded 30 seconds — a WebGL context setup and a pixel readback, neither an assertion.
+
+The cause is contention. Every spec boots a real WebGL tank and CI renders it in software; `fullyParallel` across two projects put four tanks on a two-core runner and starved the pages. The suite now runs one file at a time (one worker on CI), which costs a few minutes and stops the pipeline needing a re-run.
+
+Explicit ceilings were raised on the three genuinely heavy specs — three tank startups in the impulse loop, a long settings/reconfigure chain, and a full-board pixel readback — without touching their assertions. **Retries stay at zero:** a test that needs a second attempt is reporting a problem, and serialising is the fix.
