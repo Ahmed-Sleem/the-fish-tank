@@ -27,6 +27,21 @@ test('scene quality, motion, resize and context-loss lifecycle', async ({ page }
   await expect(page.getByLabel(strings.reducedMotion, { exact: true })).toBeChecked();
   await expect(page.getByLabel(strings.reducedMotion, { exact: true })).toBeDisabled();
   await page.emulateMedia({ reducedMotion: 'no-preference' });
+  /*
+   * `emulateMedia` fires its `change` event asynchronously, so for a moment after this call the
+   * control is legitimately still disabled and still checked. Poll until the page has actually
+   * caught up before asserting, rather than racing a single sample against an event.
+   */
+  await expect
+    .poll(async () => page.getByLabel(strings.reducedMotion, { exact: true }).isEnabled(), {
+      timeout: 15000,
+    })
+    .toBe(true);
+  await expect
+    .poll(async () => page.getByLabel(strings.reducedMotion, { exact: true }).isChecked(), {
+      timeout: 15000,
+    })
+    .toBe(false);
   await expect(page.getByLabel(strings.reducedMotion, { exact: true })).toBeEnabled();
   await expect(page.getByLabel(strings.reducedMotion, { exact: true })).not.toBeChecked();
   await page.getByLabel(strings.reducedMotion, { exact: true }).check();
