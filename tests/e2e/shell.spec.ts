@@ -2,6 +2,7 @@
 import { expect, test } from '@playwright/test';
 import { waitForTank } from './support/ready';
 import { strings } from '../../src/config/strings.en';
+import { gotoFreshTank } from './support/boot';
 
 test('the project subpath renders, reloads and never calls external services', async ({ page }) => {
   // This spec loads and then reloads the full WebGL page, so it does twice the work of its
@@ -20,7 +21,7 @@ test('the project subpath renders, reloads and never calls external services', a
   page.on('response', (response) => {
     if (response.status() >= 400) failures.push(`${String(response.status())} ${response.url()}`);
   });
-  await page.goto('./');
+  await gotoFreshTank(page);
   await waitForTank(page);
   // The title belongs to the splash, not the tank: the page keeps only an accessible heading.
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings.brand);
@@ -65,7 +66,7 @@ test('graphics failure leaves accessible status and working navigation', async (
   await page.addInitScript(() => {
     HTMLCanvasElement.prototype.getContext = () => null;
   });
-  await page.goto('./');
+  await gotoFreshTank(page);
   await waitForTank(page);
   await page.getByRole('button', { name: strings.openSettings }).click();
   const dialog = page.getByRole('dialog', { name: strings.settings });
@@ -81,7 +82,7 @@ test('graphics failure leaves accessible status and working navigation', async (
 test('lost graphics context is reported in the settings dialog, not as a silent tank', async ({
   page,
 }) => {
-  await page.goto('./');
+  await gotoFreshTank(page);
   await waitForTank(page);
   await page.locator('canvas').dispatchEvent('webglcontextlost');
   await page.getByRole('button', { name: strings.openSettings }).click();
@@ -93,7 +94,7 @@ test('lost graphics context is reported in the settings dialog, not as a silent 
 test('the tank is borderless: no frames, rules or chrome, only water and three icons', async ({
   page,
 }) => {
-  await page.goto('./');
+  await gotoFreshTank(page);
   await waitForTank(page);
   const offenders = await page.evaluate(() => {
     const bad: string[] = [];
