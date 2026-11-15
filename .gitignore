@@ -12,3 +12,9 @@ _working_docs/thinking/
 
 # Python documentation-regression test bytecode.
 __pycache__/
+
+# Local scratch scripts and dead-end probes live at the root and are never part of the product.
+# `format:check` is the first gate in `npm run verify`, so one stray file fails CI in under a
+# minute with an error that has nothing to do with the app; ignoring them keeps that gate honest.
+/*.mjs
+!/scripts/**/*.mjs

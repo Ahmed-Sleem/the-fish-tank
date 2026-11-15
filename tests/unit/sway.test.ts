@@ -57,6 +57,85 @@ describe('swayFor', () => {
     expect(identical).toBe(0);
   });
 
+  /**
+   * The owner's report: "everything should not move with the same phase with every other thing".
+   *
+   * A bed where each plant starts its phase a little later than its neighbour still *moves as one
+   * shape* — a travelling wave — and that is what the tank looked like. These assertions describe
+   * independence rather than merely difference: the plants must not share a period, must not
+   * share a configuration, and must not fall back into step over time.
+   */
+  describe('per-plant independence', () => {
+    // A full bed, laid out the way the backdrop lays one out: many plants across the width.
+    const bed = {
+      anchors: Array.from({ length: 17 }, (_, i) => plant(12 + i * 19, 60 + ((i * 37) % 40), 0.9)),
+      gain: 1,
+    };
+    const posesAt = (seconds: number) =>
+      swayFor(bed, seconds, still).bends.map((bend) => poseIndex(bend));
+
+    it('does not re-synchronise: neighbouring plants share a pose only occasionally', () => {
+      // A bed in lockstep would have neighbours agreeing nearly always. Scattered phases with a
+      // shared period still agree often, because they sit a fixed offset apart. Independent rates
+      // are what actually breaks it, so the bound here is deliberately tighter than "not always".
+      let shared = 0;
+      let pairs = 0;
+      for (let t = 0; t < 120; t += 0.25) {
+        const poses = posesAt(t);
+        for (let i = 1; i < poses.length; i++) {
+          pairs += 1;
+          if (poses[i] === poses[i - 1]) shared += 1;
+        }
+      }
+      expect(shared / pairs).toBeLessThan(0.2);
+    });
+
+    it('never settles into a repeating arrangement', () => {
+      // The real failure a shared period produces: the whole bed returns to a configuration it
+      // has held before, and the eye catches the loop. Over two minutes, every sampled
+      // *arrangement* of seventeen plants should be distinct.
+      const arrangements = new Set<string>();
+      for (let t = 0; t < 120; t += 0.5) arrangements.add(posesAt(t).join(','));
+      expect(arrangements.size).toBe(240);
+    });
+
+    it('drifts two plants apart rather than holding them together', () => {
+      // Two plants may agree for a moment; they must not stay agreed. A shared period would let
+      // them hold the same pose indefinitely whenever their phases lined up.
+      const pair = { anchors: [plant(60, 80, 1), plant(240, 80, 1)], gain: 1 };
+      let longestRun = 0;
+      let run = 0;
+      for (let t = 0; t < 240; t += 0.25) {
+        const [a, b] = swayFor(pair, t, still).bends.map((bend) => poseIndex(bend));
+        if (a === b) {
+          run += 0.25;
+          longestRun = Math.max(longestRun, run);
+        } else {
+          run = 0;
+        }
+      }
+      expect(longestRun).toBeLessThan(8);
+    });
+
+    it('gives every plant a distinct phase even when they are evenly spaced', () => {
+      // Evenly spaced plants with a linear phase mix produce evenly spaced phases: a wave
+      // travelling along the row. The seed is hashed, so adjacent plants are not adjacent phases.
+      const evenly = {
+        anchors: Array.from({ length: 12 }, (_, i) => plant(i * 25, 70, 1)),
+        gain: 1,
+      };
+      const offsets = Array.from({ length: 12 }, (_, i) => {
+        // The bed's bend at rest, one plant at a time, sampled at the same instant.
+        const only = { anchors: [evenly.anchors[i]].filter((a) => a !== undefined), gain: 1 };
+        return swayFor(only, 0.9, still).bends[0] ?? 0;
+      });
+      // No two neighbours may be at the same lean, and the sequence must not be monotonic — a
+      // monotonic run is the signature of a travelling wave.
+      const steps = offsets.slice(1).map((value, i) => value - (offsets[i] ?? 0));
+      expect(steps.some((step) => step > 0) && steps.some((step) => step < 0)).toBe(true);
+    });
+  });
+
   it('moves the near layer more than the far one, which is what makes depth read', () => {
     const near = swayFor(plants, 1.1, gust(2)).bends[0] ?? 0;
     const distant = swayFor(far, 1.1, gust(2)).bends[0] ?? 0;
@@ -75,8 +154,11 @@ describe('swayFor', () => {
     const leftOnly = (x: number) => ({ x: x < 0.5 ? 6 : 0, y: 0 });
     const stirred = swayFor(split, 2, leftOnly).bends;
     const calm = swayFor(split, 2, still).bends;
-    // The stirred plant leans further than it would have anyway...
-    expect(Math.abs(stirred[0] ?? 0)).toBeGreaterThan(Math.abs(calm[0] ?? 0));
+    // The left plant is pushed by the current, wherever its own tide happens to be. Compare the
+    // shift the current causes rather than the absolute lean: a plant leaning left on its own
+    // tide moves *toward* the centre when a rightward current arrives, so "further from zero"
+    // is not what a current does.
+    expect((stirred[0] ?? 0) - (calm[0] ?? 0)).toBeGreaterThan(0.05);
     // ...and the untouched one is exactly where it was. This is the difference between a current
     // that bends the fronds near it and a whole-bed shove.
     expect(stirred[1]).toBe(calm[1]);

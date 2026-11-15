@@ -64,12 +64,32 @@
   gap: var(--space-xs);
 }
 
+/*
+ * A closed `<dialog>` is hidden by the browser's own `display: none`. Setting `display: grid` on
+ * the element defeats that, and the card stays in the accessibility tree and in the layout even
+ * with no `open` attribute — which made every dialog appear permanently open to a screen reader
+ * and to a test that asks whether its controls are visible. Restore the closed state explicitly.
+ */
+.ui-dialog:not([open]) {
+  display: none;
+}
+
 .ui-dialog {
   margin: auto;
   padding: var(--space-lg);
   width: min(var(--dialog-width), calc(100% - var(--space-lg)));
   max-height: calc(100% - var(--space-lg));
-  overflow: auto;
+  /*
+   * A modal dialog does not scroll.
+   *
+   * `max-height` only clamps the box; the content keeps its intrinsic height and overflows the
+   * clip, which put the footer — and the button that commits — below the fold. It also stole the
+   * wheel from the drawing sheet, where a scroll gesture means "draw". A grid with one flexible
+   * row gives the body a real height to fit into, and `min-height: 0` lets its children give.
+   */
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
   border: 0;
   border-radius: var(--radius-lg);
   color: var(--text-primary);
@@ -90,6 +110,12 @@
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
   margin: 0 0 var(--space-md);
+}
+
+.ui-dialog-body {
+  /* The flexible row: this is the part that is allowed to be short. */
+  min-height: 0;
+  overflow: hidden;
 }
 
 .ui-dialog-body > * + * {

@@ -58,6 +58,14 @@ export const pixelConfig = {
   swayTide: 0.55,
   /** How far a unit of current pushes a plant, as a fraction of the maximum bend. */
   swayFlow: 1.1,
+  /**
+   * How much each plant's own period may differ from its neighbours, as a fraction.
+   *
+   * Small on purpose. This is not a variable wind: it is the tiny difference in period that stops
+   * seventeen plants from re-synchronising. At 0.12 a plant's period differs from the next by at
+   * most about a twelfth, which is invisible moment to moment and decisive over a minute.
+   */
+  swayRateSpread: 0.12,
   /** Largest flow contribution to a lean, so a violent stroke cannot uproot the scenery. */
   swayMaxPush: 1.2,
   /** Gain per layer, so depth is a difference in motion and not only in colour. */

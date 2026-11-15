@@ -231,3 +231,58 @@ test('ink is drawn in blocks the same size as the tank art, not as smooth lines'
   expect(Math.abs((sample.medianSquareRun ?? 0) - devicePerArtPixel)).toBeLessThanOrEqual(2.5);
   await expect(dialog.getByRole('button', { name: strings.drawDone })).toBeEnabled();
 });
+
+/**
+ * The panel must fit the window without scrolling, at every size it will meet.
+ *
+ * It is a sheet you draw on, so the browser's own scrolling is not merely untidy: a wheel or drag
+ * over the paper would scroll the dialog instead of drawing, and on a short window the buttons
+ * were pushed below the fold entirely. Both the dialog and the drawing panel are checked, because
+ * a child that overflows its frame is what caused it the first time.
+ */
+test('the drawing panel never scrolls, and always shows Done', async ({ page }) => {
+  /*
+   * Checked one size at a time, because the dialog is modal: while it is open nothing behind it can
+   * be clicked, and a blank sheet has no Done to dismiss it with. The viewport is restored
+   * afterwards, because the worker reuses this page and a later test that measures the sheet must
+   * not inherit this one's window.
+   */
+  const original = page.viewportSize();
+  try {
+    const dialog = await openDrawing(page);
+    for (const viewport of [
+      { width: 1280, height: 700 },
+      { width: 900, height: 560 },
+      { width: 420, height: 620 },
+    ]) {
+      await page.setViewportSize(viewport);
+      const overflow = await dialog.evaluate((node) => ({
+        scroll: node.scrollHeight,
+        client: node.clientHeight,
+      }));
+      // One pixel of tolerance for sub-pixel rounding; a real overflow is tens of pixels.
+      expect(
+        overflow.scroll,
+        `dialog overflows at ${String(viewport.width)}x${String(viewport.height)}`,
+      ).toBeLessThanOrEqual(overflow.client + 1);
+
+      // Done is the commitment; it must be on screen, not merely present in the DOM.
+      const box = await dialog.getByRole('button', { name: strings.drawDone }).boundingBox();
+      expect(box).not.toBeNull();
+      expect(box?.y ?? Infinity).toBeGreaterThan(0);
+      expect(
+        (box?.y ?? 0) + (box?.height ?? 0),
+        `Done is below the fold at ${String(viewport.width)}x${String(viewport.height)}`,
+      ).toBeLessThanOrEqual(viewport.height);
+
+      // The sheet keeps a drawing area big enough to aim at, even when the window is short.
+      const board = await dialog.locator('.draw-board').boundingBox();
+      expect(
+        board?.height ?? 0,
+        `sheet is unusably short at ${String(viewport.height)}`,
+      ).toBeGreaterThan(60);
+    }
+  } finally {
+    if (original) await page.setViewportSize(original);
+  }
+});

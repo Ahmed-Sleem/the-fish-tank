@@ -45,6 +45,8 @@ uniform sampler2D uState;
 uniform vec2 uTexel;
 uniform vec4 uLook;      // time, rayStrength, causticStrength, displacement
 uniform vec4 uStyle;     // causticScale, causticSpeed, vignette, daylight
+uniform vec4 uLightA;    // key, ambient, warmth, azimuth
+uniform vec4 uLightB;    // caustics, rays, surface, grade
 uniform vec3 uTop;
 uniform vec3 uDeep;
 uniform vec3 uRay;
@@ -74,39 +76,78 @@ void main(){
  float depth=smoothstep(0.0,1.0,refracted.y);
  vec3 tint=mix(uTop,uDeep,depth);
 
- // Caustics gather on the floor and the plants above it.
+ /*
+  * Light is graded, not multiplied by one dial.
+  *
+  * uLightA = key, ambient, warmth, azimuth. uLightB = caustics, rays, surface, grade.
+  * Each channel has its own curve (see config/lighting.ts), so the scene does not brighten and
+  * darken as a single sheet: the sun leaves first, the shadows fill in behind it, the light warms
+  * through dusk, and the picture gains weight instead of merely losing exposure.
+  */
+ float key=uLightA.x;
+ float ambient=uLightA.y;
+ float warmth=uLightA.z;
+ float azimuth=uLightA.w;
+
+ // Caustics gather on the floor and the plants above it, and are pure sunlight: they go early.
  float c=caustic(refracted*uStyle.x,uLook.x*uStyle.y);
  float floorMask=smoothstep(0.55,1.0,depth);
- float causticLight=min(c,0.6)*uLook.z*(0.03+floorMask*0.30);
+ float causticLight=min(c,0.6)*uLook.z*uLightB.x*(0.03+floorMask*0.30);
 
- // God rays fan from the light above the surface.
- vec2 rel=refracted-vec2(0.5,-0.05);
+ // God rays fan from wherever the light is coming from this hour, not from a fixed centre.
+ vec2 rel=refracted-vec2(azimuth,-0.05);
  float ang=atan(rel.x,rel.y*0.6);
  float len=length(rel);
  float rays=pow(noise(vec2(ang*13.,uLook.x*0.04))*0.72+noise(vec2(ang*29.+3.,-uLook.x*0.05))*0.28,2.4);
  float fan=smoothstep(0.72,0.02,abs(ang))*smoothstep(1.05,0.10,len);
- float rayLight=rays*fan*uLook.y*0.34;
+ float rayLight=rays*fan*uLook.y*uLightB.y*0.34;
 
- // Surface band, where light strikes the top of the water.
- float surfBand=smoothstep(0.13,0.0,refracted.y)*(0.16+uStyle.w*0.16);
+ // Surface band: the sky reflecting off the top of the water. The last light to leave.
+ float surfBand=smoothstep(0.13,0.0,refracted.y)*(0.10+uLightB.z*0.18);
 
- // Sun shaft: a soft column from the light source that widens as it sinks and warms the middle
- // of the water the way the window light does in the reference.
- float shaftX=abs(refracted.x-0.5+0.06*sin(refracted.y*3.0+uLook.x*0.05));
+ // Sun shaft: a soft column that widens as it sinks and warms the middle of the water. It travels
+ // with the azimuth, so the column leans across the tank as the day turns instead of standing
+ // permanently in the centre.
+ float lean=azimuth-0.5;
+ float shaftX=abs(refracted.x-0.5-lean+0.06*sin(refracted.y*3.0+uLook.x*0.05));
  float shaftTop=smoothstep(0.46,0.0,shaftX)*smoothstep(0.9,0.06,refracted.y);
  float shaft=smoothstep(0.62,0.0,shaftX)*smoothstep(0.85,0.02,refracted.y);
- float sunShaft=(shaftTop*0.55+shaft*0.45)*uStyle.w*0.30;
+ float sunShaft=(shaftTop*0.55+shaft*0.45)*key*0.30;
 
  // Ripple highlights so cursor interaction is visible.
  float rippleGlow=abs(h)*0.22+length(slope)*0.55;
 
  float amount=causticLight+rayLight+surfBand+sunShaft+rippleGlow;
- // Warm the column in daylight and keep the night glow cyan; the mix is the mood itself.
- vec3 glow=mix(uSurface,uRay,uStyle.w);
- vec3 lightColour=tint*uStyle.w*0.35+uRay*(1.0-uStyle.w*0.25)+glow*(rippleGlow+surfBand+sunShaft)*2.2;
+
+ /*
+  * Colour, composed the same way it always was, but lit by graded channels instead of one dial.
+  *
+  * The composition is deliberately left as lightColour times amount: that product is what makes the
+  * ripple answer the hand, because the same impulse raises both the colour term and the amount,
+  * and the two multiply. Restructuring it into a tone curve was pretty and cost the tank its
+  * responsiveness — so the shape stays, and the mood arrives through what feeds it.
+  *
+  * key replaces the old daylight in the tint coefficients, and it is the channel that leaves
+  * first. ambient adds back a floor so the night is deep rather than black: at midnight the tank
+  * is lit to about the key's worth of colour plus a share of fill, not to nothing.
+  *
+  * warmth — an arc through dusk, not a ramp toward night — mixes the ray colour toward the
+  * surface sky, which is what warms the sunset and cools the noon.
+  */
+ vec3 warmTint=mix(uSurface,uRay,0.35+warmth*0.55);
+ vec3 glow=mix(uSurface,warmTint,warmth);
+ vec3 lightColour=tint*(key*0.35+ambient*0.12)+warmTint*(key*0.72)+glow*(rippleGlow+surfBand+sunShaft)*2.2;
  lightColour=mix(lightColour,uSurface,0.22);
- finalColor=vec4(lightColour*amount,clamp(amount*1.6,0.0,1.0));
-}`;
+ /*
+  * One gentle shoulder, applied to the final colour only, and only where it can bite.
+  *
+  * A one-minus-exponential shoulder flattens above about 1 and is near-linear below it, so
+  * ordinary water keeps its full response while the brightest caustic cannot reach pure white.
+  * Mixing it halfway leaves the low end untouched.
+  */
+ vec3 lit=lightColour*amount;
+ vec3 rolled=1.0-exp(-lit*1.6);
+ finalColor=vec4(mix(lit,rolled,0.5),clamp(amount*1.6,0.0,1.0));}`;
 
 export const refractFragment = `
 in vec2 vTextureCoord;

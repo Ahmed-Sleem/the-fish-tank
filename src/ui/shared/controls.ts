@@ -68,28 +68,38 @@ export function sectionTitle(text: string) {
 }
 
 let dialogId = 0;
+/**
+ * A modal card with a title and a body.
+ *
+ * `closeLabel` is optional, and passing `null` omits the Close button. That is for dialogs whose
+ * own content already ends in a primary action that dismisses them — the drawing panel's Done
+ * commits and closes, so a second full-width Close beneath it was the same button twice, and the
+ * one thing in the card that was not doing any work.
+ */
 export function dialog(
   title: string,
-  closeLabel: string,
+  closeLabel: string | null,
   content: HTMLElement[],
   signal: AbortSignal,
 ) {
   const node = element('dialog', 'ui-dialog');
   const heading = element('h2', 'ui-dialog-title', title);
   heading.id = `shared-dialog-${String(++dialogId)}`;
+  // Focusable for the sake of `showModal()` when there is no Close button to land on.
+  heading.tabIndex = -1;
   node.setAttribute('aria-labelledby', heading.id);
   let returnFocus: HTMLElement | null = null;
-  const close = button(
-    closeLabel,
-    () => {
-      node.close();
-    },
-    signal,
-  );
-  close.classList.add('ui-dialog-close');
   const body = element('div', 'ui-dialog-body');
   body.append(...content);
-  node.append(heading, body, close);
+  node.append(heading, body);
+  const dismiss = () => {
+    node.close();
+  };
+  const close = closeLabel === null ? null : button(closeLabel, dismiss, signal);
+  if (close !== null) {
+    close.classList.add('ui-dialog-close');
+    node.append(close);
+  }
   node.addEventListener(
     'close',
     () => {
@@ -109,7 +119,8 @@ export function dialog(
       if (signal.aborted || node.open) return;
       returnFocus = trigger;
       node.showModal();
-      close.focus();
+      // Move focus into the card. With no Close button, the title is the honest landing place.
+      (close ?? heading).focus();
     },
   };
 }

@@ -125,7 +125,8 @@ export function createShell(root: HTMLElement, signal: AbortSignal) {
           drawDialog?.node.close();
         },
       });
-      drawDialog = dialog(strings.drawTitle, strings.close, [drawing.panel], signal);
+      /* Done commits and closes, so a Close button would be the same action twice. */
+      drawDialog = dialog(strings.drawTitle, null, [drawing.panel], signal);
       root.append(drawDialog.node);
     }
     drawing.refresh();

@@ -14,6 +14,7 @@ import {
 } from 'pixi.js';
 import type { Application, Container, WebGLRenderer } from 'pixi.js';
 import { effectsConfig as cfg } from '../../config/effects.config';
+import { lightingAt } from '../../config/lighting';
 import type { Mood, MoodPreference, Quality, ScenePreferences } from '../../config/scene.config';
 import { isFadingToNight, resolveMood } from '../../config/scene.config';
 import type { Impulse } from '../../sim/water/input';
@@ -86,6 +87,8 @@ export function createWaterEffects(
     uTexel: number[];
     uLook: number[];
     uStyle: number[];
+    uLightA: number[];
+    uLightB: number[];
     uTop: Rgb;
     uDeep: Rgb;
     uRay: Rgb;
@@ -98,6 +101,9 @@ export function createWaterEffects(
       value: [cfg.causticScale, cfg.causticSpeed, 0.42, 0],
       type: 'vec4<f32>',
     },
+    // The graded light. Written every frame from `lightingAt`, never from a single dial.
+    uLightA: { value: [1, 0.32, 0.46, 0.3], type: 'vec4<f32>' },
+    uLightB: { value: [1, 1, 1, 0.32], type: 'vec4<f32>' },
     uTop: { value: initial['--water-top'], type: 'vec3<f32>' },
     uDeep: { value: initial['--water-deep'], type: 'vec3<f32>' },
     uRay: { value: initial['--ray-colour'], type: 'vec3<f32>' },
@@ -136,6 +142,7 @@ export function createWaterEffects(
   let lastMood = '';
   /** Last grade opacity written to the host, so the style write happens only on a change. */
   let lastGradeOpacity = -1;
+  let lastVignetteOpacity = -1;
   /**
    * Wall-clock origin for the cycle.
    *
@@ -196,7 +203,26 @@ export function createWaterEffects(
             if (!disposed) applyTokens();
           });
         }
-        visualUniforms.uniforms.uStyle[3] = daylight;
+        const light = lightingAt(daylight);
+        visualUniforms.uniforms.uStyle[3] = light.daylight;
+        /*
+         * Written *in place*, like `uStyle` above, and not by replacing the array.
+         *
+         * A uniform group tracks its own dirty state. Assigning a fresh array to the field is not
+         * the same operation as writing the components the GPU already holds, and the shader can
+         * keep reading its initial value — which for a lighting vector means reading daylight at
+         * night, or nothing at all. In place is what the working `uStyle` write does.
+         */
+        const a = visualUniforms.uniforms.uLightA;
+        a[0] = light.key;
+        a[1] = light.ambient;
+        a[2] = light.warmth;
+        a[3] = light.azimuth;
+        const b = visualUniforms.uniforms.uLightB;
+        b[0] = light.caustics;
+        b[1] = light.rays;
+        b[2] = light.surface;
+        b[3] = light.grade;
         /*
          * The CSS grade cannot interpolate between two gradients, so it would snap at the exact
          * moment the mood attribute flips. Driving its opacity from the same `daylight` value the
@@ -207,10 +233,20 @@ export function createWaterEffects(
          * style for the whole subtree, and doing that every frame is a real cost on a software
          * renderer — it showed up as timeouts on CI, where the tank is actually rendered.
          */
-        const grade = Math.round((0.4 + daylight * 0.32) * 20) / 20;
+        const grade = Math.round((0.18 + light.grade * 0.5) * 20) / 20;
         if (grade !== lastGradeOpacity) {
           lastGradeOpacity = grade;
           host.style.setProperty('--env-grade-live-opacity', String(grade));
+        }
+        /*
+         * The vignette is the second darkening channel, and it must breathe with the grade rather
+         * than snap when the mood attribute flips. Written on the same quantisation schedule and
+         * only when it changes, for the same style-invalidation reason as the grade above.
+         */
+        const vignette = Math.round((0.2 + light.vignette * 0.62) * 20) / 20;
+        if (vignette !== lastVignetteOpacity) {
+          lastVignetteOpacity = vignette;
+          host.style.setProperty('--env-vignette-live-opacity', String(vignette));
         }
       }
       waveUniforms.uniforms.uImpulse = [
