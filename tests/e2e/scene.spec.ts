@@ -27,6 +27,21 @@ test('scene quality, motion, resize and context-loss lifecycle', async ({ page }
   await expect(page.getByLabel(strings.reducedMotion, { exact: true })).toBeChecked();
   await expect(page.getByLabel(strings.reducedMotion, { exact: true })).toBeDisabled();
   await page.emulateMedia({ reducedMotion: 'no-preference' });
+  /*
+   * `emulateMedia` fires its `change` event asynchronously, so for a moment after this call the
+   * control is legitimately still disabled and still checked. Poll until the page has actually
+   * caught up before asserting, rather than racing a single sample against an event.
+   */
+  await expect
+    .poll(async () => page.getByLabel(strings.reducedMotion, { exact: true }).isEnabled(), {
+      timeout: 15000,
+    })
+    .toBe(true);
+  await expect
+    .poll(async () => page.getByLabel(strings.reducedMotion, { exact: true }).isChecked(), {
+      timeout: 15000,
+    })
+    .toBe(false);
   await expect(page.getByLabel(strings.reducedMotion, { exact: true })).toBeEnabled();
   await expect(page.getByLabel(strings.reducedMotion, { exact: true })).not.toBeChecked();
   await page.getByLabel(strings.reducedMotion, { exact: true }).check();
@@ -96,4 +111,37 @@ test.describe('the day/night cycle', () => {
     // Within one full cycle plus a fade the mood must become night, whatever it started as.
     await expect(root).toHaveAttribute('data-mood', 'night', { timeout: 180000 });
   });
+});
+
+test('the scenery is planted one root at a time, not one sliding picture', async ({ page }) => {
+  /*
+   * The owner's report was that the plants "move badly". The cause was structural: all the plants
+   * were one sprite, rotated about a shared pivot, which slid every plant that was not standing on
+   * that pivot and resampled its pixels. This asserts the structure that replaced it, because that
+   * structure is what the motion depends on and it is invisible in a screenshot of a blank tank.
+   */
+  test.setTimeout(60000);
+  await page.goto('./');
+  await waitForTank(page);
+  const host = page.locator('.canvas-host');
+  await expect(host).toHaveAttribute('data-sway', 'on');
+
+  const plants = await page.evaluate(() =>
+    Number(document.querySelector<HTMLElement>('.canvas-host')?.dataset.plants ?? 0),
+  );
+  // One sprite per plant, not one for the bed.
+  expect(plants).toBeGreaterThan(8);
+
+  /*
+   * Motion is the opposite way round on the two projects — the mobile profile asks for reduced
+   * motion, so its tank is still from the first frame — so the test asserts the *contract* in
+   * whichever direction applies rather than assuming a starting state.
+   */
+  const stillness = await page.evaluate(
+    () => matchMedia('(prefers-reduced-motion: reduce)').matches,
+  );
+  await page.emulateMedia({ reducedMotion: stillness ? 'no-preference' : 'reduce' });
+  // Moving, or stopped dead: a frozen tank is the accessibility promise, and a moving one is the
+  // feature. Either way the attribute must follow the preference.
+  await expect(host).toHaveAttribute('data-running', stillness ? 'true' : 'false');
 });

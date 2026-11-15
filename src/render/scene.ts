@@ -20,7 +20,7 @@ import { createWaterInput } from '../sim/water/input';
 import { createWaterEffects } from './effects/water';
 import { waterBodyFragment } from './effects/shaders';
 import { createBackdropLayers, paletteFromTheme } from './pixel/backdrop';
-import { applySway, swayFor } from './pixel/sway';
+import { poseIndex, swayFor } from './pixel/sway';
 import { pixelConfig } from '../config/pixel.config';
 export function mountScene(app: Application, host: HTMLElement, preferences: ScenePreferences) {
   // Mood colours are read through the computed style so the day/night cycle needs no redraw
@@ -66,8 +66,43 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
   };
   const bed = artSprite(art.bed, 'pixel-bed');
   const far = artSprite(art.far, 'pixel-far');
-  const plants = artSprite(art.plants, 'pixel-plants');
-  const artLayers = [bed, far, plants];
+  const artLayers = [bed, far];
+
+  /**
+   * One sprite per plant, positioned at its own root.
+   *
+   * Not one sprite for all the plants: a sprite can only be moved or rotated as a whole, and a
+   * whole-layer rotation about any single pivot lifts every plant that is not standing on that
+   * pivot off the sand. Each plant gets its own small canvas, anchored at the root it grows from,
+   * so each one can bend about itself.
+   *
+   * The texture is `nearest`, so the pixels stay crisp; a plant that leans by less than half an
+   * art pixel therefore does not move at all, which is the correct reading for a stiff plant.
+   */
+  const plantSprites = art.plants.map((plant) => {
+    // One texture per plant. Its poses are frames along the strip, so walking them costs a
+    // rectangle change rather than a texture swap.
+    const texture = Texture.from(plant.strip);
+    texture.source.scaleMode = 'nearest';
+    const poseTextures = Array.from(
+      { length: pixelConfig.plantPoses },
+      (_, pose) =>
+        new Texture({
+          source: texture.source,
+          frame: new Rectangle(pose * plant.frameW, 0, plant.frameW, plant.frameH),
+        }),
+    );
+    // The resting pose is the middle one, so a plant starts neutral.
+    const resting = Math.floor((pixelConfig.plantPoses - 1) / 2);
+    const sprite = new Sprite(poseTextures[resting] ?? texture);
+    sprite.label = `pixel-plant-${plant.kind}-${String(plant.index)}`;
+    // Anchor at the root, so a pose change never shifts the plant: every frame is painted with
+    // the root at the same point in its column.
+    sprite.anchor.set(0.5, 1);
+    background.addChild(sprite);
+    return { sprite, plant, textures: poseTextures, pose: resting };
+  });
+  host.dataset.plants = String(plantSprites.length);
   host.dataset.artGrid = `${String(pixelConfig.width)}x${String(pixelConfig.height)}`;
   host.dataset.sway = 'on';
 
@@ -193,9 +228,12 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
       palette,
       seed: pixelConfig.seed,
       // Draw into the canvases the sprites already use, so only the pixels change.
-      into: { bed: art.bed, far: art.far, plants: art.plants },
+      // Every pose canvas, flattened: the painter reuses them in the same order it created them.
+      into: { bed: art.bed, far: art.far, plants: art.plants.map((plant) => plant.strip) },
     });
     for (const layer of artLayers) layer.texture.source.update();
+    // Every pose shares one source per plant, so one update refreshes the whole strip.
+    for (const { sprite } of plantSprites) sprite.texture.source.update();
   };
   const tint = () => {
     repaintArt();
@@ -215,9 +253,14 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
     bodyUniforms.uniforms.uTop = rgb('--water-top');
     bodyUniforms.uniforms.uDeep = rgb('--water-deep');
   };
-  const farLayer = { anchors: art.anchors.far, gain: pixelConfig.swayGainFar };
-  const plantsLayer = { anchors: art.anchors.plants, gain: pixelConfig.swayGainPlants };
+  const farLayer = { anchors: art.farAnchors, gain: pixelConfig.swayGainFar };
+  const plantsLayer = {
+    anchors: art.plants.map((plant) => plant.anchor),
+    gain: pixelConfig.swayGainPlants,
+  };
   let swayTime = 0;
+  let scaleX = 1;
+  let scaleY = 1;
   const loop = createFixedLoop((seconds) => {
     // Without effects nothing else drives the cycle, so the scene owns it here. Real time, not
     // simulated time: the cycle must arrive even if frames are dropped or the tab was hidden.
@@ -244,8 +287,43 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
       // identical under different frame rates — the same contract the particles keep.
       swayTime += seconds;
       const sample = (x: number, y: number) => flow.sample(x, y);
-      applySway(far, swayFor(farLayer, swayTime, sample), far.width / 2);
-      applySway(plants, swayFor(plantsLayer, swayTime, sample), plants.width / 2);
+
+      /*
+       * The far layer is scenery, not a plant: it drifts as a whole, and a sub-pixel slide there
+       * is invisible at this scale, so a small x offset is enough. It never rotates — that is
+       * what made the old motion look like a sliding photograph.
+       */
+      const farSway = swayFor(farLayer, swayTime, sample);
+      /*
+       * The far layer is one picture containing every moss clump, so it cannot bend per clump the
+       * way the plants do. It drifts as a whole — and the drift is the *average* of what the
+       * current is doing at each of its clumps, not the value at whichever one happens to be
+       * first. Sampling a single arbitrary point made the whole background lurch when a stroke
+       * landed near that point and nowhere else.
+       */
+      const farDrift =
+        farSway.bends.length > 0
+          ? farSway.bends.reduce((sum, bend) => sum + bend, 0) / farSway.bends.length
+          : 0;
+      far.x = far.width / 2 + farDrift * scaleX;
+
+      /*
+       * Each plant leans about its own root. The bend is baked into the plant's canvas as a
+       * handful of poses and the sprite is nudged to the nearest one, because moving a sprite by
+       * a fraction of an art pixel would land its pixels between grid cells and smear the art.
+       */
+      const plantSway = swayFor(plantsLayer, swayTime, sample);
+      for (let i = 0; i < plantSprites.length; i += 1) {
+        const entry = plantSprites[i];
+        if (!entry) continue;
+        const next = poseIndex(plantSway.bends[i] ?? 0);
+        // Only touch the sprite when the pose actually changes: a texture swap per frame for
+        // every plant would be pure waste, and the art would not look any different.
+        if (next === entry.pose) continue;
+        entry.pose = next;
+        const texture = entry.textures[next];
+        if (texture) entry.sprite.texture = texture;
+      }
     }
     effects?.step(impulse, seconds);
   });
@@ -280,6 +358,25 @@ export function mountScene(app: Application, host: HTMLElement, preferences: Sce
       // Anchored bottom-centre, so the box spans the full viewport around the root line.
       layer.x = width / 2;
       layer.y = height;
+    }
+    /*
+     * The whole art grid is stretched to the viewport, so a plant's placement has to be stretched
+     * the same way or it will not stand on its own sand. Both axes are scaled independently:
+     * the picture is not letterboxed, it fills the tank.
+     */
+    scaleX = width / pixelConfig.width;
+    scaleY = height / pixelConfig.height;
+    for (const { sprite, plant } of plantSprites) {
+      /*
+       * A sprite sized from its texture would be the width of the whole strip. The pose width is
+       * what belongs on screen, scaled by the same factor as the picture so one art pixel stays
+       * one art pixel everywhere.
+       */
+      sprite.width = plant.frameW * scaleX;
+      sprite.height = plant.frameH * scaleY;
+      sprite.x = plant.anchor.x * scaleX;
+      // The anchor is at the strip's bottom edge, which is one pixel below the root.
+      sprite.y = plant.anchor.y * scaleY + scaleY;
     }
     body.width = width;
     body.height = height;

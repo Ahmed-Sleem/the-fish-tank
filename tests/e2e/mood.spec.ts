@@ -51,15 +51,25 @@ test('the icon flips the tank to night and back, and the palette follows', async
 });
 
 test('a pinned light holds instead of drifting back into the cycle', async ({ page }) => {
-  test.setTimeout(120000);
+  /*
+   * The cycle reads `Date.now()`, so a pin can be tested by moving the clock forward instead of
+   * sitting still for a minute. This test used to sleep for 60 real seconds — a fifth of the whole
+   * suite's wall clock, spent waiting — to prove something the clock can say immediately.
+   *
+   * Ten minutes of clock is more than one full cycle: anything short of a true pin would have
+   * turned day over several times by then.
+   */
+  test.setTimeout(60000);
   const nightButton = page.getByRole('button', {
     name: new RegExp(`${strings.moodToNight}|${strings.moodToDay}`),
   });
   if ((await page.locator('html').getAttribute('data-mood')) !== 'night') await nightButton.click();
   await expect(page.locator('html')).toHaveAttribute('data-mood', 'night');
-  // The cycle would turn day over within about a minute; a pin must not.
+
+  await page.clock.install();
+  // Six jumps of ten minutes each: a full cycle is 100 seconds, so this is ~36 cycles' worth.
   for (let i = 0; i < 6; i++) {
-    await page.waitForTimeout(10000);
+    await page.clock.fastForward('10:00');
     expect(await mood(page)).toBe('night');
   }
 });
