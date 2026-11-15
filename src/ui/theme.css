@@ -207,11 +207,20 @@
     color-mix(in srgb, var(--day-water-glow) 14%, transparent) 46%,
     color-mix(in srgb, var(--day-water-deep) 26%, transparent) 100%
   );
+  /*
+   * Night is a different *photograph*, not the day one darkened.
+   *
+   * The day grade is warm at the top and thin at the floor, because the sun is overhead and the
+   * sand is lit. Night inverts the weight: a cool sky-coloured lip at the surface, a long dark
+   * body, and the deepest stop held back from black so the sand still reads. The stops are spread
+   * differently on purpose — the day light is top-heavy, the night light pools at the bottom.
+   */
   --env-grade-night: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--night-surface) 16%, transparent) 0%,
-    color-mix(in srgb, var(--night-water-mid) 40%, transparent) 52%,
-    color-mix(in srgb, var(--night-water-deep) 72%, transparent) 100%
+    color-mix(in srgb, var(--night-surface) 22%, transparent) 0%,
+    color-mix(in srgb, var(--night-water-mid) 30%, transparent) 34%,
+    color-mix(in srgb, var(--night-water-mid) 52%, transparent) 68%,
+    color-mix(in srgb, var(--night-water-deep) 64%, transparent) 100%
   );
   --env-grade: var(--env-grade-day);
   --env-grade-opacity: 0.5;
@@ -327,8 +336,8 @@
   --draw-gauge-fill: var(--color-accent);
   /* The paper never grows past this, so it stays inside a phone viewport with the tools visible. */
   --draw-board-max-height: min(56vh, 28rem);
-  /* A one-line status keeps its height when empty, so the footer never jumps. */
-  --draw-notice-height: 1.25rem;
+  /* The full width of a wrapping flex line, so component CSS need not write a raw percentage. */
+  --draw-notice-basis: 100%;
 
   /* ---- Drawing panel: one measured layout, not a pile of rows ---- */
   --draw-paper-inset: var(--space-2xs);
@@ -338,7 +347,9 @@
   --draw-cluster-radius: var(--radius-pill);
   --draw-cluster-surface: color-mix(in srgb, var(--text-primary) 7%, transparent);
   --draw-cluster-title-size: var(--size-tiny);
-  --draw-figure-min-width: 4.75rem;
+  /* Wide enough for a four-digit figure, narrow enough that both figures and all three actions
+   * still share one footer line at the dialog's own width. */
+  --draw-figure-min-width: 3.5rem;
   --draw-figure-value-size: var(--size-display);
   --draw-figure-ink-size: var(--size-body);
   --draw-figure-label-size: var(--size-tiny);

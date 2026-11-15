@@ -50,6 +50,18 @@ export interface SwayState {
 }
 
 /**
+ * A cheap deterministic hash of one number, into 0..1.
+ *
+ * Deterministic on purpose: the same plant must get the same phase every frame and every session,
+ * or the tank would twitch as plants were re-laid out. The specific constants are nothing more
+ * than the usual sine-fract trick, chosen to scatter neighbours rather than advance smoothly.
+ */
+function hash(value: number): number {
+  const s = Math.sin(value * 127.1) * 43758.5453;
+  return s - Math.floor(s);
+}
+
+/**
  * How far each plant is leaning this frame.
  *
  * A slow tide gives every plant a baseline drift with its **own phase**, so neighbouring fronds
@@ -63,7 +75,7 @@ export function swayFor(
   flowAt: (x: number, y: number) => { x: number; y: number },
 ): SwayState {
   if (layer.anchors.length === 0) return { bends: [] };
-  const { swaySpeed, swayTide, swayFlow, swayMaxPush } = pixelConfig;
+  const { swaySpeed, swayTide, swayFlow, swayMaxPush, swayRateSpread } = pixelConfig;
 
   const bends = layer.anchors.map((anchor, index) => {
     // Sample the current at this plant, in the normalized space the flow field uses.
@@ -71,14 +83,36 @@ export function swayFor(
     const push = Math.max(-swayMaxPush, Math.min(swayMaxPush, flow.x)) * swayFlow;
 
     /*
-     * Phase per plant, mixed from its own position so the pattern depends on the layout rather
-     * than on draw order — a plant keeps its rhythm even if the list is reordered.
+     * Each plant gets *three* independent things, and all three are needed for the motion to read
+     * as a living bed rather than as an animation played on every sprite at once.
+     *
+     * Phase is seeded from the plant's own position, not from its index, so a plant keeps its
+     * rhythm even if the list is reordered — but the seed is hashed rather than a plain linear
+     * mix, because `x * 0.37 + y * 0.11` gives evenly spaced phases to evenly spaced plants,
+     * which is itself a visible pattern: a wave travelling along the row.
      */
-    const phase = (anchor.x * 0.37 + anchor.y * 0.11 + index * 1.7) % (Math.PI * 2);
+    const seed = hash(anchor.x * 0.731 + anchor.y * 1.317 + index * 2.113);
+    const phase = seed * Math.PI * 2;
+
+    /*
+     * The two harmonics take *unrelated* phases. Previously the slow one used `phase * 0.6`,
+     * which locks the pair into a fixed relationship: every plant traced the same closed loop and
+     * merely started at a different point on it, so the whole bed still moved as one shape. Two
+     * independent phases mean each plant wanders, and pairs that happen to line up drift apart.
+     */
+    const slowPhase = hash(seed * 7.919 + 0.37) * Math.PI * 2;
+
+    /*
+     * And each plant runs at its own rate, within a few per cent of the others. This is what stops
+     * the bed re-synchronising: with one shared rate, even perfectly scattered phases fall back
+     * into step whenever the two harmonics complete a common cycle. A little variance in period
+     * means they never do, which is exactly how a real bed of plants behaves.
+     */
+    const rate = 1 + (seed - 0.5) * swayRateSpread;
 
     // The tide never stops; a slower second harmonic keeps it from reading as a pure sine.
-    const tide = Math.sin(seconds * swaySpeed + phase) * swayTide;
-    const slow = Math.sin(seconds * swaySpeed * 0.37 + phase * 0.6) * swayTide * 0.45;
+    const tide = Math.sin(seconds * swaySpeed * rate + phase) * swayTide;
+    const slow = Math.sin(seconds * swaySpeed * 0.37 * rate + slowPhase) * swayTide * 0.45;
 
     /*
      * Everything above is a *fraction* of the maximum bend, so the result stays inside the pose

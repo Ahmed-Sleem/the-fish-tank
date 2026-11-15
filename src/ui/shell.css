@@ -80,7 +80,9 @@ h3 {
    The vignette is mood-aware: night pulls the corners in further than day does. */
 .water-vignette {
   background: var(--env-vignette);
-  opacity: var(--env-vignette-opacity);
+  /* Driven per frame by the graded light, so it moves with the fade instead of snapping at the
+     mood flip. Falls back to the token when nothing is animating. */
+  opacity: var(--env-vignette-live-opacity, var(--env-vignette-opacity));
 }
 
 /* Suspended particles thicken at night, which reads as depth rather than as brightness. */

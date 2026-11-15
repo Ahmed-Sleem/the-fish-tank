@@ -4,8 +4,23 @@
  * tools are two captioned clusters, and the two numbers a player acts on sit in the footer as
  * paired figures instead of trailing text. The eye should go sheet -> pen -> price -> Done.
  */
+/* The panel is hint + surface; the surface is sheet, tools, then figures and actions.
+ *
+ * Both are grids with `min-height: 0` so the sheet is the only element that can give height
+ * without losing its purpose. Without this the panel was content-sized, overflowed the dialog's
+ * clipped box, and pushed the footer — and Done — clean out of the window. */
 .draw-panel {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+  gap: var(--space-md);
+}
+
+.draw-surface {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  min-height: 0;
   gap: var(--space-md);
 }
 
@@ -19,7 +34,17 @@
   /* Inset paper inside a recess: the sheet reads as a physical page, not a white hole. */
   position: relative;
   display: grid;
-  aspect-ratio: 4 / 3;
+  align-items: stretch;
+  /*
+   * The sheet fills whatever its row grants and never more.
+   *
+   * `aspect-ratio` alone was the bug: on a grid item it asks for a height computed from the width,
+   * the row refuses it, and the sheet then overflows *downward* over the tools and pushes the
+   * footer out of the dialog. So the ratio is a preference applied by the canvas itself, and this
+   * frame simply takes the row's height — a real length the grid can actually divide.
+   */
+  height: 100%;
+  min-height: 0;
   max-height: var(--draw-board-max-height);
   width: 100%;
   padding: var(--draw-paper-inset);
@@ -32,7 +57,15 @@
 .draw-board {
   display: block;
   width: 100%;
-  height: 100%;
+  /*
+   * The canvas is a replaced element, so it is the right place for the 4:3 shape: it honours the
+   * ratio against its own width while the frame above is told only to fill its row. Putting the
+   * ratio on the frame was what made the sheet overflow its row — a grid item's ratio is a
+   * *request* for height, and a refused request paints outside the box.
+   */
+  aspect-ratio: 4 / 3;
+  max-height: 100%;
+  margin: auto;
   touch-action: none;
   cursor: crosshair;
   border-radius: var(--draw-paper-radius);
@@ -54,7 +87,12 @@
 }
 
 .draw-cluster-title {
-  padding-inline: var(--space-2xs);
+  /*
+   * The caption sits over the pill it names, not over the pill's outer edge. Padding matches the
+   * group's own inset for exactly that reason: at any other value "PEN" floats a few pixels away
+   * from the first dot, which reads as a stray label rather than as a heading.
+   */
+  padding-inline: var(--draw-cluster-padding);
   color: var(--text-muted);
   font-size: var(--draw-cluster-title-size);
   font-weight: var(--weight-strong);
@@ -114,22 +152,40 @@
   background: var(--surface-hover);
 }
 
-/* ---- Footer: notice, the two figures, then the actions ---- */
+/*
+ * ---- Footer: the two figures and the actions on one line ----
+ *
+ * Figures left, actions right, with the notice above them. Stacking the three cost about ninety
+ * pixels of height, which on a short window came straight out of the sheet: the panel was spending
+ * more room on its own chrome than on the thing being drawn.
+ */
 .draw-footer {
-  display: grid;
-  /* One column, two rows: the notice, the figures, then the actions. Nothing wraps by accident. */
-  grid-template-columns: 1fr;
-  align-items: center;
-  gap: var(--draw-footer-gap);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--draw-footer-gap) var(--space-md);
+}
+
+/* The notice takes its own line: a refusal is about the whole footer, not one figure. */
+.draw-footer .draw-notice {
+  flex-basis: var(--draw-notice-basis);
 }
 
 .draw-notice {
   margin: 0;
-  min-height: var(--draw-notice-height);
   font-size: var(--size-small);
   color: var(--status-warn);
 }
 
+/*
+ * A status line only reserves its height when it has something to say.
+ *
+ * `min-height` on it was there to stop the footer jumping when a refusal appeared and vanished,
+ * but it also left a permanent gap above the figures that read as a missing label. The footer is
+ * a wrapping flex row now, so the notice simply taking a line when it is present *is* the stable
+ * layout — and when it is empty, it costs nothing.
+ */
 .draw-notice:empty {
   display: none;
 }
@@ -185,7 +241,12 @@
 /* Done is the commitment, so it gets the weight and the room; undo and clear are corrections. */
 .draw-actions .draw-done {
   margin-inline-start: var(--draw-action-gap);
-  padding-inline: var(--space-xl);
+  /*
+   * Wide enough to read as the primary action, not so wide that it forces the actions onto their
+   * own line. At full width it pushed the whole footer past the dialog's content box and the three
+   * controls stacked left, which is the opposite of "Done is the obvious next step".
+   */
+  padding-inline: var(--space-lg);
 }
 
 .draw-done {
