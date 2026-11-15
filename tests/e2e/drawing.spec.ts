@@ -8,9 +8,10 @@
  */
 import { expect, test } from '@playwright/test';
 import { strings } from '../../src/config/strings.en';
+import { gotoFreshTank } from './support/boot';
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('./');
+  await gotoFreshTank(page);
   await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 30000 });
 });
 

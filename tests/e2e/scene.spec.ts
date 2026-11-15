@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { waitForTank } from './support/ready';
 import { strings } from '../../src/config/strings.en';
+import { gotoFreshTank } from './support/boot';
 test('scene quality, motion, resize and context-loss lifecycle', async ({ page }) => {
   // A long chain of settings changes, each reconfiguring a real WebGL context. Every step waits on
   // the tank, so the work is bounded; 30s is simply the wrong ceiling for a software renderer.
@@ -9,7 +10,7 @@ test('scene quality, motion, resize and context-loss lifecycle', async ({ page }
   page.on('pageerror', (error) => {
     errors.push(error.message);
   });
-  await page.goto('./');
+  await gotoFreshTank(page);
   await waitForTank(page);
   const host = page.locator('.canvas-host');
   await expect(host).toHaveAttribute('data-quality', 'medium');
@@ -98,7 +99,7 @@ test.describe('the day/night cycle', () => {
     // This asserts the transition rather than a starting phase: a slow runner can free the loader
     // well into the first fade, so demanding "day" first would fail for the machine, not the code.
     test.setTimeout(240000);
-    await page.goto('./');
+    await gotoFreshTank(page);
     await waitForTank(page);
     // Reduced motion deliberately freezes the tank at night with no cycle at all, so the
     // transition is only meaningful where motion is allowed.
@@ -121,7 +122,7 @@ test('the scenery is planted one root at a time, not one sliding picture', async
    * structure is what the motion depends on and it is invisible in a screenshot of a blank tank.
    */
   test.setTimeout(60000);
-  await page.goto('./');
+  await gotoFreshTank(page);
   await waitForTank(page);
   const host = page.locator('.canvas-host');
   await expect(host).toHaveAttribute('data-sway', 'on');

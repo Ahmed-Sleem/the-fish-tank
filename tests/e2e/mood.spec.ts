@@ -8,9 +8,10 @@
 import { expect, test } from '@playwright/test';
 import { strings } from '../../src/config/strings.en';
 import { waitForTank } from './support/ready';
+import { gotoFreshTank } from './support/boot';
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('./');
+  await gotoFreshTank(page);
   await waitForTank(page);
 });
 
