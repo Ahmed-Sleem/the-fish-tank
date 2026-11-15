@@ -5,20 +5,19 @@ export default defineConfig({
   testDir: './tests/e2e',
   expect: { timeout: 10000 },
   /*
-   * Two projects, two workers, one test at a time each.
+   * One worker on CI, and one test at a time.
    *
-   * Every spec boots a real WebGL tank and CI renders it in software, so *height* of concurrency
-   * is what starved the pages: four tanks at once on a two-core runner blew ceilings on tests
-   * whose assertions were fine. One worker per project keeps at most two tanks alive and still
-   * uses both cores.
+   * Every spec boots a real WebGL tank and CI renders it in software on two cores. Anything
+   * above one live tank starves the pages: two workers produced loading screens that never
+   * cleared, and four (the original setting) produced ceilings blown on tests whose assertions
+   * were fine.
    *
-   * `fullyParallel: false` matters more than the worker count: it runs each file's tests in
-   * sequence inside its project, so the two heavy specs stop competing with their own siblings.
-   * Serialising the entire suite — one worker for both projects — fixed the flakiness but pushed
-   * the job past its 15-minute ceiling, which is a different way of being unusable.
+   * The cost of being correct here is wall-clock time, and it is paid knowingly: the job takes
+   * roughly 10 minutes of its 15-minute budget. If the suite grows much further the answer is a
+   * faster runner or a smaller suite, not more concurrency.
    */
   fullyParallel: false,
-  ...(process.env.CI ? { workers: 2 } : {}),
+  ...(process.env.CI ? { workers: 1 } : {}),
   forbidOnly: Boolean(process.env.CI),
   // No retries: a test that needs a second attempt is telling us something. Keeping concurrency
   // low is the fix; masking a failure is not.
