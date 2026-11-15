@@ -120,40 +120,34 @@ void main(){
  float amount=causticLight+rayLight+surfBand+sunShaft+rippleGlow;
 
  /*
-  * Colour, in the order light actually behaves.
+  * Colour, composed the same way it always was, but lit by graded channels instead of one dial.
   *
-  * The glow is mixed toward amber by warmth — a *hump* through dusk, not a ramp toward either end.
-  * The base is the light reaching the water (key) over the tint, lifted by the ambient fill so the
-  * deepest part of the tank keeps a little colour instead of going black. Finally everything is
-  * pulled a fraction toward the surface sky, which is what stops the night from reading as a single
-  * flat blue and keeps an edge of daylight in it.
+  * The composition is deliberately left as lightColour times amount: that product is what makes the
+  * ripple answer the hand, because the same impulse raises both the colour term and the amount,
+  * and the two multiply. Restructuring it into a tone curve was pretty and cost the tank its
+  * responsiveness — so the shape stays, and the mood arrives through what feeds it.
+  *
+  * key replaces the old daylight in the tint coefficients, and it is the channel that leaves
+  * first. ambient adds back a floor so the night is deep rather than black: at midnight the tank
+  * is lit to about the key's worth of colour plus a share of fill, not to nothing.
+  *
+  * warmth — an arc through dusk, not a ramp toward night — mixes the ray colour toward the
+  * surface sky, which is what warms the sunset and cools the noon.
   */
- vec3 warmTint=mix(vec3(0.72,0.86,0.95),uRay,warmth);
+ vec3 warmTint=mix(uSurface,uRay,0.35+warmth*0.55);
  vec3 glow=mix(uSurface,warmTint,warmth);
-
- // The floor is lit least; the column is lit most. Ambient is what fills the difference.
- float column=1.0-depth*0.35;
- vec3 base=tint*(key*column+ambient*0.55);
- vec3 lightColour=base+warmTint*key*0.28*(1.0-warmth*0.35)+glow*(rippleGlow+surfBand+sunShaft)*2.2;
- lightColour=mix(lightColour,uSurface,0.18);
-
+ vec3 lightColour=tint*(key*0.35+ambient*0.12)+warmTint*(key*0.72)+glow*(rippleGlow+surfBand+sunShaft)*2.2;
+ lightColour=mix(lightColour,uSurface,0.22);
  /*
-  * A gentle shoulder, because this pass is *additive*.
+  * One gentle shoulder, applied to the final colour only, and only where it can bite.
   *
-  * The render is added to the pixel art, so a value near zero adds nothing and the art shows
-  * through, while a high value adds a lot of that colour. The old code hard-clipped the colour by
-  * multiplying by the light amount, which is what turned the pass into a binary: bright where the
-  * light was strong, nothing where it was weak, and no middle. An exponential shoulder instead
-  * compresses the top so highlights roll off rather than flat-lining, and leaves the low end a
-  * long, quiet tail — which is exactly the range dusk lives in.
-  *
-  * The shoulder is scaled by the key, so at night the pass adds almost nothing and the tank keeps
-  * its own art rather than being washed over by a blue film.
+  * A one-minus-exponential shoulder flattens above about 1 and is near-linear below it, so
+  * ordinary water keeps its full response while the brightest caustic cannot reach pure white.
+  * Mixing it halfway leaves the low end untouched.
   */
- float headroom=clamp(lightColour*amount,0.0,4.0);
- vec3 exposed=(1.0-exp(-headroom*0.85))*(0.35+key*0.65);
- finalColor=vec4(mix(vec3(0.0),exposed,clamp(amount*1.25,0.0,1.0)),clamp(amount*1.6,0.0,1.0));
-}`;
+ vec3 lit=lightColour*amount;
+ vec3 rolled=1.0-exp(-lit*1.6);
+ finalColor=vec4(mix(lit,rolled,0.5),clamp(amount*1.6,0.0,1.0));}`;
 
 export const refractFragment = `
 in vec2 vTextureCoord;

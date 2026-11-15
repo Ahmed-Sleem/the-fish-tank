@@ -205,8 +205,24 @@ export function createWaterEffects(
         }
         const light = lightingAt(daylight);
         visualUniforms.uniforms.uStyle[3] = light.daylight;
-        visualUniforms.uniforms.uLightA = [light.key, light.ambient, light.warmth, light.azimuth];
-        visualUniforms.uniforms.uLightB = [light.caustics, light.rays, light.surface, light.grade];
+        /*
+         * Written *in place*, like `uStyle` above, and not by replacing the array.
+         *
+         * A uniform group tracks its own dirty state. Assigning a fresh array to the field is not
+         * the same operation as writing the components the GPU already holds, and the shader can
+         * keep reading its initial value — which for a lighting vector means reading daylight at
+         * night, or nothing at all. In place is what the working `uStyle` write does.
+         */
+        const a = visualUniforms.uniforms.uLightA;
+        a[0] = light.key;
+        a[1] = light.ambient;
+        a[2] = light.warmth;
+        a[3] = light.azimuth;
+        const b = visualUniforms.uniforms.uLightB;
+        b[0] = light.caustics;
+        b[1] = light.rays;
+        b[2] = light.surface;
+        b[3] = light.grade;
         /*
          * The CSS grade cannot interpolate between two gradients, so it would snap at the exact
          * moment the mood attribute flips. Driving its opacity from the same `daylight` value the
